@@ -3,6 +3,6 @@
     <label for="username-input">Användarnamn</label>
     <input type="text" name="user" id="username-input" ng-model="login.username" ng-pattern="/^[0-9a-zA-Z]{3,12}$/" required>
     <input type="submit" value="Logga in" ng-click="userLogin(login)">
-    <div ng-show="loginForm.userName.$error.pattern">Namnet kan endast innehålla bokstäver och siffror ock ska vara mellan 6 och 12 tecken långt</div>
+    <div ng-show="loginForm.userName.$error.pattern">Namnet kan endast innehålla bokstäver och siffror och ska vara mellan 6 och 12 tecken långt.</div>
   </form>
 </div>

@@ -1,0 +1,7 @@
+<div class="chat-messages">
+    <div class="chat-message" ng-repeat="message in messages">
+        {{message}}
+    </div>
+</div>
+<text-area rows="4" cols="50" class="my-message"></text-area>
+<button ng-click="postMessage()">Skicka</button>

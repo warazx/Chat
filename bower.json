@@ -1,0 +1,21 @@
+{
+  "name": "ShutApp",
+  "homepage": "https://github.com/tobiashillen/Chat",
+  "authors": [
+    "scottckr <scottckr@hotmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.6.4",
+    "angular-route": "^1.6.4"
+  }
+}

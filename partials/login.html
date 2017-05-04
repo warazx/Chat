@@ -1,7 +1,7 @@
 <div id="login-container">
   <form name="login-form" novalidate>
-    <label for="user">Användarnamn</label>
-    <input type="text" name="user" ng-model="login.username">
+    <label for="username-input">Användarnamn</label>
+    <input type="text" name="user" id="username-input" ng-model="login.username">
     <input type="submit" value="Logga in" ng-click="userLogin(login)">
   </form>
 </div>

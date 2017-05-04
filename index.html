@@ -1,19 +1,12 @@
 <!DOCTYPE html>
-<html ng-app="chatup">
+<html ng-app="app">
     <head>
         <meta charset="UTF-8">
         <title>Chat</title>
     </head>
     <body>
-        <div ng-controller="loginController">
-            <form name="loginForm">
-                <label> Välj ett användarnamn:
-                    <input type="text" name="userName" ng-model="user.name" ng-pattern="/^[0-9a-zA-Z]{3,12}$/" required>
-                </label>
-                <input type="submit" title="OK" ng-click="onSubmit()">
-                <div ng-show="loginForm.userName.$error.pattern">Namnet kan endast innehålla bokstäver och siffror ock ska vara mellan 6 och 12 tecken långt</div>
-            </form>
-        </div>
+		<a href="#!/login">Login</a>
+		<a href="#!/chat">Chat</a>
         <script src="bower_components/angular/angular.js"></script>
         <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="login.js"></script>

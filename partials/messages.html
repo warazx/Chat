@@ -1,7 +1,11 @@
 <div class="chat-messages">
     <div class="chat-message" ng-repeat="message in messages">
+        <span class="username">kuriosa</span> <span class="timestamp">20:33 2 jan 2017</span>
+        <div class="message-text">
+            Hej hopp i lingonskogen
+        </div>
         {{message}}
     </div>
 </div>
-<text-area rows="4" cols="50" class="my-message"></text-area>
+<text-area rows="4" cols="50" class="my-message"></text-area><br>
 <button ng-click="postMessage()">Skicka</button>

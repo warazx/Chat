@@ -1,0 +1,60 @@
+
+@font-face {
+    font-family: OpenSans-Semibold;
+    src: url(fonts/OpenSans-Semibold.ttf);
+}
+
+@font-face {
+    font-family: OpenSans-Light;
+    src: url(fonts/OpenSans-Light.ttf);
+}
+
+@font-face {
+    font-family: OpenSans;
+    src: url(fonts/OpenSans-Regular.ttf);
+}
+
+button {
+    font-family: OpenSans;
+    font-size: 1em;
+    background-color: #F7F7F2;
+}
+
+body {
+    background-color: #E4E6C3;
+    color: #121113;
+}
+
+.my-message {
+    width: 90%;
+    height: 5em;
+    font-family: OpenSans;
+    margin-top: 0.5em;
+    padding: 0;
+}
+
+.chat-message {
+    font-family: OpenSans;
+    font-size: 1em;
+    margin-left: 0.5em;
+}
+
+.chat-messages {
+    background-color: #F7F7F2;
+}
+
+.username {
+    font-family: OpenSans-Semibold;
+    font-size: 1.1em;
+}
+
+.timestamp {
+    font-family: OpenSans-Light;
+    font-size: 0.7em;
+    color: #595959;
+}
+
+.message-text {
+    font-family: OpenSans;
+    font-size: 0.8em;
+}

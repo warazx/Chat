@@ -1,14 +1,24 @@
 <!DOCTYPE html>
-<html ng-app="app">
+<html ng-app="app" ng-controller="MainController">
     <head>
         <meta charset="UTF-8">
         <title>Chat</title>
+		<link rel="stylesheet" href="style.css">
     </head>
     <body>
 		<a href="#!/login">Login</a>
-		<a href="#!/chat">Chat</a>
+		<a href="#!/messages">Chat</a>
+		<div class="container" ng-view></div>
+        <div>
+            <h1>ShutApp</h1>
+            <ul id="user-list">
+                <li ng-repeat="user in users">{{user}}</li>
+            </ul>
+        </div>
         <script src="bower_components/angular/angular.js"></script>
         <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="login.js"></script>
+		<script src="scripts/script.js"></script>
+
     </body>
 </html>

@@ -1,12 +1,10 @@
 {{title}}
-<div id="messages-container" ng-controller="MessagesController">
-    <div class="chat-message" ng-repeat="message in messages">
-        <span class="username">kuriosa</span> <span class="timestamp">20:33 2 jan 2017</span>
-        <div class="message-text">
-            Hej hopp i lingonskogen
-        </div>
-        {{message}}
+<div id="messages-container">
+    <div class="chat-message" ng-repeat="message in messages track by $index">
+        <span class="username">{{message.sender}}</span> <span class="timestamp">{{message.date | date : 'MMM d, hh:mm'}}</span>
+        <div class="message-text">{{message.text}}</div>
+
     </div>
 </div>
-<textarea rows="4" cols="50" class="my-message">Leeeif</textarea><br>
+<textarea ng-model="textMessage" rows="4" cols="50" class="my-message">Leeeif</textarea><br>
 <button ng-click="postMessage()">Skicka</button>

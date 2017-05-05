@@ -3,7 +3,6 @@
     <div class="chat-message" ng-repeat="message in messages track by $index">
         <span class="username">{{message.sender}}</span> <span class="timestamp">{{message.date | date : 'MMM d, hh:mm'}}</span>
         <div class="message-text">{{message.text}}</div>
-
     </div>
 </div>
 <textarea ng-model="textMessage" rows="4" cols="50" class="my-message">Leeeif</textarea><br>

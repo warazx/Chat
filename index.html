@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="app" ng-controller="MainController">
+<html ng-app="app">
     <head>
         <meta charset="UTF-8">
         <title>Chat</title>
@@ -9,10 +9,10 @@
 		<a href="#!/login">Login</a>
 		<a href="#!/messages">Chat</a>
 		<div class="container" ng-view></div>
-        <div id="right-menu">
+        <div id="right-menu" ng-controller="SideController">
             <h1>ShutApp</h1>
             <ul id="user-list">
-                <li ng-repeat="user in users">{{user}}</li>
+                <li ng-repeat="user in users">{{user.name}}</li>
             </ul>
         </div>
         <script src="bower_components/angular/angular.js"></script>

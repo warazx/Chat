@@ -1,5 +1,49 @@
 var app = angular.module('app', ['ngRoute']);
 
+app.value('users', [
+    {
+        id : 1,
+        name : "1337Leif",
+        isUserOnline : true,
+        messages : []
+    },
+    {
+        id : 2,
+        name : "RegExRolf",
+        isUserOnline : true,
+        messages : [] },
+    {
+        id : 3,
+        name : "BooleanBob",
+        isUserOnline : true,
+        messages : []
+    },
+    {
+        id : 4,
+        name : "ErrorEmil",
+        isUserOnline : true,
+        messages : []
+    },
+    {
+        id : 5,
+        name : "SyntaxScotty",
+        isUserOnline : true,
+        messages : []
+    },
+    {
+        id : 6,
+        name : "ForLoopFred",
+        isUserOnline : false,
+        messages : []
+    },
+    {
+        id : 7,
+        name : "OutOfBoundsBoerjesson",
+        isUserOnline : false,
+        messages : []
+    }
+]);
+
 app.config(function ($routeProvider) {
     $routeProvider.when('/', {
         controller: 'LoginController',
@@ -13,13 +57,12 @@ app.config(function ($routeProvider) {
     });
 });
 
-app.controller('MainController', function ($scope, $rootScope) {
-    $scope.users = ["Leif", "Oleg", "Vaaa"];
-});
+app.controller('SideController', function ($scope, $rootScope, users) {
+    $scope.users = users;
+})
 
-app.controller('LoginController', function ($scope,$rootScope) {
-	$scope.title = "Login";
-	$scope.users = ["Erika","Anna"];
+app.controller('LoginController', function ($scope, $rootScope, users) {
+	$scope.users = users;
 });
 
 app.controller('MessagesController', function ($scope,$rootScope) {

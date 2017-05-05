@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="app" ng-controller="MainController">
+<html ng-app="app">
     <head>
         <meta charset="UTF-8">
         <title>Chat</title>
@@ -8,19 +8,16 @@
     <body>
 		<a href="#!/login">Login</a>
 		<a href="#!/messages">Chat</a>
-		<div class="container" ng-view>
-        </div>
-        <div class="user-list">
+		<div class="container" ng-view></div>
+        <div id="user-list" ng-controller="SideController">
             <h1>ShutApp</h1>
             <ul>
-                <li ng-repeat="user in users">{{user}}</li>
+                <li ng-repeat="user in users">{{user}}</li>                <li ng-repeat="user in users">{{user.name}}</li>
             </ul>
         </div>
-        
         <script src="bower_components/angular/angular.js"></script>
         <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="login.js"></script>
 		<script src="scripts/script.js"></script>
-
     </body>
 </html>

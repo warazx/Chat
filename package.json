@@ -1,0 +1,24 @@
+{
+  "name": "shutapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "scripts/script.js",
+  "dependencies": {
+    "express": "^4.15.2",
+    "gulp": "^3.9.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tobiashillen/Chat.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tobiashillen/Chat/issues"
+  },
+  "homepage": "https://github.com/tobiashillen/Chat#readme"
+}

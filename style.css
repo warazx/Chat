@@ -11,18 +11,32 @@
 
 @font-face {
     font-family: OpenSans;
-    src: url(fonts/OpenSans-Regular.ttf)
+    src: url(fonts/OpenSans-Regular.ttf);
 }
 
 button {
     font-family: OpenSans;
-    font-size: 1em;
-    background-color: #F7F7F2;
+    font-size: 0.8em;
+   /* background-color: #F7F7F2;*/
+
 }
 
 body {
+    display: flex;
+    flex-direction: row;
+    font-family: OpenSans;
     background-color: #E4E6C3;
     color: #121113;
+}
+
+a {
+    color: #501050;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
 }
 
 .my-message {
@@ -57,4 +71,28 @@ body {
 .message-text {
     font-family: OpenSans;
     font-size: 0.8em;
+}
+
+.container {
+    padding: 1em;
+}
+
+.user-list {
+    display: none;
+    padding-left: 1em;
+    width: 12em;
+    height: 100%;
+    overflow: scroll;
+    background-color: #F7F7F2;
+    position: fixed;
+    right: 0;
+    top: 0;
+}
+
+.user-list ul {
+    list-style-type: none;
+    font-size: 0.8em;
+    line-height: 150%;
+    margin: 0.5em;
+    padding: 0.5em;
 }

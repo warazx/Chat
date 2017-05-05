@@ -15,7 +15,7 @@ app.config(function ($routeProvider) {
 
 app.controller('MainController', function ($scope, $rootScope) {
     $scope.users = ["Leif", "Oleg", "Vaaa"];
-})
+});
 
 app.controller('LoginController', function ($scope,$rootScope) {
 	$scope.title = "Login";
@@ -24,5 +24,18 @@ app.controller('LoginController', function ($scope,$rootScope) {
 
 app.controller('MessagesController', function ($scope,$rootScope) {
     $scope.title = "Messages";
-    $scope.messages = ["Bla bla bla bla bla", "Blö blö blö blö blö", "Blä blä blä blä blä blä"];
+    $scope.messages = [];
+
+    var currentId = 0; //Temp
+    $scope.postMessage = function() {
+      $scope.messages.push({
+        id : currentId,
+        text : $scope.textMessage,
+        date : Date.now(),
+        isPrivateMessage : false,
+        sender : 0, //User-ID
+        receiver : 0 //UserID / ChatRoomID
+      });
+      currentId++;
+    };
 });

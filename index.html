@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html ng-app="app" ng-controller="MainController">
+<html ng-app="app">
     <head>
         <meta charset="UTF-8">
         <title>Chat</title>
 		<link rel="stylesheet" href="style.css">
     </head>
     <body>
-		<div id="container" ng-view>
+        <div id="container">
+            <div id="messages-container" ng-view>
+            </div>
+            <div id="user-list">
+                <h1>ShutApp</h1>
+                <ul>
+                    <li ng-repeat="user in users">{{user.name}}</li>
+                </ul>
+            </div>
         </div>
-        <div id="user-list" ng-if="showMenu">
-            <h1>ShutApp</h1>
-            <ul>
-                <li ng-repeat="user in users">{{user}}</li>
-            </ul>
-        </div>
-        
         <script src="bower_components/angular/angular.js"></script>
         <script src="bower_components/angular-route/angular-route.js"></script>
+        <script src="node_modules/angular-sanitize/angular-sanitize.js"></script>
         <script src="login.js"></script>
 		<script src="scripts/script.js"></script>
 

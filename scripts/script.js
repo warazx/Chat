@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ngRoute']);
+var app = angular.module('app', ['ngRoute', 'ngSanitize']);
 
 app.value('users', [
     {
@@ -57,11 +57,33 @@ app.config(function ($routeProvider) {
     });
 });
 
+//snodd kod från http://fdietz.github.io/recipes-with-angular-js/common-user-interface-patterns/editing-text-in-place-using-html5-content-editable.html
+app.directive("contenteditable", function() {
+  return {
+    restrict: "A",
+    require: "ngModel",
+    link: function(scope, element, attrs, ngModel) {
+
+      function read() {
+        ngModel.$setViewValue(element.html());
+      }
+
+      ngModel.$render = function() {
+        element.html(ngModel.$viewValue || "");
+      };
+
+      element.bind("blur keyup change", function() {
+        scope.$apply(read);
+      });
+    }
+  };
+});
+
 app.controller('SideController', function ($scope, $rootScope, users) {
     $scope.users = users;
 })
 
-app.controller('LoginController', function ($scope,$rootScope, $window) {
+app.controller('LoginController', function ($scope,$rootScope, $window, users) {
 	$scope.users = users;
     $scope.showMenu = false;
     $scope.userLogin = function userLogin() {
@@ -76,6 +98,15 @@ app.controller('LoginController', function ($scope,$rootScope, $window) {
 
 app.controller('MessagesController', function ($scope,$rootScope) {
     $scope.title = "Messages";
+    document.getElementById('my-message').onkeypress=function(e){
+        //keyCode 13 is the enter key
+        if(e.keyCode==13 && !e.shiftKey){
+            e.preventDefault();
+            if($scope.messagecontent != "" && $scope.messagecontent != "<br>") {
+                $scope.postMessage();
+            }
+        }
+    }
     $scope.messages = [];
 
     var currentId = 0; //Temp
@@ -89,6 +120,13 @@ app.controller('MessagesController', function ($scope,$rootScope) {
         receiver : 0 //UserID / ChatRoomID
       });
       $scope.textMessage = "";
+      document.getElementById('my-message').focus();
       currentId++;
+      //scroll to the bottom
+      setTimeout(function() {
+                var div = document.getElementById("chat-messages");
+                div.scrollTop = div.scrollHeight;
+      }, 200);
+      
     };
 });

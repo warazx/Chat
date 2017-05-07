@@ -1,3 +1,4 @@
+<div>
 <div id="chat-messages">
     <div class="chat-message" ng-repeat="message in messages track by $index">
         <span class="username">{{message.sender}}</span> <span class="timestamp">{{message.date | date : 'MMM d, hh:mm'}}</span>
@@ -5,6 +6,7 @@
     </div>
 </div>
 <div id="my-message-container">
-<div contenteditable ng-model="textMessage" id="my-message">Leeeif</div>
+<div contenteditable="true" ng-model="textMessage" id="my-message"></div>
 </div>
 <button ng-click="userLogout()">Logga ut</button>
+</div>

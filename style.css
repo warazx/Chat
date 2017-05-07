@@ -22,6 +22,8 @@ body {
     font-family: Catamaran-Thin, sans-serif;
     background-color: #FFFFFF;
     color: #101010;
+    margin: 0;
+    padding: 0;
 }
 
 button {
@@ -107,14 +109,13 @@ a:hover {
 }
 
 #user-list {
-    /*display: none;*/
-    padding-left: 1em;
+    padding: 0;
     width: 20em;
     height: 100vh;
     overflow: auto;
     background-color: #224433;
     color: #CCDDCC;
-    line-height: 1.4em;
+    line-height: 1.6em;
 }
 
 #user-list ul {
@@ -126,6 +127,7 @@ a:hover {
 }
 
 #user-list ul li {
+    padding-left: 1.5em;
     font-family: Catamaran-Thin;
 }
 

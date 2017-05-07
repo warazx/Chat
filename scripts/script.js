@@ -81,7 +81,11 @@ app.directive("contenteditable", function() {
 
 app.controller('SideController', function ($scope, $rootScope, users) {
     $scope.users = users;
-})
+});
+
+app.controller('MainController', function($scope, $rootScope, users) {
+    $scope.users = users;
+});
 
 app.controller('LoginController', function ($scope,$rootScope, $window, users) {
 	$scope.users = users;
@@ -96,7 +100,8 @@ app.controller('LoginController', function ($scope,$rootScope, $window, users) {
     };
 });
 
-app.controller('MessagesController', function ($scope,$rootScope) {
+app.controller('MessagesController', function ($scope,$rootScope, users) {
+    $scope.users = users;
     $scope.title = "Messages";
     document.getElementById('my-message').onkeypress=function(e){
         //keyCode 13 is the enter key

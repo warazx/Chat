@@ -6,13 +6,11 @@
 		<link rel="stylesheet" href="style.css">
     </head>
     <body>
-		<a href="#!/login">Login</a>
-		<a href="#!/messages">Chat</a>
-		<div class="container" ng-view>
+		<div id="container" ng-view>
         </div>
-        <div class="user-list">
+        <div id="user-list" ng-if="showMenu">
             <h1>ShutApp</h1>
-            <ul id="user-list">
+            <ul>
                 <li ng-repeat="user in users">{{user}}</li>
             </ul>
         </div>

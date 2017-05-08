@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html ng-app="app">
+    <head>
+        <meta charset="UTF-8">
+        <title>Chat</title>
+		<link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div id="container">
+            <div id="messages-container" ng-view>
+            </div>
+            <div id="user-list" ng-controller="SideController" ng-show="showMenu">
+                <h1>ShutApp</h1>
+                <ul>
+                    <li ng-repeat="user in users">{{user.name}}</li>
+                </ul>
+            </div>
+        </div>
+        <script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/angular-route/angular-route.js"></script>
+        <script src="node_modules/angular-sanitize/angular-sanitize.js"></script>
+        <script src="login.js"></script>
+		<script src="scripts/script.js"></script>
+
+    </body>
+</html>

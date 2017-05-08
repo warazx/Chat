@@ -24,7 +24,7 @@ app.post('/messages', function(req, res) {
         console.log("Saved to database.");
         res.redirect('/');
     })
-})
+});
 
 app.use(express.static(__dirname + '/public'));
 

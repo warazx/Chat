@@ -5,8 +5,8 @@
 # compiled output
 /dist
 /tmp
-/app/**/*.js
-/app/**/*.js.map
+public/app/**/*.js
+public/app/**/*.js.map
 test.html
 # dependencies
 /node_modules

@@ -85,18 +85,14 @@ app.controller('SideController', function ($scope, $rootScope, users) {
 
 app.controller('LoginController', function ($scope,$rootScope, $window, users) {
 	$scope.users = users;
-    $scope.showMenu = false;
     $scope.userLogin = function userLogin() {
         $window.location.href="#!/messages";
-        $scope.showMenu = true;
+        $rootScope.showMenu = true;
     };
-    $scope.userLogout = function userLogout() {
-        $window.location.href="#!/login";
-        $scope.showMenu = false;
-    };
+    
 });
 
-app.controller('MessagesController', function ($scope,$rootScope, users) {
+app.controller('MessagesController', function ($scope,$rootScope, $window, users) {
     $scope.users = users;
     $scope.title = "Messages";
     document.getElementById('my-message').onkeypress=function(e){
@@ -129,5 +125,10 @@ app.controller('MessagesController', function ($scope,$rootScope, users) {
                 div.scrollTop = div.scrollHeight;
       }, 200);
       
+    };
+
+    $scope.userLogout = function userLogout() {
+        $window.location.href="#!/login";
+        $rootScope.showMenu = false;
     };
 });

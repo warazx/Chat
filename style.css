@@ -1,4 +1,3 @@
-
 @font-face {
     font-family: Catamaran-Thin;
     src: url(fonts/Catamaran-Thin.ttf);
@@ -16,6 +15,10 @@
 
 *:focus {
     outline: none;
+}
+
+html {
+    box-sizing: border-box;
 }
 
 body {
@@ -52,7 +55,7 @@ a:hover {
     font-family: Catamaran-Light, sans-serif;
     box-sizing: border-box;
     width: 96%;
-    min-height: 1.4em;
+    min-height: 1.7em;
     max-height: 7.2em;
     font-size: 1em;
     line-height: 1.4em;
@@ -66,7 +69,7 @@ a:hover {
     box-sizing: border-box;
     width: 90%;
     border: 2px solid #DDCA99;
-    border-radius: 5px;
+    border-radius: 0.5em;
     padding: 0.2em;
 }
 

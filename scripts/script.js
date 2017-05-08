@@ -83,10 +83,6 @@ app.controller('SideController', function ($scope, $rootScope, users) {
     $scope.users = users;
 });
 
-app.controller('MainController', function($scope, $rootScope, users) {
-    $scope.users = users;
-});
-
 app.controller('LoginController', function ($scope,$rootScope, $window, users) {
 	$scope.users = users;
     $scope.showMenu = false;
@@ -107,7 +103,7 @@ app.controller('MessagesController', function ($scope,$rootScope, users) {
         //keyCode 13 is the enter key
         if(e.keyCode==13 && !e.shiftKey){
             e.preventDefault();
-            if($scope.messagecontent != "" && $scope.messagecontent != "<br>") {
+            if($scope.textMessage != "" && $scope.textMessage != "<br>") {
                 $scope.postMessage();
             }
         }

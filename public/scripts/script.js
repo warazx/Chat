@@ -127,7 +127,8 @@ app.controller('MessagesController', function ($scope,$rootScope, $window, users
 	   node.appendChild(textNode);
        document.getElementById('messages').appendChild(node);
 	   */
-	   messages.push(msg);
+	   console.log(msg);
+	   $scope.messages.push(msg);
    });
    
     $scope.users = users;
@@ -146,9 +147,13 @@ app.controller('MessagesController', function ($scope,$rootScope, $window, users
 
     var currentId = 0; //Temp
     $scope.postMessage = function() {
-		socket.emit('broadcast message', $scope.textMessage);
+		var newMessage = {
+			"sender": $rootScope.user.name,
+			"date": new Date(),
+			"text": $scope.textMessage
+		};
+		socket.emit('broadcast message', newMessage);
 		$scope.textMessage = "";
-        return false;
 		/*
         $scope.messages.push({
             id : currentId,
@@ -161,11 +166,11 @@ app.controller('MessagesController', function ($scope,$rootScope, $window, users
         document.getElementById('my-message').focus();
         currentId++;
         //scroll to the bottom
-        setTimeout(function() {
-            var div = document.getElementById("chat-messages");
-            div.scrollTop = div.scrollHeight;
-        }, 200);
-
+        //setTimeout(function() {
+            //var div = document.getElementById("chat-messages");
+            //div.scrollTop = div.scrollHeight;
+			//}, 200);
+		return false;
     };
 
     $scope.userLogout = function userLogout() {

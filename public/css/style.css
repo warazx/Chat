@@ -1,16 +1,16 @@
 @font-face {
     font-family: Catamaran-Thin;
-    src: url(fonts/Catamaran-Thin.ttf);
+    src: url(../fonts/Catamaran-Thin.ttf);
 }
 
 @font-face {
     font-family: Catamaran-Light;
-    src: url(fonts/Catamaran-Light.ttf);
+    src: url(../fonts/Catamaran-Light.ttf);
 }
 
 @font-face {
     font-family: Raleway;
-    src: url(fonts/Raleway-ExtraBold.ttf);
+    src: url(../fonts/Raleway-ExtraBold.ttf);
 }
 
 *:focus {

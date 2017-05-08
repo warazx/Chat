@@ -78,7 +78,7 @@ app.run(function($rootScope, $location) {
 
 app.controller('SideController', function ($scope, $rootScope, users) {
     $scope.users = users;
-})
+});
 
 app.controller('LoginController', function ($scope, $rootScope, $location, users) {
 	$scope.users = users;

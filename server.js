@@ -30,6 +30,30 @@ app.use(express.static(__dirname + '/public'));
 
 require('./app/routes')(app);
 
+/*
 app.listen(port, function () {
     console.log("Server is running on port " + port);
 });
+*/
+
+// ------------
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+
+var users = [];
+
+io.on('connection', function(socket){
+  //message
+  socket.on('broadcast message', function(message){
+    io.emit('broadcast message', message);
+  });
+   socket.on('private message', function(message){
+    io.emit('private message', message);
+  });
+});
+
+
+http.listen(3000, function(){
+  console.log('listening on *:3000');
+});
+

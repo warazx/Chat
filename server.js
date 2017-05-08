@@ -22,7 +22,7 @@ app.post('/messages', function(req, res) {
             console.log(err);
         }
         console.log("Saved to database.");
-        res.redirect('/');
+        res.redirect('/messages');
     })
 })
 

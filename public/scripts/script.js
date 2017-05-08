@@ -114,25 +114,22 @@ app.controller('LoginController', function ($scope, $rootScope, $location, users
     }
 });
 
-app.controller('MessagesController', function ($scope,$rootScope) {
-    $scope.title = "Messages";
-    $scope.messages = [];
 
-    var currentId = 0; //Temp
-    $scope.postMessage = function() {
-        $scope.messages.push({
-            id : currentId,
-            text : $scope.textMessage,
-            date : Date.now(),
-            isPrivateMessage : false,
-            sender : 0, //User-ID
-            receiver : 0 //UserID / ChatRoomID
-        });
-        currentId++;
-    };
-});
 
 app.controller('MessagesController', function ($scope,$rootScope, $window, users) {
+	$scope.messages = [];
+    var socket = io();
+   
+   socket.on('broadcast message', function(msg){
+	   /*
+	   var node = document.createElement("LI");
+	   var textNode = document.createTextNode(msg);
+	   node.appendChild(textNode);
+       document.getElementById('messages').appendChild(node);
+	   */
+	   messages.push(msg);
+   });
+   
     $scope.users = users;
     $scope.title = "Messages";
 
@@ -145,10 +142,14 @@ app.controller('MessagesController', function ($scope,$rootScope, $window, users
             }
         }
     }
-    $scope.messages = [];
+    
 
     var currentId = 0; //Temp
     $scope.postMessage = function() {
+		socket.emit('broadcast message', $scope.textMessage);
+		$scope.textMessage = "";
+        return false;
+		/*
         $scope.messages.push({
             id : currentId,
             text : $scope.textMessage,
@@ -156,8 +157,7 @@ app.controller('MessagesController', function ($scope,$rootScope, $window, users
             isPrivateMessage : false,
             sender : 0, //User-ID
             receiver : 0 //UserID / ChatRoomID
-        });
-        $scope.textMessage = "";
+        });*/
         document.getElementById('my-message').focus();
         currentId++;
         //scroll to the bottom

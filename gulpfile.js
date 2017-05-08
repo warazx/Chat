@@ -3,7 +3,7 @@ var gulp = require('gulp'),
     gulpLiveServer = require('gulp-live-server');
 
 gulp.task('jshint', function () {
-    return gulp.src(['scripts/*.js'])
+    return gulp.src(['public/scripts/*.js'])
         .pipe(jshint())
         .pipe(jshint.reporter('default'));
 });

@@ -13,6 +13,7 @@
     "gulp-live-server": "0.0.30",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^2.1.2",
+    "jshint": "^2.9.4",
     "mongodb": "^2.2.26",
     "socket.io": "^1.7.4"
   },

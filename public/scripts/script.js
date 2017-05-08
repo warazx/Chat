@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ngRoute']);
+var app = angular.module('app', ['ngRoute', 'ngSanitize']);
 
 app.value('users', [
     {
@@ -54,10 +54,29 @@ app.config(function ($routeProvider) {
         auth: function(user) {
             return user
         }
-    }).otherwise({
-        controller: 'LoginController',
-        templateUrl: 'partials/login.html'
     });
+});
+
+//snodd kod från http://fdietz.github.io/recipes-with-angular-js/common-user-interface-patterns/editing-text-in-place-using-html5-content-editable.html
+app.directive("contenteditable", function() {
+    return {
+        restrict: "A",
+        require: "ngModel",
+        link: function(scope, element, attrs, ngModel) {
+
+            function read() {
+                ngModel.$setViewValue(element.html());
+            }
+
+            ngModel.$render = function() {
+                element.html(ngModel.$viewValue || "");
+            };
+
+            element.bind("blur keyup change", function() {
+                scope.$apply(read);
+            });
+        }
+    };
 });
 
 app.run(function($rootScope, $location) {
@@ -70,10 +89,6 @@ app.run(function($rootScope, $location) {
             }
         }
     })
-    $rootScope.isSideHidden = function(viewLocation) {
-        var hidden = (viewLocation === $location.path());
-        return hidden;
-    }
 });
 
 app.controller('SideController', function ($scope, $rootScope, users) {
@@ -92,6 +107,7 @@ app.controller('LoginController', function ($scope, $rootScope, $location, users
                     users[i].isUserOnline = true;
                     $rootScope.user = users[i];
                     $location.path("/messages");
+                    $rootScope.showMenu = true;
                 }
             }
         }
@@ -104,14 +120,56 @@ app.controller('MessagesController', function ($scope,$rootScope) {
 
     var currentId = 0; //Temp
     $scope.postMessage = function() {
-      $scope.messages.push({
-        id : currentId,
-        text : $scope.textMessage,
-        date : Date.now(),
-        isPrivateMessage : false,
-        sender : 0, //User-ID
-        receiver : 0 //UserID / ChatRoomID
-      });
-      currentId++;
+        $scope.messages.push({
+            id : currentId,
+            text : $scope.textMessage,
+            date : Date.now(),
+            isPrivateMessage : false,
+            sender : 0, //User-ID
+            receiver : 0 //UserID / ChatRoomID
+        });
+        currentId++;
+    };
+});
+
+app.controller('MessagesController', function ($scope,$rootScope, $window, users) {
+    $scope.users = users;
+    $scope.title = "Messages";
+
+    document.getElementById('my-message').onkeypress=function(e){
+        //keyCode 13 is the enter key
+        if(e.keyCode==13 && !e.shiftKey){
+            e.preventDefault();
+            if($scope.textMessage != "" && $scope.textMessage != "<br>") {
+                $scope.postMessage();
+            }
+        }
+    }
+    $scope.messages = [];
+
+    var currentId = 0; //Temp
+    $scope.postMessage = function() {
+        $scope.messages.push({
+            id : currentId,
+            text : $scope.textMessage,
+            date : Date.now(),
+            isPrivateMessage : false,
+            sender : 0, //User-ID
+            receiver : 0 //UserID / ChatRoomID
+        });
+        $scope.textMessage = "";
+        document.getElementById('my-message').focus();
+        currentId++;
+        //scroll to the bottom
+        setTimeout(function() {
+            var div = document.getElementById("chat-messages");
+            div.scrollTop = div.scrollHeight;
+        }, 200);
+
+    };
+
+    $scope.userLogout = function userLogout() {
+        $window.location.href="#!/";
+        $rootScope.showMenu = false;
     };
 });

@@ -1,32 +1,44 @@
-
 @font-face {
-    font-family: OpenSans-Semibold;
-    src: url(../fonts/OpenSans-Semibold.ttf);
+    font-family: Catamaran-Thin;
+    src: url(fonts/Catamaran-Thin.ttf);
 }
 
 @font-face {
-    font-family: OpenSans-Light;
-    src: url(../fonts/OpenSans-Light.ttf);
+    font-family: Catamaran-Light;
+    src: url(fonts/Catamaran-Light.ttf);
 }
 
 @font-face {
-    font-family: OpenSans;
-    src: url(../fonts/OpenSans-Regular.ttf);
+    font-family: Raleway;
+    src: url(fonts/Raleway-ExtraBold.ttf);
 }
 
-button {
-    font-family: OpenSans;
-    font-size: 0.8em;
-   /* background-color: #F7F7F2;*/
+*:focus {
+    outline: none;
+}
 
+html {
+    box-sizing: border-box;
 }
 
 body {
-    display: flex;
-    flex-direction: row;
-    font-family: OpenSans;
-    background-color: #E4E6C3;
-    color: #121113;
+    font-family: Catamaran-Thin, sans-serif;
+    background-color: #FFFFFF;
+    color: #101010;
+    margin: 0;
+    padding: 0;
+}
+
+button {
+    font-size: 0.8em;
+    width: 10em;
+}
+
+h1 {
+    font-family: Raleway;
+    font-weight: normal;
+    font-size: 1.8em;
+    margin-left: 2em;
 }
 
 a {
@@ -39,63 +51,100 @@ a:hover {
     text-decoration: underline;
 }
 
-.my-message {
+#my-message {
+    font-family: Catamaran-Light, sans-serif;
+    box-sizing: border-box;
+    width: 96%;
+    min-height: 1.7em;
+    max-height: 7.2em;
+    font-size: 1em;
+    line-height: 1.4em;
+    border: none;
+    padding: 0.1em;
+    margin: 1em;
+    overflow-y: auto;
+}
+
+#my-message-container {
+    box-sizing: border-box;
     width: 90%;
-    height: 5em;
-    font-family: OpenSans;
-    margin-top: 0.5em;
-    padding: 0;
+    border: 2px solid #DDCA99;
+    border-radius: 0.5em;
+    padding: 0.2em;
 }
 
 .chat-message {
-    font-family: OpenSans;
+    font-family: Catamaran-Light, sans-serif;
     font-size: 1em;
     margin-left: 0.5em;
 }
 
-.chat-messages {
-    background-color: #F7F7F2;
+#chat-messages {
+    font-family: Catamaran-Light, sans-serif;
+    font-size: 1em;
+    height: 100vh;
+    width: 90%;
+    background-color: #FFFFFF;
+    overflow-y: auto;
+    padding: 1em;
 }
 
 .username {
-    font-family: OpenSans-Semibold;
+    font-weight: bold;
     font-size: 1.1em;
 }
 
 .timestamp {
-    font-family: OpenSans-Light;
+    /*font-family: Catamaran-Light;*/
     font-size: 0.7em;
     color: #595959;
 }
 
 .message-text {
-    font-family: OpenSans;
-    font-size: 0.8em;
+    /*font-family: Catamaran-Light;*/
+    font-size: 1em;
 }
 
-.container {
-    padding: 1em;
+#content {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
 }
 
 #user-list {
-    padding-left: 1em;
-    width: 12em;
-    height: 100%;
-    overflow: scroll;
-    background-color: #F7F7F2;
-    position: fixed;
-    right: 0;
-    top: 0;
+    padding: 0;
+    width: 20em;
+    height: 100vh;
+    overflow: auto;
+    background-color: #224433;
+    color: #CCDDCC;
+    line-height: 1.6em;
 }
 
 #user-list ul {
     list-style-type: none;
-    font-size: 0.8em;
-    line-height: 150%;
-    margin: 0.5em;
-    padding: 0.5em;
+    font-size: 1em;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
 }
 
-.hidden {
-    display: none;
+#user-list ul li {
+    padding-left: 1.5em;
+    font-family: Catamaran-Thin;
+}
+
+#user-list ul li:hover {
+    background-color: #102510;
+}
+
+#container {
+    box-sizing: border-box;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1em;
+    margin: 0;
 }

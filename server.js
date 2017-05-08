@@ -16,7 +16,7 @@ mongo.connect('mongodb://shutapp:shutapp123@ds133981.mlab.com:33981/shutapp', fu
     db = database;
 });
 
-/*app.post('/messages', function(req, res) {
+app.post('/messages', function(req, res) {
     db.collection('users').save(req.body, function(err, result) {
         if (err) {
             console.log(err);
@@ -24,7 +24,7 @@ mongo.connect('mongodb://shutapp:shutapp123@ds133981.mlab.com:33981/shutapp', fu
         console.log("Saved to database.");
         res.redirect('/');
     })
-})*/
+})
 
 app.use(express.static(__dirname + '/public'));
 

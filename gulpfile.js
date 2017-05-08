@@ -1,10 +1,6 @@
-/* Needs to be installed locally
-  1: sudo npm install gulp
-  2: sudo npm install --save-dev jshint gulp-jshint
-*/
-
 var gulp = require('gulp'),
-    jshint = require('gulp-jshint');
+    jshint = require('gulp-jshint'),
+    gulpLiveServer = require('gulp-live-server');
 
 gulp.task('jshint', function () {
     return gulp.src(['scripts/*.js'])
@@ -12,6 +8,15 @@ gulp.task('jshint', function () {
         .pipe(jshint.reporter('default'));
 });
 
+gulp.task('serve', function() {
+    var server = gulpLiveServer.new('server.js');
+    server.start();
+
+    gulp.watch('server.js', function (file) {
+        server.start.apply(server);
+    });
+});
+
 gulp.task('listen', function() { gulp.watch('scripts/*.js', ['jshint']); });
 
-gulp.task('default', ['listen']);
+gulp.task('default', ['listen', 'serve']);

@@ -4,17 +4,17 @@
   "description": "",
   "main": "scripts/script.js",
   "dependencies": {
+    "angular-sanitize": "^1.6.4",
     "body-parser": "^1.17.1",
     "express": "^4.15.2",
     "gulp": "^3.9.1",
-    "mongodb": "^2.2.26",
-    "socket.io": "^1.7.4",
-    "angular-sanitize": "^1.6.4",
-    "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
     "gulp-jshint": "^2.0.4",
+    "gulp-live-server": "0.0.30",
     "gulp-rename": "^1.2.2",
-    "gulp-uglify": "^2.1.2"
+    "gulp-uglify": "^2.1.2",
+    "mongodb": "^2.2.26",
+    "socket.io": "^1.7.4"
   },
   "devDependencies": {},
   "scripts": {

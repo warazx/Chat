@@ -9,7 +9,8 @@
         "id" : 2,
         "name" : "RegExRolf",
         "isUserOnline" : false,
-        "messages" : [] },
+        "messages" : []
+    },
     {
         "id" : 3,
         "name" : "BooleanBob",

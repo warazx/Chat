@@ -28,19 +28,26 @@ app.post('/messages', function(req, res) {
 
 app.use(express.static(__dirname + '/public'));
 
-require('./app/routes')(app);
-
-/*
-app.listen(port, function () {
-    console.log("Server is running on port " + port);
+//Mock data with users.
+var users = require('./mock/users.json');
+//GET handler for users.
+app.get('/users', function (req, res) {
+    res.send(users);
 });
-*/
+var activeUsers = [];
+app.get('/login/:name', function (req, res) {
+    var name = req.params.name;
+    var isActive = false;
+    for(var i = 0; i < activeUsers.length; i++) {
+        if (activeUsers[i].name === name) isActive = true;
+    }
+    if(!isActive) activeUsers.push({name: name});
+    res.send(isActive);
+});
 
 // ------------
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-
-var users = [];
 
 io.on('connection', function(socket){
   //message

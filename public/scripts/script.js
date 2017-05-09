@@ -1,4 +1,8 @@
-var app = angular.module('app', ['ngRoute', 'ngSanitize']);
+var app = angular.module('app', ['ngRoute', 'ngSanitize', 'btford.socket-io', 'luegg.directives']);
+
+app.factory('mySocket', function(socketFactory) {
+    return socketFactory();
+});
 
 app.value('users', [
     {
@@ -91,12 +95,18 @@ app.run(function($rootScope, $location) {
     })
 });
 
-app.controller('SideController', function ($scope, $rootScope, users) {
+app.controller('SideController', function ($window, $scope, $rootScope, users) {
     $scope.users = users;
+
+    $scope.userLogout = function() {
+        console.log("baaad");
+        $window.location.href = "/";
+        $rootScope.showMenu = false;
+    };
 });
 
 app.controller('LoginController', function ($scope, $rootScope, $location, users) {
-	$scope.users = users;
+    $scope.users = users;
     $scope.userLogin = function(login) {
         //Check that username is not already in use by another user.
         for (var i = 0; i < users.length; i++) {
@@ -114,25 +124,16 @@ app.controller('LoginController', function ($scope, $rootScope, $location, users
     }
 });
 
-
-
-app.controller('MessagesController', function ($scope,$rootScope, $window, users) {
-	$scope.messages = [];
-    var socket = io();
-   
-   socket.on('broadcast message', function(msg){
-	   /*
-	   var node = document.createElement("LI");
-	   var textNode = document.createTextNode(msg);
-	   node.appendChild(textNode);
-       document.getElementById('messages').appendChild(node);
-	   */
-	   console.log(msg);
-	   $scope.messages.push(msg);
-   });
-   
+app.controller('MessagesController', function ($scope,$rootScope, users, mySocket) {
     $scope.users = users;
     $scope.title = "Messages";
+    $scope.messages = [];
+    document.getElementById('my-message').focus();
+
+    mySocket.on('broadcast message', function(msg){
+        console.log(msg);
+        $scope.messages.push(msg);
+    });
 
     document.getElementById('my-message').onkeypress=function(e){
         //keyCode 13 is the enter key
@@ -143,38 +144,19 @@ app.controller('MessagesController', function ($scope,$rootScope, $window, users
             }
         }
     }
-    
 
     var currentId = 0; //Temp
     $scope.postMessage = function() {
-		var newMessage = {
-			"sender": $rootScope.user.name,
-			"date": new Date(),
-			"text": $scope.textMessage
-		};
-		socket.emit('broadcast message', newMessage);
-		$scope.textMessage = "";
-		/*
-        $scope.messages.push({
-            id : currentId,
-            text : $scope.textMessage,
-            date : Date.now(),
-            isPrivateMessage : false,
-            sender : 0, //User-ID
-            receiver : 0 //UserID / ChatRoomID
-        });*/
+        var newMessage = {
+            "sender": $rootScope.user.name,
+            "date": new Date(),
+            "text": $scope.textMessage
+        };
+        mySocket.emit('broadcast message', newMessage);
+        $scope.textMessage = "";
         document.getElementById('my-message').focus();
         currentId++;
-        //scroll to the bottom
-        //setTimeout(function() {
-            //var div = document.getElementById("chat-messages");
-            //div.scrollTop = div.scrollHeight;
-			//}, 200);
-		return false;
-    };
 
-    $scope.userLogout = function userLogout() {
-        $window.location.href="#!/";
-        $rootScope.showMenu = false;
+        return false;
     };
 });

@@ -8,18 +8,26 @@
     <body>
         <div id="content">
             <div id="container" ng-view></div>
-            <div id="user-list" ng-controller="SideController" ng-show="showMenu">
-                <h1>ShutApp</h1>
-                <ul>
-                    <li ng-repeat="user in users">{{user.name}}</li>
-                </ul>
-                <button ng-click="userLogout()">Logga ut</button>
+            <div id="side-menu" ng-controller="SideController" ng-show="showMenu">
+                <div id="title">
+                    <h1>ShutApp</h1>
+                </div>
+                <div id="user-list">
+                    <ul>
+                        <li ng-repeat="user in users">{{user.name}}</li>
+                    </ul>
+                </div>
+                <div id="logout">
+                    <button id="logout-button" ng-click="userLogout()">Logga ut</button>
+                </div>
             </div>
         </div>
-		<script src="/socket.io/socket.io.js"></script>
         <script src="bower_components/angular/angular.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="bower_components/angular-scroll-glue/src/scrollglue.js"></script>
         <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+        <script src="bower_components/angular-socket-io/socket.js"></script>
 		<script src="scripts/script.js"></script>
     </body>
 </html>

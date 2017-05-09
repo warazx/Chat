@@ -17,6 +17,8 @@
   "dependencies": {
     "angular": "^1.6.4",
     "angular-route": "^1.6.4",
-    "angular-sanitize": "^1.6.4"
+    "angular-sanitize": "^1.6.4",
+    "angular-socket-io": "^0.7.0",
+    "angular-scroll-glue": "^2.2.0"
   }
 }

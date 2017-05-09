@@ -23,7 +23,7 @@ html {
 
 body {
     font-family: Catamaran-Thin, sans-serif;
-    background-color: #FFFFFF;
+    background-color: #52414C;
     color: #101010;
     margin: 0;
     padding: 0;
@@ -54,7 +54,7 @@ a:hover {
 #my-message {
     font-family: Catamaran-Light, sans-serif;
     box-sizing: border-box;
-    width: 96%;
+    width: 100%;
     min-height: 1.7em;
     max-height: 7.2em;
     font-size: 1em;
@@ -67,7 +67,7 @@ a:hover {
 
 #my-message-container {
     box-sizing: border-box;
-    width: 90%;
+    width: 100%;
     border: 2px solid #DDCA99;
     border-radius: 0.5em;
     padding: 0.2em;
@@ -83,8 +83,7 @@ a:hover {
     font-family: Catamaran-Light, sans-serif;
     font-size: 1em;
     height: 100vh;
-    width: 90%;
-    background-color: #FFFFFF;
+    width: 98%;
     overflow-y: auto;
     padding: 1em;
 }
@@ -111,17 +110,19 @@ a:hover {
     justify-content: flex-end;
 }
 
-#user-list {
+#side-menu {
+    display: flex;
+    flex-direction: column;
     padding: 0;
     width: 20em;
     height: 100vh;
-    overflow: auto;
-    background-color: #224433;
+    overflow: hidden;
+    background-color: #52414C;
     color: #CCDDCC;
     line-height: 1.6em;
 }
 
-#user-list ul {
+#side-menu ul {
     list-style-type: none;
     font-size: 1em;
     margin: 0;
@@ -129,13 +130,13 @@ a:hover {
     cursor: pointer;
 }
 
-#user-list ul li {
+#side-menu ul li {
     padding-left: 1.5em;
     font-family: Catamaran-Thin;
 }
 
-#user-list ul li:hover {
-    background-color: #102510;
+#side-menu ul li:hover {
+    background-color: #372731;
 }
 
 #container {
@@ -145,6 +146,83 @@ a:hover {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 1em;
+    padding: 0em;
     margin: 0;
+}
+
+#login-container {
+    border: 1px solid #372731;
+    border-radius: 0.5rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 1rem;
+    box-sizing: border-box;
+    background-color: #f2f0d5;
+    color: #372731;
+    width: 20vw;
+    margin: 50vh 40vw;
+}
+
+#login-container input {
+    border: 1px solid #372731;
+    border-radius: 0.1rem;
+    width: 100%;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+#login-container input[type=submit] {
+    background-color: #ffffff;
+    border: 1px solid #372731;
+    border-radius: 0.2rem;
+    font-size: 0.8rem;
+    color: #372731;
+    width: 70%;
+    margin: 0 15%;
+}
+
+#login-container input[type=submit]:active {
+    background-color: #ebe9ce;
+    color: #52414C;
+    border: 1px solid #52414C;
+}
+
+#logout-button {
+    background-color: #ffffff;
+    color: #372731;
+    border: 1px solid #372731;
+    border-radius: 0.2rem;
+    font-size: 1rem;
+    height: 2rem;
+    width: 15rem;
+    margin: 0.5rem 0.5rem;
+    position: fixed;
+    bottom: 0;
+}
+
+#logout-button:active {
+    background-color: #EBE9CE;
+    color: #52414C;
+    border: 1px solid #52414C;
+}
+
+#messages-view {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background-color: #FFFFFF;
+}
+
+#title {
+    position: fixed;
+}
+
+#user-list {
+    height: 100vh;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 3.5rem 0;
 }

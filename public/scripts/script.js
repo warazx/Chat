@@ -95,12 +95,18 @@ app.run(function($rootScope, $location) {
     })
 });
 
-app.controller('SideController', function ($scope, $rootScope, users) {
+app.controller('SideController', function ($window, $scope, $rootScope, users) {
     $scope.users = users;
+
+    $scope.userLogout = function() {
+        console.log("baaad");
+        $window.location.href = "/";
+        $rootScope.showMenu = false;
+    };
 });
 
 app.controller('LoginController', function ($scope, $rootScope, $location, users) {
-	$scope.users = users;
+    $scope.users = users;
     $scope.userLogin = function(login) {
         //Check that username is not already in use by another user.
         for (var i = 0; i < users.length; i++) {
@@ -118,18 +124,16 @@ app.controller('LoginController', function ($scope, $rootScope, $location, users
     }
 });
 
-
-
-app.controller('MessagesController', function ($scope,$rootScope, $window, users, mySocket) {
-	$scope.messages = [];
-   
-   mySocket.on('broadcast message', function(msg){
-	   console.log(msg);
-	   $scope.messages.push(msg);
-   });
-   
+app.controller('MessagesController', function ($scope,$rootScope, users, mySocket) {
     $scope.users = users;
     $scope.title = "Messages";
+    $scope.messages = [];
+    document.getElementById('my-message').focus();
+
+    mySocket.on('broadcast message', function(msg){
+        console.log(msg);
+        $scope.messages.push(msg);
+    });
 
     document.getElementById('my-message').onkeypress=function(e){
         //keyCode 13 is the enter key
@@ -140,30 +144,23 @@ app.controller('MessagesController', function ($scope,$rootScope, $window, users
             }
         }
     }
-    
 
     var currentId = 0; //Temp
     $scope.postMessage = function() {
-		var newMessage = {
-			"sender": $rootScope.user.name,
-			"date": new Date(),
-			"text": $scope.textMessage
-		};
-		mySocket.emit('broadcast message', newMessage);
-		$scope.textMessage = "";
-
+        var newMessage = {
+            "sender": $rootScope.user.name,
+            "date": new Date(),
+            "text": $scope.textMessage
+        };
+        mySocket.emit('broadcast message', newMessage);
+        $scope.textMessage = "";
         document.getElementById('my-message').focus();
         currentId++;
         //scroll to the bottom
         setTimeout(function() {
             var div = document.getElementById("chat-messages");
             div.scrollTop = div.scrollHeight;
-			}, 200);
-		return false;
-    };
-
-    $scope.userLogout = function userLogout() {
-        $window.location.href="#!/";
-        $rootScope.showMenu = false;
+        }, 200);
+        return false;
     };
 });

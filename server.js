@@ -55,7 +55,6 @@ app.get('/login/:name', function (req, res) {
 // ------------
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-
 io.on('connection', function(socket){
     //message
     socket.on('broadcast message', function(message){
@@ -64,8 +63,8 @@ io.on('connection', function(socket){
     socket.on('private message', function(message){
         io.emit('private message', message);
     });
-    socket.on('disconnect', function() {
-        socket.emit('disconnected');
+    socket.on('disconnect message', function(message) {
+        io.emit('disconnect message', message);
     });
 });
 

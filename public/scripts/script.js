@@ -93,15 +93,21 @@ app.run(function($rootScope, $location, mySocket) {
             }
         }
     });
-    mySocket.on('disconnected', function() {
-        $rootScope.userLogout();
+    mySocket.on('disconnect message', function(msg) {
+        $rootScope.messages.push(msg);
     });
 });
 
-app.controller('SideController', function ($window, $scope, $rootScope, users) {
+app.controller('SideController', function ($window, $scope, $rootScope, users, mySocket) {
     $scope.users = users;
 
     $rootScope.userLogout = function() {
+        var disconnectMsg = {
+            "sender": $rootScope.user.name,
+            "date": new Date(),
+            "text": $rootScope.user.name + " har loggat ut."
+        }
+        mySocket.emit('disconnect message' , disconnectMsg);
         $window.location.href = "/logout/" + $rootScope.user.name;
         $rootScope.showMenu = false;
     };
@@ -109,32 +115,37 @@ app.controller('SideController', function ($window, $scope, $rootScope, users) {
 
 app.controller('LoginController', function ($scope, $rootScope, $location, users) {
     $scope.users = users;
+    $scope.errorMessage = "";
     $scope.userLogin = function(login) {
-        //Check that username is not already in use by another user.
-        for (var i = 0; i < users.length; i++) {
-            if ($scope.login.username == users[i].name) {
-                if (users[i].isUserOnline) {
-                    alert('User is already logged in. Log in using a different username.');
-                } else {
-                    users[i].isUserOnline = true;
-                    $rootScope.user = users[i];
-                    $location.path("/messages");
-                    $rootScope.showMenu = true;
+        if ($scope.login === undefined || $scope.login.username === undefined || $scope.login.username === "") {
+            $scope.errorMessage = "Du måste välja ett användarnamn!";
+        } else {
+            //Check that username is not already in use by another user.
+            for (var i = 0; i < users.length; i++) {
+                if ($scope.login.username.toUpperCase() == users[i].name.toUpperCase()) {
+                    if (users[i].isUserOnline) {
+                        $scope.errorMessage = "Användarnamnet är upptaget. \nVänligen välj ett annat användarnamn.";
+                    } else {
+                        users[i].isUserOnline = true;
+                        $rootScope.user = users[i];
+                        $location.path("/messages");
+                        $rootScope.showMenu = true;
+                    }
                 }
             }
         }
     }
 });
 
-app.controller('MessagesController', function ($scope,$rootScope, users, mySocket) {
+app.controller('MessagesController', function ($scope, $rootScope, users, mySocket) {
     $scope.users = users;
     $scope.title = "Messages";
-    $scope.messages = [];
+    $rootScope.messages = [];
     document.getElementById('my-message').focus();
 
     mySocket.on('broadcast message', function(msg){
         console.log(msg);
-        $scope.messages.push(msg);
+        $rootScope.messages.push(msg);
     });
 
     document.getElementById('my-message').onkeypress=function(e){

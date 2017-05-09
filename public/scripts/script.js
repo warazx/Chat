@@ -83,7 +83,7 @@ app.directive("contenteditable", function() {
     };
 });
 
-app.run(function($rootScope, $location) {
+app.run(function($rootScope, $location, mySocket) {
     $rootScope.$on('$routeChangeStart', function(ev, next, curr) {
         if (next.$$route) {
             var user = $rootScope.user;
@@ -92,14 +92,17 @@ app.run(function($rootScope, $location) {
                 $location.path("/");
             }
         }
-    })
+    });
+    mySocket.on('disconnected', function() {
+        $rootScope.userLogout();
+    });
 });
 
 app.controller('SideController', function ($window, $scope, $rootScope, users) {
     $scope.users = users;
 
-    $scope.userLogout = function() {
-        $window.location.href = "/";
+    $rootScope.userLogout = function() {
+        $window.location.href = "/logout/" + $rootScope.user.name;
         $rootScope.showMenu = false;
     };
 });

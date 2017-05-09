@@ -35,6 +35,13 @@ app.get('/users', function (req, res) {
     res.send(users);
 });
 var activeUsers = [];
+
+app.get('/logout/:name', function (req, res) {
+    var name = req.params.name;
+    activeUsers.splice(activeUsers.indexOf(name), 1);
+    res.redirect("/");
+});
+
 app.get('/login/:name', function (req, res) {
     var name = req.params.name;
     var isActive = false;
@@ -50,13 +57,16 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 io.on('connection', function(socket){
-  //message
-  socket.on('broadcast message', function(message){
-    io.emit('broadcast message', message);
-  });
-   socket.on('private message', function(message){
-    io.emit('private message', message);
-  });
+    //message
+    socket.on('broadcast message', function(message){
+        io.emit('broadcast message', message);
+    });
+    socket.on('private message', function(message){
+        io.emit('private message', message);
+    });
+    socket.on('disconnect', function() {
+        socket.emit('disconnected');
+    });
 });
 
 http.listen(port, function(){

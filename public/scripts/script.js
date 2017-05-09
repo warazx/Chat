@@ -99,7 +99,6 @@ app.controller('SideController', function ($window, $scope, $rootScope, users) {
     $scope.users = users;
 
     $scope.userLogout = function() {
-        console.log("baaad");
         $window.location.href = "/";
         $rootScope.showMenu = false;
     };

@@ -1,4 +1,8 @@
-var app = angular.module('app', ['ngRoute', 'ngSanitize']);
+var app = angular.module('app', ['ngRoute', 'ngSanitize', 'btford.socket-io']);
+
+app.factory('mySocket', function(socketFactory) {
+    return socketFactory();
+});
 
 app.value('users', [
     {
@@ -116,17 +120,10 @@ app.controller('LoginController', function ($scope, $rootScope, $location, users
 
 
 
-app.controller('MessagesController', function ($scope,$rootScope, $window, users) {
+app.controller('MessagesController', function ($scope,$rootScope, $window, users, mySocket) {
 	$scope.messages = [];
-    var socket = io();
    
-   socket.on('broadcast message', function(msg){
-	   /*
-	   var node = document.createElement("LI");
-	   var textNode = document.createTextNode(msg);
-	   node.appendChild(textNode);
-       document.getElementById('messages').appendChild(node);
-	   */
+   mySocket.on('broadcast message', function(msg){
 	   console.log(msg);
 	   $scope.messages.push(msg);
    });
@@ -152,24 +149,16 @@ app.controller('MessagesController', function ($scope,$rootScope, $window, users
 			"date": new Date(),
 			"text": $scope.textMessage
 		};
-		socket.emit('broadcast message', newMessage);
+		mySocket.emit('broadcast message', newMessage);
 		$scope.textMessage = "";
-		/*
-        $scope.messages.push({
-            id : currentId,
-            text : $scope.textMessage,
-            date : Date.now(),
-            isPrivateMessage : false,
-            sender : 0, //User-ID
-            receiver : 0 //UserID / ChatRoomID
-        });*/
+
         document.getElementById('my-message').focus();
         currentId++;
         //scroll to the bottom
-        //setTimeout(function() {
-            //var div = document.getElementById("chat-messages");
-            //div.scrollTop = div.scrollHeight;
-			//}, 200);
+        setTimeout(function() {
+            var div = document.getElementById("chat-messages");
+            div.scrollTop = div.scrollHeight;
+			}, 200);
 		return false;
     };
 

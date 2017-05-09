@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ngRoute', 'ngSanitize', 'btford.socket-io']);
+var app = angular.module('app', ['ngRoute', 'ngSanitize', 'btford.socket-io', 'luegg.directives']);
 
 app.factory('mySocket', function(socketFactory) {
     return socketFactory();
@@ -156,11 +156,7 @@ app.controller('MessagesController', function ($scope,$rootScope, users, mySocke
         $scope.textMessage = "";
         document.getElementById('my-message').focus();
         currentId++;
-        //scroll to the bottom
-        setTimeout(function() {
-            var div = document.getElementById("chat-messages");
-            div.scrollTop = div.scrollHeight;
-        }, 200);
+
         return false;
     };
 });

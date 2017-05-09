@@ -1,0 +1,44 @@
+[
+    {
+        "id" : 1,
+        "name" : "1337Leif",
+        "isUserOnline" : false,
+        "messages" : []
+    },
+    {
+        "id" : 2,
+        "name" : "RegExRolf",
+        "isUserOnline" : false,
+        "messages" : []
+    },
+    {
+        "id" : 3,
+        "name" : "BooleanBob",
+        "isUserOnline" : true,
+        "messages" : []
+    },
+    {
+        "id" : 4,
+        "name" : "ErrorEmil",
+        "isUserOnline" : true,
+        "messages" : []
+    },
+    {
+        "id" : 5,
+        "name" : "SyntaxScotty",
+        "isUserOnline" : false,
+        "messages" : []
+    },
+    {
+        "id" : 6,
+        "name" : "ForLoopFred",
+        "isUserOnline" : false,
+        "messages" : []
+    },
+    {
+        "id" : 7,
+        "name" : "OutOfBoundsBoerjesson",
+        "isUserOnline" : false,
+        "messages" : []
+    }
+]

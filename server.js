@@ -31,18 +31,29 @@ app.use(express.static(__dirname + '/public'));
 //Mock data with users.
 var users = require('./mock/users.json');
 //GET handler for users.
-app.get('/users', function (req, res) {
-    res.send(users);
+var activeUsers = [{
+    name: "Harry"
+}];
+app.get('/activeUsers', function (req, res) {
+    res.send(activeUsers);
 });
-var activeUsers = [];
 app.get('/login/:name', function (req, res) {
+    console.log('hej');
     var name = req.params.name;
     var isActive = false;
     for(var i = 0; i < activeUsers.length; i++) {
-        if (activeUsers[i].name === name) isActive = true;
+        if (activeUsers[i].name.toUpperCase() == name.toUpperCase()) isActive = true;
     }
-    if(!isActive) activeUsers.push({name: name});
-    res.send(isActive);
+    if(!isActive) {
+        console.log('i should redirect');
+        activeUsers.push({name: name});
+        res.send({redirect: '/messages'});
+    } else {
+        res.send({errorMsg: "Användarnamnet är upptaget. \nVänligen välj ett annat användarnamn."});
+    }
+
+    console.log('test: ' + activeUsers);
+
 });
 
 // ------------

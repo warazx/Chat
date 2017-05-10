@@ -4,50 +4,6 @@ app.factory('mySocket', function(socketFactory) {
     return socketFactory();
 });
 
-app.value('users', [
-    {
-        id : 1,
-        name : "1337Leif",
-        isUserOnline : false,
-        messages : []
-    },
-    {
-        id : 2,
-        name : "RegExRolf",
-        isUserOnline : false,
-        messages : [] },
-    {
-        id : 3,
-        name : "BooleanBob",
-        isUserOnline : true,
-        messages : []
-    },
-    {
-        id : 4,
-        name : "ErrorEmil",
-        isUserOnline : true,
-        messages : []
-    },
-    {
-        id : 5,
-        name : "SyntaxScotty",
-        isUserOnline : false,
-        messages : []
-    },
-    {
-        id : 6,
-        name : "ForLoopFred",
-        isUserOnline : false,
-        messages : []
-    },
-    {
-        id : 7,
-        name : "OutOfBoundsBoerjesson",
-        isUserOnline : false,
-        messages : []
-    }
-]);
-
 app.config(function ($routeProvider) {
     $routeProvider.when('/', {
         controller: 'LoginController',
@@ -56,7 +12,7 @@ app.config(function ($routeProvider) {
         controller: 'MessagesController',
         templateUrl: 'partials/messages.html',
         auth: function(user) {
-            return user
+            return user;
         }
     });
 });
@@ -82,7 +38,7 @@ app.directive("contenteditable", function() {
         }
     };
 });
-
+/*
 app.run(function($rootScope, $location) {
     $rootScope.$on('$routeChangeStart', function(ev, next, curr) {
         if (next.$$route) {
@@ -92,11 +48,42 @@ app.run(function($rootScope, $location) {
                 $location.path("/");
             }
         }
-    })
+    });
+});
+*/
+
+app.factory('loginManager', function($http, $q) {
+    return {
+        loginRequest: function(username) {
+            return $q(function(resolve) {
+                $http.get('./login/' + username).then(function(response) {
+                    resolve(response.data);
+                });
+            });
+        }
+    };
 });
 
-app.controller('SideController', function ($window, $scope, $rootScope, users) {
-    $scope.users = users;
+app.factory('userManager', function($http, $q) {
+    return {
+        getActiveUsers: function() {
+            return $q(function(resolve) {
+                $http.get('./activeUsers').then(function(response) {
+                    resolve(response.data);
+                });
+            });
+        }
+    };
+});
+
+app.controller('SideController', function ($interval, $window, $scope, $rootScope, userManager ) {
+    //Gets all current active users from the server.
+    $interval(function () {
+        userManager.getActiveUsers().then(function(response) {
+            $scope.users = response;
+            console.log('new req');
+        });
+    }, 1000);
 
     $scope.userLogout = function() {
         console.log("baaad");
@@ -105,27 +92,33 @@ app.controller('SideController', function ($window, $scope, $rootScope, users) {
     };
 });
 
-app.controller('LoginController', function ($scope, $rootScope, $location, users) {
-    $scope.users = users;
+app.controller('LoginController', function ($window, $scope, $rootScope, $location, loginManager) {
+    $scope.errorMessage = "";
     $scope.userLogin = function(login) {
-        //Check that username is not already in use by another user.
-        for (var i = 0; i < users.length; i++) {
-            if ($scope.login.username == users[i].name) {
-                if (users[i].isUserOnline) {
-                    alert('User is already logged in. Log in using a different username.');
-                } else {
-                    users[i].isUserOnline = true;
-                    $rootScope.user = users[i];
-                    $location.path("/messages");
+        if ($scope.login === undefined || $scope.login.username === undefined || $scope.login.username === "") {
+            $scope.errorMessage = "Du måste välja ett användarnamn!";
+        } else {
+            loginManager.loginRequest($scope.login.username).then(function(response) {
+
+                if (response.redirect) {
+                    console.log('i got here');
+                    $scope.errorMessage = "";
+                    $location.path(response.redirect);
                     $rootScope.showMenu = true;
+                    $rootScope.user = {
+                        name: $scope.login.username
+                    };
+                } else {
+                    $scope.errorMessage = response.errorMsg;
+                    console.log($scope.errorMessage);
                 }
-            }
+            });
         }
-    }
+    };
 });
 
-app.controller('MessagesController', function ($scope,$rootScope, users, mySocket) {
-    $scope.users = users;
+app.controller('MessagesController', function ($scope,$rootScope, mySocket) {
+    //$scope.users = users;
     $scope.title = "Messages";
     $scope.messages = [];
     document.getElementById('my-message').focus();
@@ -139,11 +132,11 @@ app.controller('MessagesController', function ($scope,$rootScope, users, mySocke
         //keyCode 13 is the enter key
         if(e.keyCode==13 && !e.shiftKey){
             e.preventDefault();
-            if($scope.textMessage != "" && $scope.textMessage != "<br>") {
+            if($scope.textMessage !== "" && $scope.textMessage != "<br>") {
                 $scope.postMessage();
             }
         }
-    }
+    };
 
     var currentId = 0; //Temp
     $scope.postMessage = function() {

@@ -58,6 +58,9 @@ app.config(function ($routeProvider) {
         auth: function(user) {
             return user
         }
+    }).when('/settings', {
+        controller: 'SettingsController',
+        templateUrl: 'partials/settings.html',
     });
 });
 
@@ -122,6 +125,10 @@ app.controller('LoginController', function ($scope, $rootScope, $location, users
             }
         }
     }
+});
+
+app.controller('SettingsController', function ($scope, $rootScope, $location, users){
+	
 });
 
 app.controller('MessagesController', function ($scope,$rootScope, users, mySocket) {

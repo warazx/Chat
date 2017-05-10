@@ -214,7 +214,7 @@ a:hover {
 #messages-view {
     display: flex;
     flex-direction: column;
-    padding: 1rem;
+    padding: 1rem 1rem 0;
     background-color: #FFFFFF;
 }
 
@@ -236,4 +236,25 @@ a:hover {
     font-size: 0.8rem;
     color: #dd2b38;
     margin: 0.7rem auto 1rem;
+}
+
+#status-message {
+    min-height: 2rem;
+    padding: 0 auto;
+    margin: 0.2rem auto 0.1rem;
+}
+
+#status-message span {
+    vertical-align: middle;
+    margin: 1rem auto 0;
+}
+
+#status-message-time {
+    font-size: 0.7em;
+    padding-right: 0.5rem;
+    color: #595959;
+}
+
+#status-message-text {
+    font-size: 0.8rem;
 }

@@ -83,7 +83,7 @@ app.directive("contenteditable", function() {
     };
 });
 
-app.run(function($rootScope, $location, mySocket) {
+app.run(function($rootScope, $location, $http, mySocket) {
     $rootScope.$on('$routeChangeStart', function(ev, next, curr) {
         if (next.$$route) {
             var user = $rootScope.user;
@@ -94,7 +94,7 @@ app.run(function($rootScope, $location, mySocket) {
         }
     });
     mySocket.on('disconnect message', function(msg) {
-        $rootScope.messages.push(msg);
+        $rootScope.statusMessage = msg;
     });
 });
 
@@ -102,18 +102,13 @@ app.controller('SideController', function ($window, $scope, $rootScope, users, m
     $scope.users = users;
 
     $rootScope.userLogout = function() {
-        var disconnectMsg = {
-            "sender": $rootScope.user.name,
-            "date": new Date(),
-            "text": $rootScope.user.name + " har loggat ut."
-        }
-        mySocket.emit('disconnect message' , disconnectMsg);
+        mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat ut."});
         $window.location.href = "/logout/" + $rootScope.user.name;
         $rootScope.showMenu = false;
     };
 });
 
-app.controller('LoginController', function ($scope, $rootScope, $location, users) {
+app.controller('LoginController', function ($scope, $rootScope, $location, users, mySocket) {
     $scope.users = users;
     $scope.errorMessage = "";
     $scope.userLogin = function(login) {
@@ -129,6 +124,7 @@ app.controller('LoginController', function ($scope, $rootScope, $location, users
                         users[i].isUserOnline = true;
                         $rootScope.user = users[i];
                         $location.path("/messages");
+                        mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat in."});
                         $rootScope.showMenu = true;
                     }
                 }
@@ -137,15 +133,21 @@ app.controller('LoginController', function ($scope, $rootScope, $location, users
     }
 });
 
-app.controller('MessagesController', function ($scope, $rootScope, users, mySocket) {
+app.controller('MessagesController', function ($scope, $rootScope, $http, users, mySocket) {
+    $http.get('/messages').then(function(response) {
+        $rootScope.messages = response.data;
+    });
     $scope.users = users;
     $scope.title = "Messages";
     $rootScope.messages = [];
     document.getElementById('my-message').focus();
 
     mySocket.on('broadcast message', function(msg){
-        console.log(msg);
         $rootScope.messages.push(msg);
+    });
+
+    mySocket.on('connect message', function(msg) {
+        $rootScope.statusMessage = msg;
     });
 
     document.getElementById('my-message').onkeypress=function(e){
@@ -165,6 +167,7 @@ app.controller('MessagesController', function ($scope, $rootScope, users, mySock
             "date": new Date(),
             "text": $scope.textMessage
         };
+        $http.post('/messages', {sender: $rootScope.user.name, text: $scope.textMessage});
         mySocket.emit('broadcast message', newMessage);
         $scope.textMessage = "";
         document.getElementById('my-message').focus();

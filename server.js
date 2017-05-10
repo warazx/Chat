@@ -7,7 +7,7 @@ var app = express();
 var port = 3000;
 var db;
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
 mongo.connect('mongodb://shutapp:shutapp123@ds133981.mlab.com:33981/shutapp', function(err, database) {
     if (err) {
@@ -17,13 +17,19 @@ mongo.connect('mongodb://shutapp:shutapp123@ds133981.mlab.com:33981/shutapp', fu
 });
 
 app.post('/messages', function(req, res) {
-    db.collection('users').save(req.body, function(err, result) {
-        if (err) {
-            console.log(err);
+    db.collection('messages').insert({ sender: req.body.sender, date: new Date(), text: req.body.text }).then(function() {
+        res.status(201).send({});
+    });
+});
+
+app.get('/messages', function(req, res) {
+    db.collection('messages').find().sort({ "date": 1 }).toArray(function(error, result) {
+        if (error) {
+            response.status(500).send(error);
+            return;
         }
-        console.log("Saved to database.");
-        res.redirect('/messages');
-    })
+        res.status(200).send(result);
+    });
 });
 
 app.use(express.static(__dirname + '/public'));
@@ -62,6 +68,9 @@ io.on('connection', function(socket){
     });
     socket.on('private message', function(message){
         io.emit('private message', message);
+    });
+    socket.on('connect message', function(message) {
+        io.emit('connect message', message);
     });
     socket.on('disconnect message', function(message) {
         io.emit('disconnect message', message);

@@ -38,8 +38,10 @@ app.directive("contenteditable", function() {
         }
     };
 });
+
+//Code not working with new server login handler. Delete?
 /*
-app.run(function($rootScope, $location) {
+app.run(function($rootScope, $location, mySocket) {
     $rootScope.$on('$routeChangeStart', function(ev, next, curr) {
         if (next.$$route) {
             var user = $rootScope.user;
@@ -49,8 +51,13 @@ app.run(function($rootScope, $location) {
             }
         }
     });
+    mySocket.on('disconnect message', function(msg) {
+        $rootScope.messages.push(msg);
+    });
+});
 });
 */
+
 
 app.factory('loginManager', function($http, $q) {
     return {
@@ -76,7 +83,7 @@ app.factory('userManager', function($http, $q) {
     };
 });
 
-app.controller('SideController', function ($interval, $window, $scope, $rootScope, userManager ) {
+app.controller('SideController', function ($interval, $window, $scope, $rootScope, userManager, mySocket ) {
     //Gets all current active users from the server.
     $interval(function () {
         userManager.getActiveUsers().then(function(response) {
@@ -85,9 +92,14 @@ app.controller('SideController', function ($interval, $window, $scope, $rootScop
         });
     }, 1000);
 
-    $scope.userLogout = function() {
-        console.log("baaad");
-        $window.location.href = "/";
+    $rootScope.userLogout = function() {
+        var disconnectMsg = {
+            "sender": $rootScope.user.name,
+            "date": new Date(),
+            "text": $rootScope.user.name + " har loggat ut."
+        };
+        mySocket.emit('disconnect message' , disconnectMsg);
+        $window.location.href = "/logout/" + $rootScope.user.name;
         $rootScope.showMenu = false;
     };
 });
@@ -98,6 +110,7 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
         if ($scope.login === undefined || $scope.login.username === undefined || $scope.login.username === "") {
             $scope.errorMessage = "Du måste välja ett användarnamn!";
         } else {
+
             loginManager.loginRequest($scope.login.username).then(function(response) {
 
                 if (response.redirect) {
@@ -117,15 +130,16 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
     };
 });
 
+
 app.controller('MessagesController', function ($scope,$rootScope, mySocket) {
     //$scope.users = users;
     $scope.title = "Messages";
-    $scope.messages = [];
+    $rootScope.messages = [];
     document.getElementById('my-message').focus();
 
     mySocket.on('broadcast message', function(msg){
         console.log(msg);
-        $scope.messages.push(msg);
+        $rootScope.messages.push(msg);
     });
 
     document.getElementById('my-message').onkeypress=function(e){

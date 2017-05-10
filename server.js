@@ -31,12 +31,18 @@ app.use(express.static(__dirname + '/public'));
 //Mock data with users.
 var users = require('./mock/users.json');
 //GET handler for users.
-var activeUsers = [{
-    name: "Harry"
-}];
 app.get('/activeUsers', function (req, res) {
     res.send(activeUsers);
 });
+
+var activeUsers = [];
+
+app.get('/logout/:name', function (req, res) {
+    var name = req.params.name;
+    activeUsers.splice(activeUsers.indexOf(name), 1);
+    res.redirect("/");
+});
+
 app.get('/login/:name', function (req, res) {
     console.log('hej');
     var name = req.params.name;
@@ -59,15 +65,17 @@ app.get('/login/:name', function (req, res) {
 // ------------
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-
 io.on('connection', function(socket){
-  //message
-  socket.on('broadcast message', function(message){
-    io.emit('broadcast message', message);
-  });
-   socket.on('private message', function(message){
-    io.emit('private message', message);
-  });
+    //message
+    socket.on('broadcast message', function(message){
+        io.emit('broadcast message', message);
+    });
+    socket.on('private message', function(message){
+        io.emit('private message', message);
+    });
+    socket.on('disconnect message', function(message) {
+        io.emit('disconnect message', message);
+    });
 });
 
 http.listen(port, function(){

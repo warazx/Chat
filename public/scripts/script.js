@@ -83,7 +83,7 @@ app.directive("contenteditable", function() {
     };
 });
 
-app.run(function($rootScope, $location, $http, mySocket) {
+app.run(function($rootScope, $location, $interval, $http, mySocket) {
     $rootScope.$on('$routeChangeStart', function(ev, next, curr) {
         if (next.$$route) {
             var user = $rootScope.user;
@@ -96,13 +96,16 @@ app.run(function($rootScope, $location, $http, mySocket) {
     mySocket.on('disconnect message', function(msg) {
         $rootScope.statusMessage = msg;
     });
+    $interval(function() {
+        $http.post('/heartbeat', {name: $rootScope.user.name});
+    }, 1000*60*5);
 });
 
 app.controller('SideController', function ($window, $scope, $rootScope, users, mySocket) {
     $scope.users = users;
 
     $rootScope.userLogout = function() {
-        mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat ut."});
+        mySocket.emit('disconnect message', {date: new Date(), text: $rootScope.user.name + " har loggat ut."});
         $window.location.href = "/logout/" + $rootScope.user.name;
         $rootScope.showMenu = false;
     };
@@ -123,6 +126,7 @@ app.controller('LoginController', function ($scope, $rootScope, $location, users
                     } else {
                         users[i].isUserOnline = true;
                         $rootScope.user = users[i];
+                        mySocket.emit('connected', $rootScope.user.name);
                         $location.path("/messages");
                         mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat in."});
                         $rootScope.showMenu = true;

@@ -58,10 +58,41 @@ app.get('/login/:name', function (req, res) {
     res.send(isActive);
 });
 
+var heartbeatUsers = [];
+app.post('/heartbeat', function(req, res) {
+    var name = req.body.name;
+    var exists = false;
+    for (var i = 0; i < heartbeatUsers.length; i++) {
+        if (heartbeatUsers[i].name == name) {
+            heartbeatUsers[i].time = new Date();
+            exists = true;
+        }
+    }
+    if(!exists) {
+        heartbeatUsers.push({name: name, time: new Date()});
+    }
+    console.log(heartbeatUsers);
+});
+
+setInterval(function() {
+    var now = new Date();
+    for (var i = heartbeatUsers.length - 1; i >= 0; i--) {
+        var difference = now - heartbeatUsers[i].time; // Difference between the time right now and last heartbeat.
+        var diffMins = Math.round(((difference % 86400000) % 3600000) / 60000);
+        if (diffMins > 5) {
+            heartbeatUsers.splice(i, 1);
+        }
+    }
+}, 1000*60*5);
+
 // ------------
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 io.on('connection', function(socket){
+    var socketUser;
+    socket.on('connected', function(username) {
+        socketUser = username;
+    });
     //message
     socket.on('broadcast message', function(message){
         io.emit('broadcast message', message);
@@ -70,13 +101,16 @@ io.on('connection', function(socket){
         io.emit('private message', message);
     });
     socket.on('connect message', function(message) {
-        io.emit('connect message', message);
+        socket.broadcast.emit('connect message', message);
     });
     socket.on('disconnect message', function(message) {
         io.emit('disconnect message', message);
     });
+    socket.on('disconnect', function() {
+        io.emit('disconnect message', {date: new Date(), text: socketUser + " har loggat ut."});
+    });
 });
 
 http.listen(port, function(){
-  console.log('Listening on: ' + port);
+    console.log('Listening on: ' + port);
 });

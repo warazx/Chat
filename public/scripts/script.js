@@ -88,7 +88,7 @@ app.controller('SideController', function ($interval, $window, $location, $scope
     //Gets all current active users from the server.
     $rootScope.userLogout = function() {
         $location.path('/');
-        mySocket.disconnect();
+        mySocket.emit('disconnect');
         $rootScope.showMenu = false;
     };
 });
@@ -97,7 +97,8 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
     $scope.errorMessage = "";
     $scope.userLogin = function() {
         if ($scope.login === undefined || $scope.login.username === undefined || $scope.login.username === "") {
-            $scope.errorMessage = "Du måste välja ett användarnamn!";
+            $scope.errorMessage = "Du måste välja ett användarnamn som innehåller minst tre tecken och max tjugo tecken. " +
+                "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";
         } else {
             loginManager.loginRequest($scope.login.username).then(function(response) {
                 if (response.redirect) {
@@ -119,7 +120,7 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
     };
 });
 
-app.controller('MessagesController', function ($scope,$rootScope, $http, mySocket) {
+app.controller('MessagesController', function ($scope, $rootScope, $http, mySocket) {
     $http.get('/messages').then(function(response) {
         $rootScope.messages = response.data;
     });

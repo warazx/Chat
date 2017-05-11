@@ -60,11 +60,8 @@ app.get('/login/:name', function (req, res) {
     } else {
         res.send({errorMsg: "Användarnamnet är upptaget. \nVänligen välj ett annat användarnamn."});
     }
-
-    console.log('test: ' + activeUsers);
-
 });
-
+/*
 var heartbeatUsers = [];
 app.post('/heartbeat', function(req, res) {
     var name = req.body.name;
@@ -91,12 +88,12 @@ setInterval(function() {
         }
     }
 }, 1000*60*5);
-
+*/
 io.on('connection', function(socket){
-    var socketUser;
     socket.on('connected', function(username) {
-        activeUsers.push({ name: username });
-        socketUser = username;
+        socket.username = username;
+        console.log(socket.username + " has connected.");
+        activeUsers.push({ name: socket.username });
         io.emit('active users', activeUsers);
     });
     //message
@@ -114,10 +111,11 @@ io.on('connection', function(socket){
     });
     socket.on('disconnect', function() {
         activeUsers.splice(activeUsers.findIndex(function(obj) {
-            return obj.name === socketUser;
+            return obj.name === socket.username;
         }), 1);
+        console.log(socket.id + " has disconnected.");
         socket.broadcast.emit('active users', activeUsers);
-        socket.broadcast.emit('disconnect message', {date: new Date(), text: socketUser + " har loggat ut."});
+        socket.broadcast.emit('disconnect message', {date: new Date(), text: socket.username + " har loggat ut."});
     });
 });
 

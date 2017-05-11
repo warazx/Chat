@@ -169,8 +169,8 @@ a:hover {
     box-sizing: border-box;
     background-color: #f2f0d5;
     color: #372731;
-    min-width: 35%;
-    margin: 50vh 37.5%;
+    min-width: 25%;
+    margin: 0 37.5% 40vh;
 }
 
 #login-container input[type=text] {
@@ -194,6 +194,12 @@ a:hover {
     background-color: #ebe9ce;
     color: #52414C;
     border: 1px solid #52414C;
+}
+
+#login-title {
+    margin: 0 34vw 3rem;
+    font-size: 6rem;
+    color: white;
 }
 
 #logout-button {
@@ -235,17 +241,19 @@ a:hover {
 }
 
 .error-message {
-    white-space: pre;
     height: auto;
     font-size: 0.8rem;
     color: #dd2b38;
     margin: 0.7rem auto 1rem;
+    white-space: pre-wrap;
+    word-wrap: normal;
 }
 
 #status-message {
     min-height: 2rem;
     padding: 0 auto;
     margin: 0.2rem auto 0.1rem;
+    text-align: center;
 }
 
 #status-message span {

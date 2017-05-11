@@ -4,50 +4,6 @@ app.factory('mySocket', function(socketFactory) {
     return socketFactory();
 });
 
-app.value('users', [
-    {
-        id : 1,
-        name : "1337Leif",
-        isUserOnline : false,
-        messages : []
-    },
-    {
-        id : 2,
-        name : "RegExRolf",
-        isUserOnline : false,
-        messages : [] },
-    {
-        id : 3,
-        name : "BooleanBob",
-        isUserOnline : true,
-        messages : []
-    },
-    {
-        id : 4,
-        name : "ErrorEmil",
-        isUserOnline : true,
-        messages : []
-    },
-    {
-        id : 5,
-        name : "SyntaxScotty",
-        isUserOnline : false,
-        messages : []
-    },
-    {
-        id : 6,
-        name : "ForLoopFred",
-        isUserOnline : false,
-        messages : []
-    },
-    {
-        id : 7,
-        name : "OutOfBoundsBoerjesson",
-        isUserOnline : false,
-        messages : []
-    }
-]);
-
 app.config(function ($routeProvider) {
     $routeProvider.when('/', {
         controller: 'LoginController',
@@ -56,7 +12,7 @@ app.config(function ($routeProvider) {
         controller: 'MessagesController',
         templateUrl: 'partials/messages.html',
         auth: function(user) {
-            return user
+            return user;
         }
     });
 });
@@ -84,7 +40,7 @@ app.directive("contenteditable", function() {
 });
 
 app.run(function($rootScope, $location, $interval, $http, mySocket) {
-    $rootScope.$on('$routeChangeStart', function(ev, next, curr) {
+    /*$rootScope.$on('$routeChangeStart', function(ev, next, curr) {
         if (next.$$route) {
             var user = $rootScope.user;
             var auth = next.$$route.auth;
@@ -92,57 +48,80 @@ app.run(function($rootScope, $location, $interval, $http, mySocket) {
                 $location.path("/");
             }
         }
-    });
+    });*/
     mySocket.on('disconnect message', function(msg) {
         $rootScope.statusMessage = msg;
+    });
+    mySocket.on('active users', function(arr) {
+        $rootScope.users = arr;
     });
     $interval(function() {
         $http.post('/heartbeat', {name: $rootScope.user.name});
     }, 1000*60*5);
 });
 
-app.controller('SideController', function ($window, $scope, $rootScope, users, mySocket) {
-    $scope.users = users;
+app.factory('loginManager', function($http, $q) {
+    return {
+        loginRequest: function(username) {
+            return $q(function(resolve) {
+                $http.get('./login/' + username).then(function(response) {
+                    resolve(response.data);
+                });
+            });
+        }
+    };
+});
 
+/*app.factory('userManager', function($http, $q) {
+    return {
+        getActiveUsers: function() {
+            return $q(function(resolve) {
+                $http.get('./activeUsers').then(function(response) {
+                    resolve(response.data);
+                });
+            });
+        }
+    };
+});*/
+
+app.controller('SideController', function ($interval, $window, $scope, $rootScope, mySocket ) {
+    //Gets all current active users from the server.
     $rootScope.userLogout = function() {
-        mySocket.emit('disconnect message', {date: new Date(), text: $rootScope.user.name + " har loggat ut."});
-        $window.location.href = "/logout/" + $rootScope.user.name;
+        mySocket.disconnect();
         $rootScope.showMenu = false;
     };
 });
 
-app.controller('LoginController', function ($scope, $rootScope, $location, users, mySocket) {
-    $scope.users = users;
+app.controller('LoginController', function ($window, $scope, $rootScope, $location, mySocket, loginManager) {
     $scope.errorMessage = "";
-    $scope.userLogin = function(login) {
+    $scope.userLogin = function() {
         if ($scope.login === undefined || $scope.login.username === undefined || $scope.login.username === "") {
             $scope.errorMessage = "Du måste välja ett användarnamn!";
         } else {
-            //Check that username is not already in use by another user.
-            for (var i = 0; i < users.length; i++) {
-                if ($scope.login.username.toUpperCase() == users[i].name.toUpperCase()) {
-                    if (users[i].isUserOnline) {
-                        $scope.errorMessage = "Användarnamnet är upptaget. \nVänligen välj ett annat användarnamn.";
-                    } else {
-                        users[i].isUserOnline = true;
-                        $rootScope.user = users[i];
-                        mySocket.emit('connected', $rootScope.user.name);
-                        $location.path("/messages");
-                        mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat in."});
-                        $rootScope.showMenu = true;
-                    }
+            loginManager.loginRequest($scope.login.username).then(function(response) {
+                if (response.redirect) {
+                    console.log('i got here');
+                    $scope.errorMessage = "";
+                    $location.path(response.redirect);
+                    $rootScope.showMenu = true;
+                    $rootScope.user = {
+                        name: $scope.login.username
+                    };
+                    mySocket.emit('connected', $rootScope.user.name);
+                    mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat in."});
+                } else {
+                    $scope.errorMessage = response.errorMsg;
+                    console.log($scope.errorMessage);
                 }
-            }
+            });
         }
-    }
+    };
 });
 
-app.controller('MessagesController', function ($scope, $rootScope, $http, users, mySocket) {
+app.controller('MessagesController', function ($scope,$rootScope, $http, mySocket) {
     $http.get('/messages').then(function(response) {
         $rootScope.messages = response.data;
     });
-    $scope.users = users;
-    $scope.title = "Messages";
     $rootScope.messages = [];
     document.getElementById('my-message').focus();
 
@@ -158,11 +137,11 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, users,
         //keyCode 13 is the enter key
         if(e.keyCode==13 && !e.shiftKey){
             e.preventDefault();
-            if($scope.textMessage != "" && $scope.textMessage != "<br>") {
+            if($scope.textMessage !== "" && $scope.textMessage != "<br>") {
                 $scope.postMessage();
             }
         }
-    }
+    };
 
     var currentId = 0; //Temp
     $scope.postMessage = function() {

@@ -3,11 +3,16 @@ var mongo = require('mongodb').MongoClient;
 var bodyParser = require('body-parser');
 
 var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+
+var activeUsers = [];
 
 var port = 3000;
 var db;
 
 app.use(bodyParser.json());
+app.use(express.static(__dirname + '/public'));
 
 mongo.connect('mongodb://shutapp:shutapp123@ds133981.mlab.com:33981/shutapp', function(err, database) {
     if (err) {
@@ -32,30 +37,32 @@ app.get('/messages', function(req, res) {
     });
 });
 
-app.use(express.static(__dirname + '/public'));
-
 //Mock data with users.
 var users = require('./mock/users.json');
-//GET handler for users.
-app.get('/users', function (req, res) {
-    res.send(users);
-});
-var activeUsers = [];
 
-app.get('/logout/:name', function (req, res) {
+/*app.get('/logout/:name', function (req, res) {
     var name = req.params.name;
-    activeUsers.splice(activeUsers.indexOf(name), 1);
+    activeUsers.splice(activeUsers.findIndex(function(obj) {
+        return obj.name === name;
+    }), 1);
     res.redirect("/");
-});
+});*/
 
 app.get('/login/:name', function (req, res) {
     var name = req.params.name;
     var isActive = false;
     for(var i = 0; i < activeUsers.length; i++) {
-        if (activeUsers[i].name === name) isActive = true;
+        if (activeUsers[i].name.toUpperCase() == name.toUpperCase()) isActive = true;
     }
-    if(!isActive) activeUsers.push({name: name});
-    res.send(isActive);
+    if(!isActive) {
+        console.log('I should redirect');
+        res.send({redirect: '/messages'});
+    } else {
+        res.send({errorMsg: "Användarnamnet är upptaget. \nVänligen välj ett annat användarnamn."});
+    }
+
+    console.log('test: ' + activeUsers);
+
 });
 
 var heartbeatUsers = [];
@@ -85,13 +92,12 @@ setInterval(function() {
     }
 }, 1000*60*5);
 
-// ------------
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
 io.on('connection', function(socket){
     var socketUser;
     socket.on('connected', function(username) {
+        activeUsers.push({ name: username });
         socketUser = username;
+        io.emit('active users', activeUsers);
     });
     //message
     socket.on('broadcast message', function(message){
@@ -107,6 +113,10 @@ io.on('connection', function(socket){
         io.emit('disconnect message', message);
     });
     socket.on('disconnect', function() {
+        activeUsers.splice(activeUsers.findIndex(function(obj) {
+            return obj.name === socketUser;
+        }));
+        io.emit('active users', activeUsers);
         io.emit('disconnect message', {date: new Date(), text: socketUser + " har loggat ut."});
     });
 });

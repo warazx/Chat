@@ -11,9 +11,9 @@ app.config(function ($routeProvider) {
     }).when('/messages', {
         controller: 'MessagesController',
         templateUrl: 'partials/messages.html',
-        auth: function(user) {
+        /*auth: function(user) {
             return user;
-        }
+        }*/
     });
 });
 

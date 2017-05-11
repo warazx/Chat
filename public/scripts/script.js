@@ -88,7 +88,7 @@ app.controller('SideController', function ($interval, $window, $location, $scope
     //Gets all current active users from the server.
     $rootScope.userLogout = function() {
         $location.path('/');
-        mySocket.emit('disconnect');
+        mySocket.disconnect();
         $rootScope.user = null;
         $rootScope.showMenu = false;
     };

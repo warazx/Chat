@@ -113,7 +113,7 @@ io.on('connection', function(socket){
         activeUsers.splice(activeUsers.findIndex(function(obj) {
             return obj.name === socket.username;
         }), 1);
-        console.log(socket.id + " has disconnected.");
+        console.log(socket.username + " has disconnected.");
         socket.broadcast.emit('active users', activeUsers);
         socket.broadcast.emit('disconnect message', {date: new Date(), text: socket.username + " har loggat ut."});
     });

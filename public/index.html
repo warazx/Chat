@@ -6,9 +6,9 @@
 		<link rel="stylesheet" href="css/style.css">
     </head>
     <body>
-        <div id="content">
+        <div id="content" ng-cloak>
             <div id="container" ng-view></div>
-            <div id="side-menu" ng-controller="SideController" ng-show="showMenu" ng-cloak>
+            <div id="side-menu" ng-controller="SideController" ng-show="showMenu">
                 <div id="title">
                     <h1>ShutApp</h1>
                 </div>

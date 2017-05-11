@@ -88,6 +88,7 @@ app.controller('SideController', function ($interval, $window, $location, $scope
     //Gets all current active users from the server.
     $rootScope.userLogout = function() {
         $location.path('/');
+        $rootScope.user = null;
         mySocket.disconnect();
         $rootScope.showMenu = false;
     };
@@ -119,7 +120,14 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
     };
 });
 
-app.controller('MessagesController', function ($scope,$rootScope, $http, mySocket) {
+app.controller('MessagesController', function ($scope,$rootScope, $http, $location, mySocket) {
+
+    //Checks if user object exist on rootScope and if not, redirects to loginpage.
+    if (!$rootScope.user) {
+        console.log("User not logged in! Redirecting to login.");
+        $location.path('/');
+    }
+
     $http.get('/messages').then(function(response) {
         $rootScope.messages = response.data;
     });

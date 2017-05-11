@@ -115,9 +115,9 @@ io.on('connection', function(socket){
     socket.on('disconnect', function() {
         activeUsers.splice(activeUsers.findIndex(function(obj) {
             return obj.name === socketUser;
-        }));
-        io.emit('active users', activeUsers);
-        io.emit('disconnect message', {date: new Date(), text: socketUser + " har loggat ut."});
+        }), 1);
+        socket.broadcast.emit('active users', activeUsers);
+        socket.broadcast.emit('disconnect message', {date: new Date(), text: socketUser + " har loggat ut."});
     });
 });
 

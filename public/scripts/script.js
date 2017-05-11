@@ -89,6 +89,7 @@ app.controller('SideController', function ($interval, $window, $location, $scope
     $rootScope.userLogout = function() {
         $location.path('/');
         mySocket.emit('disconnect');
+        $rootScope.user = null;
         $rootScope.showMenu = false;
     };
 });
@@ -97,7 +98,7 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
     $scope.errorMessage = "";
     $scope.userLogin = function() {
         if ($scope.login === undefined || $scope.login.username === undefined || $scope.login.username === "") {
-            $scope.errorMessage = "Du måste välja ett användarnamn som innehåller minst tre tecken och max tjugo tecken. " +
+            $scope.errorMessage = "Du måste välja ett användarnamn som innehåller minst tre tecken och max tjugo tecken." +
                 "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";
         } else {
             loginManager.loginRequest($scope.login.username).then(function(response) {
@@ -120,44 +121,50 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
     };
 });
 
-app.controller('MessagesController', function ($scope, $rootScope, $http, mySocket) {
-    $http.get('/messages').then(function(response) {
-        $rootScope.messages = response.data;
-    });
-    $rootScope.messages = [];
-    document.getElementById('my-message').focus();
-
-    mySocket.on('broadcast message', function(msg){
-        $rootScope.messages.push(msg);
-    });
-
-    mySocket.on('connect message', function(msg) {
-        $rootScope.statusMessage = msg;
-    });
-
-    document.getElementById('my-message').onkeypress=function(e){
-        //keyCode 13 is the enter key
-        if(e.keyCode==13 && !e.shiftKey){
-            e.preventDefault();
-            if($scope.textMessage !== "" && $scope.textMessage != "<br>") {
-                $scope.postMessage();
-            }
-        }
-    };
-
-    var currentId = 0; //Temp
-    $scope.postMessage = function() {
-        var newMessage = {
-            "sender": $rootScope.user.name,
-            "date": new Date(),
-            "text": $scope.textMessage
-        };
-        $http.post('/messages', {sender: $rootScope.user.name, text: $scope.textMessage});
-        mySocket.emit('broadcast message', newMessage);
-        $scope.textMessage = "";
+app.controller('MessagesController', function ($scope,$rootScope, $http, $location, mySocket) {
+    //Checks if user object exist on rootScope and if not, redirects to loginpage.
+    if (!$rootScope.user) {
+        console.log("User not logged in! Redirecting to login.");
+        $location.path('/');
+    } else {
+        $http.get('/messages').then(function(response) {
+            $rootScope.messages = response.data;
+        });
+        $rootScope.messages = [];
         document.getElementById('my-message').focus();
-        currentId++;
 
-        return false;
-    };
+        mySocket.on('broadcast message', function(msg){
+            $rootScope.messages.push(msg);
+        });
+
+        mySocket.on('connect message', function(msg) {
+            $rootScope.statusMessage = msg;
+        });
+
+        document.getElementById('my-message').onkeypress=function(e){
+            //keyCode 13 is the enter key
+            if(e.keyCode==13 && !e.shiftKey){
+                e.preventDefault();
+                if($scope.textMessage !== "" && $scope.textMessage != "<br>") {
+                    $scope.postMessage();
+                }
+            }
+        };
+
+        var currentId = 0; //Temp
+        $scope.postMessage = function() {
+            var newMessage = {
+                "sender": $rootScope.user.name,
+                "date": new Date(),
+                "text": $scope.textMessage
+            };
+            $http.post('/messages', {sender: $rootScope.user.name, text: $scope.textMessage});
+            mySocket.emit('broadcast message', newMessage);
+            $scope.textMessage = "";
+            document.getElementById('my-message').focus();
+            currentId++;
+
+            return false;
+        };
+    }
 });

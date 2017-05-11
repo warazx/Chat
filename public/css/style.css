@@ -63,6 +63,8 @@ a:hover {
     padding: 0.1em;
     margin: 1em;
     overflow-y: auto;
+    max-width: 75vw;
+    word-wrap: break-word;
 }
 
 #my-message-container {
@@ -107,6 +109,8 @@ a:hover {
 .message-text {
     /*font-family: Catamaran-Light;*/
     font-size: 1em;
+    max-width: 78vw;
+    word-wrap: break-word;
 }
 
 #content {

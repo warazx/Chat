@@ -84,9 +84,10 @@ app.factory('loginManager', function($http, $q) {
     };
 });*/
 
-app.controller('SideController', function ($interval, $window, $scope, $rootScope, mySocket ) {
+app.controller('SideController', function ($interval, $window, $location, $scope, $rootScope, mySocket) {
     //Gets all current active users from the server.
     $rootScope.userLogout = function() {
+        $location.path('/');
         mySocket.disconnect();
         $rootScope.showMenu = false;
     };

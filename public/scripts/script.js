@@ -55,9 +55,9 @@ app.run(function($rootScope, $location, $interval, $http, mySocket) {
     mySocket.on('active users', function(arr) {
         $rootScope.users = arr;
     });
-    $interval(function() {
+    /*$interval(function() {
         $http.post('/heartbeat', {name: $rootScope.user.name});
-    }, 1000*60*5);
+    }, 1000*60*5);*/
 });
 
 app.factory('loginManager', function($http, $q) {

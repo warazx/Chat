@@ -23,6 +23,7 @@ mongo.connect('mongodb://shutapp:shutapp123@ds133981.mlab.com:33981/shutapp', fu
 
 app.post('/messages', function(req, res) {
     db.collection('messages').insert({ sender: req.body.sender, date: new Date(), text: req.body.text }).then(function() {
+        //201 is an "okay" status code
         res.status(201).send({});
     });
 });
@@ -33,6 +34,7 @@ app.get('/messages', function(req, res) {
             response.status(500).send(error);
             return;
         }
+        //200 is an "okay" status code
         res.status(200).send(result);
     });
 });

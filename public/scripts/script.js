@@ -8,6 +8,9 @@ app.config(function ($routeProvider) {
     $routeProvider.when('/', {
         controller: 'LoginController',
         templateUrl: 'partials/login.html'
+    }).when('/signup', {
+        controller: 'SignupController',
+        templateUrl: 'partials/signup.html',
     }).when('/messages', {
         controller: 'MessagesController',
         templateUrl: 'partials/messages.html',
@@ -72,6 +75,19 @@ app.factory('loginManager', function($http, $q) {
     };
 });
 
+//Not tested with endpoint. Results in error message! Working?
+app.factory('signupManager', function($http, $q) {
+    return {
+        signupRequest: function(signupCredentials) {
+            return $q(function(resolve) {
+                $http.post('./signup/', signupCredentials).then(function(response) {
+                    resolve(response.data);
+                });
+            });
+        }
+    };
+});
+
 /*app.factory('userManager', function($http, $q) {
     return {
         getActiveUsers: function() {
@@ -94,6 +110,39 @@ app.controller('SideController', function ($interval, $window, $location, $scope
     };
 });
 
+app.controller('SignupController', function ($scope, $rootScope, $location, signupManager, mySocket) {
+    $scope.errorMessage = "";
+    $scope.userSignup = function() {
+        if ($scope.signup === undefined || $scope.signup.email === undefined || $scope.signup.username === undefined || $scope.signup.password === undefined ||
+            $scope.signup.username === "" || $scope.signup.email === "" || $scope.signup.password === "") {
+            $scope.errorMessage = "Du måste välja ett användarnamn som innehåller minst tre tecken och max tjugo tecken." +
+            "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";
+        } else {
+            signupManager.signupRequest({
+                username: $scope.signup.username,
+                email: $scope.signup.email,
+                password: $scope.signup.password
+            }).then(function(response) {
+                //TO-DO: Handle response. This code may change.
+                /*
+                if (res.redirect) {
+                    $scope.errorMessage = "";
+                    $location.path(response.redirect);
+                    $rootScope.showMenu = true;
+                    $rootScope.user = {
+                        name: $scope.login.username
+                    };
+                    mySocket.emit('connected', $rootScope.user.name);
+                    mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat in."});
+                } else {
+                    //$scope.errorMessage = err.errorMsg;
+                }
+                */
+            });
+        }
+    };
+});
+
 app.controller('LoginController', function ($window, $scope, $rootScope, $location, mySocket, loginManager) {
     $scope.errorMessage = "";
     $scope.userLogin = function() {
@@ -103,7 +152,6 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
         } else {
             loginManager.loginRequest($scope.login.username).then(function(response) {
                 if (response.redirect) {
-                    console.log('i got here');
                     $scope.errorMessage = "";
                     $location.path(response.redirect);
                     $rootScope.showMenu = true;

@@ -171,7 +171,8 @@ a:hover {
     margin: 0;
 }
 
-#login-container {
+#login-container,
+#signup-container {
     border: 1px solid #372731;
     border-radius: 0.5rem;
     font-size: 1.2rem;
@@ -185,14 +186,18 @@ a:hover {
     margin: 0 37.5% 40vh;
 }
 
-#login-container input[type=text] {
+#login-container input[type=text],
+#signup-container input[type=text],
+#signup-container input[type="email"],
+#signup-container input[type="password"] {
     border: 1px solid #372731;
     border-radius: 0.1rem;
     width: 100%;
     margin: 0.5rem 0 0.5rem;
 }
 
-#login-container input[type=submit] {
+#login-container input[type=submit],
+#signup-container input[type=submit] {
     background-color: #ffffff;
     border: 1px solid #372731;
     border-radius: 0.2rem;
@@ -202,16 +207,24 @@ a:hover {
     margin: 0 0.5rem;
 }
 
-#login-container input[type=submit]:active {
+#login-container input[type=submit]:active,
+#signup-container input[type=submit]:active {
     background-color: #ebe9ce;
     color: #52414C;
     border: 1px solid #52414C;
 }
 
-#login-title {
+#login-title,
+#signup-title {
     margin: 0 34vw 3rem;
     font-size: 6rem;
     color: white;
+}
+
+#signup-link-container,
+#home-link-container {
+    font-size: 0.9rem;
+    padding-bottom: 1rem;
 }
 
 .right-side-button {

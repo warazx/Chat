@@ -119,19 +119,17 @@ a:hover {
     justify-content: flex-end;
 }
 
-#side-menu {
+.side-menu {
     display: flex;
     flex-direction: column;
     padding: 0;
     min-width: 15rem;
     height: 100vh;
     overflow: hidden;
-    background-color: #52414C;
-    color: #CCDDCC;
     line-height: 1.6em;
 }
 
-#side-menu ul {
+.side-menu ul {
     list-style-type: none;
     font-size: 1em;
     margin: 0;
@@ -139,12 +137,26 @@ a:hover {
     cursor: pointer;
 }
 
-#side-menu ul li {
+.side-menu ul li {
     padding-left: 1.5em;
     font-family: Catamaran-Thin;
 }
 
-#side-menu ul li:hover {
+#left-side-menu {
+    background-color: #52414C;
+    color: #CCDDCC;
+}
+
+#left-side-menu ul li:hover {
+    background-color: #372731;
+}
+
+#right-side-menu {
+    background-color: #52414C;
+    color: #CCDDCC;
+}
+
+#right-side-menu ul li:hover {
     background-color: #372731;
 }
 
@@ -202,7 +214,7 @@ a:hover {
     color: white;
 }
 
-#logout-button {
+.right-side-button {
     background-color: #ffffff;
     color: #372731;
     border: 1px solid #372731;
@@ -212,13 +224,20 @@ a:hover {
     min-width: 14rem;
     margin: 0.5rem 0.5rem;
     position: fixed;
-    bottom: 0;
 }
 
-#logout-button:active {
+.right-side-button:active {
     background-color: #EBE9CE;
     color: #52414C;
     border: 1px solid #52414C;
+}
+
+#logout-button {
+    bottom: 0;
+}
+
+#settings-button {
+    top: 0;
 }
 
 #messages-view {
@@ -232,12 +251,19 @@ a:hover {
     position: fixed;
 }
 
-#user-list {
+.side-menu-list {
     height: 100vh;
     width: 100%;
     overflow-y: auto;
     overflow-x: hidden;
-    margin: 3.5rem 0;
+}
+
+#user-list {
+    margin: 3.5rem 0 0;
+}
+
+#chatroom-list {
+    margin: 3.5rem 0 0;
 }
 
 .error-message {

@@ -7,18 +7,26 @@
     </head>
     <body>
         <div id="content" ng-cloak>
-            <div id="container" ng-view>
-            </div>
-            <div id="side-menu" ng-controller="SideController" ng-show="showMenu">
+            <div id="left-side-menu" class="side-menu" ng-controller="LeftSideController" ng-show="showMenu">
                 <div id="title">
                     <h1>ShutApp</h1>
                 </div>
-                <div id="user-list">
+                <div id="chatroom-list" class="side-menu-list">
+                    <ul>
+                        <li ng-repeat="chatroom in chatrooms">#{{chatroom.name}}</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="container" ng-view>
+            </div>
+            <div id="right-side-menu" class="side-menu" ng-controller="RightSideController" ng-show="showMenu">
+                <button id="settings-button" class="right-side-button">Inställningar</button>
+                <div id="user-list" class="side-menu-list">
                     <ul>
                         <li ng-repeat="user in users">{{user.name}}</li>
                     </ul>
                 </div>
-                <button id="logout-button" ng-click="userLogout()">Logga ut</button>
+                <button id="logout-button" class="right-side-button" ng-click="userLogout()">Logga ut</button>
             </div>
         </div>
         <script src="bower_components/angular/angular.js"></script>

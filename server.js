@@ -23,7 +23,7 @@ mongo.connect('mongodb://shutapp:shutapp123@ds133981.mlab.com:33981/shutapp', fu
 
 app.post('/messages', function(req, res) {
     db.collection('messages').insert({ sender: req.body.sender, date: new Date(), text: req.body.text }).then(function() {
-        //201 is an "okay" status code
+        //201 is an "okay" status code which indicates that something has been sent to the server
         res.status(201).send({});
     });
 });
@@ -41,14 +41,6 @@ app.get('/messages', function(req, res) {
 
 //Mock data with users.
 var users = require('./mock/users.json');
-
-/*app.get('/logout/:name', function (req, res) {
-    var name = req.params.name;
-    activeUsers.splice(activeUsers.findIndex(function(obj) {
-        return obj.name === name;
-    }), 1);
-    res.redirect("/");
-});*/
 
 app.get('/login/:name', function (req, res) {
     var name = req.params.name;

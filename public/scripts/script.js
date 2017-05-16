@@ -11,9 +11,6 @@ app.config(function ($routeProvider) {
     }).when('/messages', {
         controller: 'MessagesController',
         templateUrl: 'partials/messages.html',
-        /*auth: function(user) {
-            return user;
-        }*/
     });
 });
 
@@ -40,15 +37,6 @@ app.directive("contenteditable", function() {
 });
 
 app.run(function($rootScope, $location, $interval, $http, mySocket) {
-    /*$rootScope.$on('$routeChangeStart', function(ev, next, curr) {
-        if (next.$$route) {
-            var user = $rootScope.user;
-            var auth = next.$$route.auth;
-            if (auth && !auth(user)) {
-                $location.path("/");
-            }
-        }
-    });*/
     mySocket.on('disconnect message', function(msg) {
         $rootScope.statusMessage = msg;
     });
@@ -72,20 +60,12 @@ app.factory('loginManager', function($http, $q) {
     };
 });
 
-/*app.factory('userManager', function($http, $q) {
-    return {
-        getActiveUsers: function() {
-            return $q(function(resolve) {
-                $http.get('./activeUsers').then(function(response) {
-                    resolve(response.data);
-                });
-            });
-        }
-    };
-});*/
+app.controller('LeftSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket) {
+    // Temporary array of chatrooms.
+    $scope.chatrooms = [{name: "general"}, {name: "leif"}, {name: "offtopic"}, {name: "sports"}];
+});
 
-app.controller('SideController', function ($interval, $window, $location, $scope, $rootScope, mySocket) {
-    //Gets all current active users from the server.
+app.controller('RightSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket) {
     $rootScope.userLogout = function() {
         $location.path('/');
         mySocket.disconnect();

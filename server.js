@@ -40,26 +40,24 @@ app.post('/signup', function(req, res) {
         res.status(400).send({});
         return;
     }
-    
-    //find returns a cursor
-    db.collection('users').findOne( { "username": username }, function(err, doc) {
+
+    db.collection('users').findOne( { "username": username }, function(err, user) {
         if(err) {
             //Server error
             res.status(500).send(err);
         } else {
-            console.log(doc);
+            console.log(user);
             //if the user does not already exist in the database, create a new user
-            if(doc === null) {
-                db.collection('users').findOne( { "email": email }, function(err, doc) {
+            if(user === null) {
+                db.collection('users').findOne( { "email": email }, function(err, user) {
                     if(err) {
                         res.status(500).send(err);
                     } else {
-                        if(doc === null) {
+                        if(user === null) {
                             //Add user to the database
                             db.collection('users').insert({username: username, email: req.body.email, password: req.body.password}).then(function() {
-                                res.status(201).send({});
+                                res.status(201).send({redirect:'/'});
                             });
-                            res.send({redirect:'/'});
                         } else {
                             res.status(409).send({"reason":"email"});
                         }

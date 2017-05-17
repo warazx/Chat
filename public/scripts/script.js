@@ -64,15 +64,10 @@ app.factory('loginManager', function($http, $q) {
     };
 });
 
-//Not tested with endpoint. Results in error message! Working?
-app.factory('signupManager', function($http, $q) {
+app.factory('signupManager', function($http) {
     return {
         signupRequest: function(signupCredentials) {
-            return $q(function(resolve) {
-                $http.post('./signup/', signupCredentials).then(function(response) {
-                    resolve(response.data);
-                });
-            });
+            return $http.post('signup', signupCredentials);
         }
     };
 });
@@ -94,31 +89,34 @@ app.controller('RightSideController', function ($interval, $window, $location, $
 app.controller('SignupController', function ($scope, $rootScope, $location, signupManager, mySocket) {
     $scope.errorMessage = "";
     $scope.userSignup = function() {
-        if ($scope.signup === undefined || $scope.signup.email === undefined || $scope.signup.username === undefined || $scope.signup.password === undefined ||
-            $scope.signup.username === "" || $scope.signup.email === "" || $scope.signup.password === "") {
-            $scope.errorMessage = "Du måste välja ett användarnamn som innehåller minst tre tecken och max tjugo tecken." +
+        //Shorten?
+        if ($scope.signup === undefined || $scope.signup.email === undefined || $scope.signup.username === undefined || $scope.signup.password === undefined) {
+            var message = "";
+            if($scope.signup.username === undefined) message += "Du måste välja ett användarnamn som innehåller minst tre tecken och max 20 tecken." +
             "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";
+            if($scope.signup.email === undefined) message += "\nFelaktig emailadress.";
+            if($scope.signup.password === undefined) message += "\nDu måste välja ett lösenord som innehåller minst sex tecken och max 50 tecken.";
+            $scope.errorMessage = message;
         } else {
             signupManager.signupRequest({
                 username: $scope.signup.username,
                 email: $scope.signup.email,
                 password: $scope.signup.password
-            }).then(function(res) {
-                //TO-DO: Handle response. This code may change.
-                
-                if (res.redirect) {
-                    $scope.errorMessage = "";
-                    $location.path(res.redirect);
-                    $rootScope.showMenu = true;
-                    $rootScope.user = {
-                        name: $scope.login.username
-                    };
-                    mySocket.emit('connected', $rootScope.user.name);
-                    mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat in."});
-                } else {
-                    $scope.errorMessage = "errorrrrrrr!";
+            }).then(function(res) { //Successful codes 100-399.
+                console.log("Signup OK. Redirecting to login.");
+                $location.path(res.data.redirect);
+            }, function(res) { //Failed codes 400-599+?
+                console.log("Signup failed.");
+                switch(res.data.reason) {
+                    case "username":
+                        $scope.errorMessage = "Användarnamnet är upptaget.";
+                        break;
+                    case "email":
+                        $scope.errorMessage = "Emailadressen är redan registrerad.";
+                        break;
+                    default:
+                        $scope.errorMessage = "Det blev lite fel!";
                 }
-                
             });
         }
     };

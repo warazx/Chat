@@ -1,9 +1,11 @@
 <div id="login-view">
     <h1 id="login-title">ShutApp</h1>
     <div id="login-container">
-        <form name="login-form" novalidate="true">
-            <label for="username-input">Användarnamn</label>
-            <input type="text" autofocus name="user" id="username-input" ng-model="login.username" ng-pattern="/^[0-9a-zA-Z]{3,20}$/" required="true">
+        <form name="login-form" novalidate>
+            <label for="login-username-input">Användarnamn</label>
+            <input type="text" autofocus id="login-username-input" ng-model="login.username" ng-pattern="/^[0-9a-zA-Z]{3,20}$/" required>
+            <label for="login-password-input">Lösenord</label>
+            <input type="password" id="login-password-input" ng-model="login.password" required>
             <input type="submit" value="Logga in" ng-click="userLogin()">
         </form>
         <div id="error-messages">

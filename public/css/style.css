@@ -173,7 +173,8 @@ a:hover {
     margin: 0 37.5% 40vh;
 }
 
-#login-container input[type=text] {
+#login-container input[type=text],
+#login-container input[type=password] {
     border: 1px solid #372731;
     border-radius: 0.1rem;
     width: 100%;

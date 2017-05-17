@@ -23,8 +23,50 @@ mongo.connect('mongodb://shutapp:shutapp123@ds133981.mlab.com:33981/shutapp', fu
 
 app.post('/messages', function(req, res) {
     db.collection('messages').insert({ sender: req.body.sender, date: new Date(), text: req.body.text }).then(function() {
-        //201 is an "okay" status code which indicates that something has been sent to the server
+        //201 is a "created" status code
         res.status(201).send({});
+    });
+});
+
+app.post('/signup', function(req, res) {
+    //all usernames are stored as lowercase for simplicity
+    var username = req.body.username.toLowerCase();
+    var email = req.body.email.toLowerCase();
+    if(!email.match(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)
+        || !username.match(/[a-zA-Z]{3,20}/)) {
+        //400 is "bad request"
+        res.status(400).send({});
+        return;
+    }
+    //find returns a cursor
+    db.collection('users').findOne( { "username": username }, function(err, doc) {
+        if(err) {
+            //Server error
+            res.status(500).send(err);
+        } else {
+            console.log(doc);
+            //if the user does not already exist in the database, create a new user
+            if(doc === null) {
+                db.collection('users').findOne( { "email": email }, function(err, doc) {
+                    if(err) {
+                        res.status(500).send(err);
+                    } else {
+                        if(doc === null) {
+                            //Add user to the database
+                            db.collection('users').insert({username: username, email: req.body.email, password: req.body.password}).then(function() {
+                                res.status(201).send({});
+                            });
+                            res.send({redirect:'/messages'});
+                        } else {
+                            res.status(409).send({"reason":"email"});
+                        }
+                    }
+                });
+            } else {
+                //409 means "conflict".
+                res.status(409).send({"reason":"username"});
+            }
+        }
     });
 });
 

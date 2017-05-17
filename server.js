@@ -32,12 +32,15 @@ app.post('/signup', function(req, res) {
     //all usernames are stored as lowercase for simplicity
     var username = req.body.username.toLowerCase();
     var email = req.body.email.toLowerCase();
+    var password = req.body.password;
     if(!email.match(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)
-        || !username.match(/[a-zA-Z]{3,20}/)) {
+        || !username.match(/[0-9a-zA-Z]{3,20}/)
+        || !password.match(/^.{6,50}$/) ) {
         //400 is "bad request"
         res.status(400).send({});
         return;
     }
+    
     //find returns a cursor
     db.collection('users').findOne( { "username": username }, function(err, doc) {
         if(err) {
@@ -56,7 +59,7 @@ app.post('/signup', function(req, res) {
                             db.collection('users').insert({username: username, email: req.body.email, password: req.body.password}).then(function() {
                                 res.status(201).send({});
                             });
-                            res.send({redirect:'/messages'});
+                            res.send({redirect:'/'});
                         } else {
                             res.status(409).send({"reason":"email"});
                         }

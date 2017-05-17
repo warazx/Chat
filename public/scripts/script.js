@@ -17,7 +17,8 @@ app.config(function ($routeProvider) {
     });
 });
 
-//snodd kod från http://fdietz.github.io/recipes-with-angular-js/common-user-interface-patterns/editing-text-in-place-using-html5-content-editable.html
+//Code from http://fdietz.github.io/recipes-with-angular-js/common-user-interface-patterns/editing-text-in-place-using-html5-content-editable.html
+//Makes a div with contenteditable usable with ng-model
 app.directive("contenteditable", function() {
     return {
         restrict: "A",
@@ -102,12 +103,12 @@ app.controller('SignupController', function ($scope, $rootScope, $location, sign
                 username: $scope.signup.username,
                 email: $scope.signup.email,
                 password: $scope.signup.password
-            }).then(function(response) {
+            }).then(function(res) {
                 //TO-DO: Handle response. This code may change.
-                /*
+                
                 if (res.redirect) {
                     $scope.errorMessage = "";
-                    $location.path(response.redirect);
+                    $location.path(res.redirect);
                     $rootScope.showMenu = true;
                     $rootScope.user = {
                         name: $scope.login.username
@@ -115,9 +116,9 @@ app.controller('SignupController', function ($scope, $rootScope, $location, sign
                     mySocket.emit('connected', $rootScope.user.name);
                     mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat in."});
                 } else {
-                    //$scope.errorMessage = err.errorMsg;
+                    $scope.errorMessage = "errorrrrrrr!";
                 }
-                */
+                
             });
         }
     };

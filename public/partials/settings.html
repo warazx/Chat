@@ -1,0 +1,24 @@
+<div id="settings-container" >
+	
+	<input
+	  uploadcare-widget
+	  ng-model="object.image.info.uuid"
+	  data-public-key="YOURKEYHERE"
+	  data-tabs="file url"
+	  data-images-only="true"
+	  data-preview-step="true"
+	  data-clearable="true"
+	  data-multiple="false"
+	  data-crop="400:200"
+	  on-upload-complete="onUCUploadComplete(info)"
+	  on-widget-ready="onUCWidgetReady(widget)"
+	  value="{{ object.image.info.cdnUrl }}"/>
+
+    <form name="settings-form" novalidate="true">
+        <label for="username-setting-input">Användarnamn</label>
+        <input type="text" id="username-setting-input" ng-model="login.username">
+        <input type="submit" value="Ändra" ng-click="userLogin()">
+        
+    </form>
+	
+</div>

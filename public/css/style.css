@@ -270,3 +270,7 @@ a:hover {
 #status-message-text {
     font-size: 0.8rem;
 }
+
+#settings-container {
+    height: 100%;
+}

@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ngRoute', 'ngSanitize', 'btford.socket-io', 'luegg.directives']);
+var app = angular.module('app', ['ngRoute', 'ngSanitize', 'btford.socket-io', 'luegg.directives', 'ng-uploadcare']);
 
 app.factory('mySocket', function(socketFactory) {
     return socketFactory();
@@ -14,6 +14,10 @@ app.config(function ($routeProvider) {
         /*auth: function(user) {
             return user;
         }*/
+    }).when('/settings', {
+        controller: 'SettingsController',
+        templateUrl: 'partials/settings.html',
+
     });
 });
 
@@ -167,4 +171,8 @@ app.controller('MessagesController', function ($scope,$rootScope, $http, $locati
             return false;
         };
     }
+});
+
+app.controller('SettingsController', function ($scope, $rootScope, $location){
+    
 });

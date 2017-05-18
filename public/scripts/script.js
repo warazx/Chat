@@ -103,12 +103,15 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
 
 app.controller('MessagesController', function ($scope,$rootScope, $http, $location, mySocket) {
     //Checks if user object exist on rootScope and if not, redirects to loginpage.
-    if (!$rootScope.user) {
+    /*if (!$rootScope.user) {
         console.log("User not logged in! Redirecting to login.");
         $location.path('/');
-    } else {
+    } else {*/
         $http.get('/messages').then(function(response) {
             $rootScope.messages = response.data;
+            if (response.redirect) {
+                $location.path(response.redirect);
+            }
         });
         $rootScope.messages = [];
         document.getElementById('my-message').focus();
@@ -146,5 +149,5 @@ app.controller('MessagesController', function ($scope,$rootScope, $http, $locati
 
             return false;
         };
-    }
+    //}
 });

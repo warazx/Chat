@@ -1,6 +1,7 @@
 var express = require('express');
 var mongo = require('mongodb').MongoClient;
 var bodyParser = require('body-parser');
+var session = require('express-session');
 
 var app = express();
 var http = require('http').Server(app);
@@ -13,12 +14,27 @@ var db;
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: (1000*10) }
+}));
 
 mongo.connect('mongodb://shutapp:shutapp123@ds133981.mlab.com:33981/shutapp', function(err, database) {
     if (err) {
         console.log(err);
     }
     db = database;
+});
+
+app.get('/', function(req, res) {
+    if (req.session.loggedIn) {
+        console.log("User has a session, redirecting to messages.");
+        res.send({redirect: '/messages'});
+    } else {
+        console.log("User does not have a session.");
+    }
 });
 
 app.post('/messages', function(req, res) {
@@ -29,14 +45,20 @@ app.post('/messages', function(req, res) {
 });
 
 app.get('/messages', function(req, res) {
-    db.collection('messages').find().sort({ "date": 1 }).toArray(function(error, result) {
-        if (error) {
-            response.status(500).send(error);
-            return;
-        }
-        //200 is an "okay" status code
-        res.status(200).send(result);
-    });
+    if (req.session.loggedIn) {
+        console.log("User has a session, showing messages.");
+        db.collection('messages').find().sort({ "date": 1 }).toArray(function(error, result) {
+            if (error) {
+                response.status(500).send(error);
+                return;
+            }
+            //200 is an "okay" status code
+            res.status(200).send(result);
+        });
+    } else {
+        console.log("No session. Redirecting to login page!");
+        res.send({redirect: '/'});
+    }
 });
 
 //Mock data with users.
@@ -49,6 +71,7 @@ app.get('/login/:name', function (req, res) {
         if (activeUsers[i].name.toUpperCase() == name.toUpperCase()) isActive = true;
     }
     if(!isActive) {
+        req.session.loggedIn = true;
         console.log('I should redirect');
         res.send({redirect: '/messages'});
     } else {

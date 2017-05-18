@@ -23,15 +23,21 @@ mongo.connect('mongodb://shutapp:shutapp123@ds133981.mlab.com:33981/shutapp', fu
 });
 
 app.post('/messages', function(req, res) {
-    //If it is a private message, it has a recipient
-    if(req.body.recipient) {
-        db.collection('privateMessages').insert({ sender: req.body.sender, recipient: req.body.recipient, timestamp: new Date(), text: req.body.text });
-    } else {
-        db.collection('messages').insert({ sender: req.body.sender, date: new Date(), text: req.body.text }).then(function() {
-            //201 is a "created" status code
-            res.status(201).send({});
-        });
+    db.collection('chatMessages').insert({ sender: req.body.sender, timestamp: new Date(), text: req.body.text }).then(function() {
+        //201 is a "created" status code
+        res.status(201).send({});
+    });
+});
+
+app.post('/private-messages', function(req, res) {
+    var newPrivateMessage = {
+        sender: req.body.sender,
+        recipient: req.body.recipient,
+        timestamp: new Date(),
+        text: req.body.text
     }
+    db.collection('privateMessages').insert(newPrivateMessage);
+    res.status(201).send({});
 });
 
 app.post('/signup', function(req, res) {
@@ -78,31 +84,26 @@ app.post('/signup', function(req, res) {
 });
 
 app.get('/messages', function(req, res) {
-    if(req.query.user && req.query.otheruser) {
-        var user = req.query.user;
-        var otherUser = req.query.otheruser;
-        db.collection('privateMessages').find({$or: [ {sender: user, recipient: otherUser}, {sender: otherUser, recipient: user} ] }).sort({ "date" : 1}).toArray(function(error, result) {
-            if(error) {
-                res.status(500).send(error);
-                return;
-            } else {
-                //200 is an "okay" status code
-                res.status(200).send(result);
-            }
-        });
-    } else {
-        db.collection('messages').find().sort({ "date": 1 }).toArray(function(error, result) {
-            if (error) {
-                res.status(500).send(error);
-                return;
-            }
-            res.status(200).send(result);
-        });
-    }
+    var allMessages = [];
+    var cursor = db.collection('chatMessages').find().sort({ "timestamp": 1 });
+    
+    cursor.toArray(function(err, result) {
+        res.status(200).send(result);
+    });
+});
+
+app.get('/private-messages', function(req, res) {
+    var user = req.query.user;
+    var otherUser = req.query.otheruser;
+    var cursor = db.collection('privateMessages').find({$or: [ {sender: user, recipient: otherUser}, {sender: otherUser, recipient: user} ] }).sort({ "timestamp" : 1});
+    cursor.toArray(function(err, result) {
+        res.status(200).send(result);
+    });
+    
 });
 
 //GET one or all users. Not finished!
-/*
+
 app.get('/users/:id?', function (req, res) {
     var searchObject = {};
     if(req.params.id) {
@@ -115,10 +116,13 @@ app.get('/users/:id?', function (req, res) {
         if (err) {
             return res.status(500).send(error);
         }
-        res.status(200).send(result);
+        var userObject = {
+            "id": result._id,
+            "name": result.username
+        }
+        res.status(200).send(userObject);
     });
 });
-*/
 
 app.get('/login/:username/:password', function (req, res) {
     db.collection('users').findOne({username: req.params.username.toLowerCase()}, function(err, user) {
@@ -170,10 +174,11 @@ setInterval(function() {
 }, 1000*60*5);
 */
 io.on('connection', function(socket){
-    socket.on('connected', function(username) {
-        socket.username = username;
+    socket.on('connected', function(user) {
+        socket.username = user.name;
+        socket.id = user.id;
         console.log(socket.username + " has connected.");
-        activeUsers.push({ name: socket.username });
+        activeUsers.push({ name: socket.username, id: socket.id });
         io.emit('active users', activeUsers);
     });
     //message
@@ -195,7 +200,7 @@ io.on('connection', function(socket){
         }), 1);
         console.log(socket.username + " has disconnected.");
         socket.broadcast.emit('active users', activeUsers);
-        socket.broadcast.emit('disconnect message', {date: new Date(), text: socket.username + " har loggat ut."});
+        socket.broadcast.emit('disconnect message', {timestamp: new Date(), text: socket.username + " har loggat ut."});
     });
 });
 

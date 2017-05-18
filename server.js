@@ -83,6 +83,8 @@ app.get('/messages', function(req, res) {
     });
 });
 
+//GET one or all users. Not finished!
+/*
 app.get('/users/:id?', function (req, res) {
     var searchObject = {};
     if(req.params.id) {
@@ -98,9 +100,10 @@ app.get('/users/:id?', function (req, res) {
         res.status(200).send(result);
     });
 });
+*/
 
 app.get('/login/:username/:password', function (req, res) {
-    db.collection('users').findOne({username: req.params.username}, function(err, user) {
+    db.collection('users').findOne({username: req.params.username.toLowerCase()}, function(err, user) {
         if(err) {
             console.log('Loginrequest caused database error.');
             res.status(500).send(err);

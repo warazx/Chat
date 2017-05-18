@@ -126,16 +126,17 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
             $scope.errorMessage = "Felaktiga inloggningsuppgifter.";
         } else {
             loginManager.loginRequest($scope.login.username, $scope.login.password).then(function(res) {
-                console.log('Login succed.');
+                console.log('Login successful.');
                 $rootScope.user = {
                     id: res.data._id,
                     name: res.data.username
                 };
-                $location.path(res.data.redirect);
+                $location.path(res.data.redirect); //Redirects to /messages.
                 $rootScope.showMenu = true;
                 mySocket.emit('connected', $rootScope.user.name);
                 mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat in."});
             }, function(res) {
+                console.log('Login failed on server.');
                 $scope.errorMessage = "Felaktiga inloggningsuppgifter.";
             });
         }

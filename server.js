@@ -1,5 +1,6 @@
 var express = require('express');
 var mongo = require('mongodb').MongoClient;
+var ObjectID = require('mongodb').ObjectID;
 var bodyParser = require('body-parser');
 
 var app = express();
@@ -74,7 +75,7 @@ app.post('/signup', function(req, res) {
 app.get('/messages', function(req, res) {
     db.collection('messages').find().sort({ "date": 1 }).toArray(function(error, result) {
         if (error) {
-            response.status(500).send(error);
+            res.status(500).send(error);
             return;
         }
         //200 is an "okay" status code
@@ -82,21 +83,42 @@ app.get('/messages', function(req, res) {
     });
 });
 
-//Mock data with users.
-var users = require('./mock/users.json');
+app.get('/users/:id?', function (req, res) {
+    var searchObject = {};
+    if(req.params.id) {
+        searchObject = {
+            "_id": ObjectID(req.params.id)
+        }
+    }
+    console.log(searchObject);
+    db.collection('users').find(searchObject).toArray(function(err, result) {
+        if (err) {
+            return res.status(500).send(error);
+        }
+        res.status(200).send(result);
+    });
+});
 
-app.get('/login/:name', function (req, res) {
-    var name = req.params.name;
-    var isActive = false;
-    for(var i = 0; i < activeUsers.length; i++) {
-        if (activeUsers[i].name.toUpperCase() == name.toUpperCase()) isActive = true;
-    }
-    if(!isActive) {
-        console.log('I should redirect');
-        res.send({redirect: '/messages'});
-    } else {
-        res.send({errorMsg: "Användarnamnet är upptaget. \nVänligen välj ett annat användarnamn."});
-    }
+app.get('/login/:username/:password', function (req, res) {
+    db.collection('users').findOne({username: req.params.username}, function(err, user) {
+        if(err) {
+            console.log('Loginrequest caused database error.');
+            res.status(500).send(err);
+        } else if(user === null) {
+            console.log('Loginrequest with invalid username.');
+            res.status(401).send({});
+        } else if(user.password !== req.params.password) {
+            console.log('Loginrequest with invalid password.');
+            res.status(401).send({});
+        } else {
+            console.log('Loginrequest for ' + user.username + ' successful.');
+            res.status(200).send({
+                _id: user._id,
+                username: user.username,
+                redirect: 'messages'
+            });
+        }
+    });
 });
 /*
 var heartbeatUsers = [];

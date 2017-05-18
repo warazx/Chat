@@ -52,14 +52,10 @@ app.run(function($rootScope, $location, $interval, $http, mySocket) {
     }, 1000*60*5);*/
 });
 
-app.factory('loginManager', function($http, $q) {
+app.factory('loginManager', function($http) {
     return {
-        loginRequest: function(username) {
-            return $q(function(resolve) {
-                $http.get('./login/' + username).then(function(response) {
-                    resolve(response.data);
-                });
-            });
+        loginRequest: function(username, password) {
+            return $http.get('login/' + username + '/' + password);
         }
     };
 });
@@ -125,24 +121,22 @@ app.controller('SignupController', function ($scope, $rootScope, $location, sign
 app.controller('LoginController', function ($window, $scope, $rootScope, $location, mySocket, loginManager) {
     $scope.errorMessage = "";
     $scope.userLogin = function() {
-        if ($scope.login === undefined || $scope.login.username === undefined || $scope.login.username === "") {
-            $scope.errorMessage = "Du måste välja ett användarnamn som innehåller minst tre tecken och max tjugo tecken." +
-                "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";
+        if ($scope.login === undefined || $scope.login.username === undefined || $scope.login.password === undefined) {
+            console.log('Invalid logininformation.');
+            $scope.errorMessage = "Felaktiga inloggningsuppgifter.";
         } else {
-            loginManager.loginRequest($scope.login.username).then(function(response) {
-                if (response.redirect) {
-                    $scope.errorMessage = "";
-                    $location.path(response.redirect);
-                    $rootScope.showMenu = true;
-                    $rootScope.user = {
-                        name: $scope.login.username
-                    };
-                    mySocket.emit('connected', $rootScope.user.name);
-                    mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat in."});
-                } else {
-                    $scope.errorMessage = response.errorMsg;
-                    console.log($scope.errorMessage);
-                }
+            loginManager.loginRequest($scope.login.username, $scope.login.password).then(function(res) {
+                console.log('Login succed.');
+                $rootScope.user = {
+                    id: res.data._id,
+                    name: res.data.username
+                };
+                $location.path(res.data.redirect);
+                $rootScope.showMenu = true;
+                mySocket.emit('connected', $rootScope.user.name);
+                mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat in."});
+            }, function(res) {
+                $scope.errorMessage = "Felaktiga inloggningsuppgifter.";
             });
         }
     };

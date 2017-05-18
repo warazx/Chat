@@ -72,9 +72,13 @@ app.factory('signupManager', function($http) {
     };
 });
 
-app.controller('LeftSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket) {
-    // Temporary array of chatrooms.
-    $scope.chatrooms = [{name: "general"}, {name: "leif"}, {name: "offtopic"}, {name: "sports"}];
+app.controller('LeftSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket, $http) {
+	$http.get('chatrooms').then(function (data) {
+		console.log(data.data);
+		$scope.chatrooms = data.data;
+	});
+	// Temporary array of chatrooms.
+    //$scope.chatrooms = [{name: "general"}, {name: "leif"}, {name: "offtopic"}, {name: "sports"}];
 });
 
 app.controller('RightSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket) {

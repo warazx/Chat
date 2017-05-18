@@ -22,10 +22,15 @@ mongo.connect('mongodb://shutapp:shutapp123@ds133981.mlab.com:33981/shutapp', fu
 });
 
 app.post('/messages', function(req, res) {
-    db.collection('messages').insert({ sender: req.body.sender, date: new Date(), text: req.body.text }).then(function() {
-        //201 is a "created" status code
-        res.status(201).send({});
-    });
+    //If it is a private message, it has a recipient
+    if(req.body.recipient) {
+        db.collection('privateMessages').insert({ sender: req.body.sender, recipient: req.body.recipient, timestamp: new Date(), text: req.body.text });
+    } else {
+        db.collection('messages').insert({ sender: req.body.sender, date: new Date(), text: req.body.text }).then(function() {
+            //201 is a "created" status code
+            res.status(201).send({});
+        });
+    }
 });
 
 app.post('/signup', function(req, res) {
@@ -72,14 +77,27 @@ app.post('/signup', function(req, res) {
 });
 
 app.get('/messages', function(req, res) {
-    db.collection('messages').find().sort({ "date": 1 }).toArray(function(error, result) {
-        if (error) {
-            response.status(500).send(error);
-            return;
-        }
-        //200 is an "okay" status code
-        res.status(200).send(result);
-    });
+    if(req.query.user && req.query.otheruser) {
+        var user = req.query.user;
+        var otherUser = req.query.otheruser;
+        db.collection('privateMessages').find({$or: [ {sender: user, recipient: otherUser}, {sender: otherUser, recipient: user} ] }).sort({ "date" : 1}).toArray(function(error, result) {
+            if(error) {
+                res.status(500).send(error);
+                return;
+            } else {
+                //200 is an "okay" status code
+                res.status(200).send(result);
+            }
+        });
+    } else {
+        db.collection('messages').find().sort({ "date": 1 }).toArray(function(error, result) {
+            if (error) {
+                res.status(500).send(error);
+                return;
+            }
+            res.status(200).send(result);
+        });
+    }
 });
 
 //Mock data with users.

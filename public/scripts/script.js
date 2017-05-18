@@ -77,12 +77,24 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
     $scope.chatrooms = [{name: "general"}, {name: "leif"}, {name: "offtopic"}, {name: "sports"}];
 });
 
-app.controller('RightSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket) {
+app.controller('RightSideController', function ($http, $interval, $window, $location, $scope, $rootScope, mySocket) {
     $rootScope.userLogout = function() {
         $location.path('/');
         mySocket.disconnect();
         $rootScope.user = null;
         $rootScope.showMenu = false;
+    };
+    $scope.changeRecipient = function changeRecipient() {
+        $rootScope.privateRecipientName = this.user.name;
+        console.log(this.user.name);
+        $http({
+            url: '/messages',
+            method: "GET",
+            params: {user: $rootScope.user.name, otheruser: $rootScope.privateRecipientName}
+        }).then(function(response) {
+            console.log("bla bla " + response.data);
+            $rootScope.messages = response.data;
+        });
     };
 });
 
@@ -154,20 +166,23 @@ app.controller('MessagesController', function ($scope,$rootScope, $http, $locati
         console.log("User not logged in! Redirecting to login.");
         $location.path('/');
     } else {
-        $http.get('/messages').then(function(response) {
-            $rootScope.messages = response.data;
-        });
         $rootScope.messages = [];
+        if($rootScope.privateRecipientName) {
+            $http.get('/messages/' + privateRecipientName).then(function(response) {
+                $rootScope.messages = response.data;
+            });
+        } else {
+            $http.get('/messages').then(function(response) {
+                $rootScope.messages = response.data;
+            });
+            mySocket.on('broadcast message', function(msg){
+                $rootScope.messages.push(msg);
+            });
+            mySocket.on('connect message', function(msg) {
+                $rootScope.statusMessage = msg;
+            });
+        }
         document.getElementById('my-message').focus();
-
-        mySocket.on('broadcast message', function(msg){
-            $rootScope.messages.push(msg);
-        });
-
-        mySocket.on('connect message', function(msg) {
-            $rootScope.statusMessage = msg;
-        });
-
         document.getElementById('my-message').onkeypress=function(e){
             //keyCode 13 is the enter key
             if(e.keyCode==13 && !e.shiftKey){
@@ -178,19 +193,28 @@ app.controller('MessagesController', function ($scope,$rootScope, $http, $locati
             }
         };
 
-        var currentId = 0; //Temp
+        //var currentId = 0; //Temp
         $scope.postMessage = function() {
-            var newMessage = {
-                "sender": $rootScope.user.name,
-                "date": new Date(),
-                "text": $scope.textMessage
-            };
-            $http.post('/messages', {sender: $rootScope.user.name, text: $scope.textMessage});
-            mySocket.emit('broadcast message', newMessage);
+            if($rootScope.privateRecipientName) {
+                var messageObject = {
+                    sender: $rootScope.user.name,
+                    recipient: $rootScope.privateRecipientName,
+                    timestamp: new Date(),
+                    text: $scope.textMessage
+                }
+                $http.post('/messages', messageObject);
+            } else {
+                var newMessage = {
+                    "sender": $rootScope.user.name,
+                    "date": new Date(),
+                    "text": $scope.textMessage
+                };
+                $http.post('/messages', {sender: $rootScope.user.name, text: $scope.textMessage});
+                mySocket.emit('broadcast message', newMessage);
+            }
             $scope.textMessage = "";
             document.getElementById('my-message').focus();
-            currentId++;
-
+            //currentId++;
             return false;
         };
     }

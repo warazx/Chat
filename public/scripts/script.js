@@ -14,6 +14,15 @@ app.config(function ($routeProvider) {
     }).when('/messages', {
         controller: 'MessagesController',
         templateUrl: 'partials/messages.html',
+<<<<<<< HEAD
+=======
+        auth: function(user) {
+            return user
+        }
+    }).when('/settings', {
+        controller: 'SettingsController',
+        templateUrl: 'partials/settings.html',
+>>>>>>> 61712558c256fcbd5840689da06639ae6ff94653
     });
 });
 
@@ -152,6 +161,7 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
     };
 });
 
+<<<<<<< HEAD
 app.controller('MessagesController', function ($scope,$rootScope, $http, $location, mySocket) {
     //Checks if user object exist on rootScope and if not, redirects to loginpage.
     if (!$rootScope.user) {
@@ -163,6 +173,17 @@ app.controller('MessagesController', function ($scope,$rootScope, $http, $locati
         });
         $rootScope.messages = [];
         document.getElementById('my-message').focus();
+=======
+app.controller('SettingsController', function ($scope, $rootScope, $location, users){
+	
+});
+
+app.controller('MessagesController', function ($scope,$rootScope, users, mySocket) {
+    $scope.users = users;
+    $scope.title = "Messages";
+    $scope.messages = [];
+    document.getElementById('my-message').focus();
+>>>>>>> 61712558c256fcbd5840689da06639ae6ff94653
 
         mySocket.on('broadcast message', function(msg){
             $rootScope.messages.push(msg);

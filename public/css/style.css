@@ -269,6 +269,11 @@ a:hover {
     width: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+    margin: 3.5rem 0;
+}
+
+#settings-container {
+	height: 100%;
 }
 
 #user-list {

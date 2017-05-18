@@ -160,7 +160,7 @@ a:hover {
     background-color: #372731;
 }
 
-#container {
+#partial-container {
     box-sizing: border-box;
     height: 100vh;
     width: 100vw;
@@ -189,7 +189,8 @@ a:hover {
 #login-container input[type=text],
 #signup-container input[type=text],
 #signup-container input[type="email"],
-#signup-container input[type="password"] {
+#signup-container input[type="password"],
+#login-container input[type=password] {
     border: 1px solid #372731;
     border-radius: 0.1rem;
     width: 100%;

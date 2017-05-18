@@ -183,7 +183,9 @@ a:hover {
     background-color: #f2f0d5;
     color: #372731;
     min-width: 25%;
-    margin: 0 37.5% 40vh;
+    margin: 0 37.5%;
+    position: fixed;
+    top: 40vh;
 }
 
 #login-container input[type=text],
@@ -217,9 +219,17 @@ a:hover {
 
 #login-title,
 #signup-title {
-    margin: 0 34vw 3rem;
     font-size: 6rem;
     color: white;
+    margin-left: 0;
+}
+
+.title-container {
+    min-width: 40%;
+    margin: 0 30% 0;
+    text-align: center;
+    position: fixed;
+    top: 10vh;
 }
 
 #signup-link-container,

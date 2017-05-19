@@ -83,11 +83,7 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 	});
 });
 
-<<<<<<< HEAD
-app.controller('RightSideController', function ($http, $interval, $window, $location, $scope, $rootScope, mySocket) {
-=======
 app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket) {
->>>>>>> christian
     $rootScope.userLogout = function() {
         $http.get('/logout');
         mySocket.disconnect();
@@ -176,7 +172,7 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
 });
 
 app.controller('SettingsController', function ($scope, $rootScope, $location, users){
-	
+
 });
 
 app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket) {
@@ -196,7 +192,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         mySocket.on('connect message', function(msg) {
             $rootScope.statusMessage = msg;
         });
-        
+
         document.getElementById('my-message').focus();
         document.getElementById('my-message').onkeypress=function(e){
             //keyCode 13 is the enter key

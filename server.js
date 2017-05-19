@@ -42,7 +42,7 @@ app.post('/messages', function(req, res) {
 app.get('/messages', function(req, res) {
     var allMessages = [];
     var cursor = db.collection('chatMessages').find().sort({ "timestamp": 1 });
-    
+
     cursor.toArray(function(err, result) {
         res.status(200).send(result);
     });
@@ -82,7 +82,7 @@ app.get('/private-messages', function(req, res) {
     cursor.toArray(function(err, result) {
         res.status(200).send(result);
     });
-    
+
 });
 
 app.post('/signup', function(req, res) {
@@ -128,8 +128,6 @@ app.post('/signup', function(req, res) {
     });
 });
 
-<<<<<<< HEAD
-=======
 app.get('/logout', function(req, res, next) {
     if(req.session) {
         req.session.destroy();
@@ -147,7 +145,6 @@ app.get('/messages', function(req, res) {
     });
 });
 
->>>>>>> christian
 //GET one or all users. Not finished!
 app.get('/users/:id?', function (req, res) {
     var searchObject = {};
@@ -182,7 +179,7 @@ app.get('/login/:username/:password', function (req, res) {
             res.status(401).send({});
         } else {
             console.log('Loginrequest for ' + user.username + ' successful.');
-            //Sets a cookie with the user id.
+            //Adds the userID to the session for the server to track.
             req.session.userId = user._id;
             res.status(200).send({
                 _id: user._id,

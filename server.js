@@ -33,15 +33,15 @@ app.use(session({
 }));
 
 app.post('/messages', function(req, res) {
-    db.collection('chatMessages').insert({ sender: req.body.sender, timestamp: new Date(), text: req.body.text }).then(function() {
+	console.log(req.body.chatroom);
+    db.collection('chatMessages').insert({ sender: req.body.sender, timestamp: req.body.timestamp, text: req.body.text, chatroom: req.body.chatroom}).then(function() {
         //201 is a "created" status code
         res.status(201).send({});
     });
 });
 
 app.get('/messages', function(req, res) {
-    var allMessages = [];
-    var cursor = db.collection('chatMessages').find().sort({ "timestamp": 1 });
+    var cursor = db.collection('chatMessages').find({"chatroom":req.query.chatroom}).sort({ "timestamp": 1 });
 
     cursor.toArray(function(err, result) {
         res.status(200).send(result);

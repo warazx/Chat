@@ -29,20 +29,26 @@ app.post('/messages', function(req, res) {
     });
 });
 
-//detta är en endpoint på servern
+app.get('/messages', function(req, res) {
+    var allMessages = [];
+    var cursor = db.collection('chatMessages').find().sort({ "timestamp": 1 });
+    
+    cursor.toArray(function(err, result) {
+        res.status(200).send(result);
+    });
+});
+
+//This is an endpoint at the server
 app.get('/chatrooms', function(req, res) {
-	//find alla chatrooms och lägg dessa till en lista
+	//find all chatrooms and add these to a list
 	db.collection('chatrooms').find().toArray(function (error, result){
 		if(error) {
 			res.status(500).send(error);
 			return;
 		}
-		//result är en array med chatrooms-object i
-		console.log(result);
+		//result is an array with chatroom objects
 		res.status(200).send(result);
     });
-	//res.status(200).send("Halloj");
-	//console.log(chatrooms);
 });
 
 app.post('/private-messages', function(req, res) {
@@ -52,8 +58,21 @@ app.post('/private-messages', function(req, res) {
         timestamp: new Date(),
         text: req.body.text
     }
-    db.collection('privateMessages').insert(newPrivateMessage);
-    res.status(201).send({});
+    db.collection('privateMessages').insert(newPrivateMessage).then(function(err, result) {
+        if(!err) {
+            res.status(201).send({});
+        }
+    });
+});
+
+app.get('/private-messages', function(req, res) {
+    var user = req.query.user;
+    var otherUser = req.query.otheruser;
+    var cursor = db.collection('privateMessages').find({$or: [ {sender: user, recipient: otherUser}, {sender: otherUser, recipient: user} ] }).sort({ "timestamp" : 1});
+    cursor.toArray(function(err, result) {
+        res.status(200).send(result);
+    });
+    
 });
 
 app.post('/signup', function(req, res) {
@@ -99,27 +118,7 @@ app.post('/signup', function(req, res) {
     });
 });
 
-app.get('/messages', function(req, res) {
-    var allMessages = [];
-    var cursor = db.collection('chatMessages').find().sort({ "timestamp": 1 });
-    
-    cursor.toArray(function(err, result) {
-        res.status(200).send(result);
-    });
-});
-
-app.get('/private-messages', function(req, res) {
-    var user = req.query.user;
-    var otherUser = req.query.otheruser;
-    var cursor = db.collection('privateMessages').find({$or: [ {sender: user, recipient: otherUser}, {sender: otherUser, recipient: user} ] }).sort({ "timestamp" : 1});
-    cursor.toArray(function(err, result) {
-        res.status(200).send(result);
-    });
-    
-});
-
 //GET one or all users. Not finished!
-
 app.get('/users/:id?', function (req, res) {
     var searchObject = {};
     if(req.params.id) {

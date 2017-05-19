@@ -78,9 +78,8 @@ app.factory('signupManager', function($http) {
 });
 
 app.controller('LeftSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket, $http) {
-	$http.get('chatrooms').then(function (data) {
-		console.log(data.data);
-		$scope.chatrooms = data.data;
+	$http.get('chatrooms').then(function (response) {
+		$scope.chatrooms = response.data;
 	});
 });
 
@@ -183,10 +182,8 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
     } else {
         $rootScope.messages = [];
         $http.get('/messages').then(function(response) {
-            console.log(response.data);
             $rootScope.messages = response.data;
         });
-        $rootScope.messages = [];
         document.getElementById('my-message').focus();
         mySocket.on('broadcast message', function(msg){
             $rootScope.messages.push(msg);

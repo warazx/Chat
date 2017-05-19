@@ -41,10 +41,21 @@ app.post('/messages', function(req, res) {
 });
 
 app.get('/messages', function(req, res) {
-    var cursor = db.collection('chatMessages').find({"chatroom":req.query.chatroom}).sort({ "timestamp": 1 });
+    db.collection('chatMessages').find().sort({ "timestamp": 1 }).toArray(function(err, result) {
+        var callbackcounter = 0;
+        var newArray = [];
 
-    cursor.toArray(function(err, result) {
-        res.status(200).send(result);
+        //Replaces userId with the username. Should be done with promise(?).
+        result.map(function(message) {
+            db.collection('users').findOne({_id: ObjectID(message.sender)}).then(function(doc) {
+                message.sender = doc.username;
+                callbackcounter++;
+                newArray.push(message);
+                if(callbackcounter == result.length) {
+                    res.status(200).send(newArray);
+                }
+            });
+        });
     });
 });
 

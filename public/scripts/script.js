@@ -189,7 +189,11 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         $location.path('/');
     } else {
         $rootScope.messages = [];
-        $http.get('/messages').then(function(response) {
+        $http({
+        	url: "/messages",
+			method: "GET",
+			params: {chatroom: "General"}
+        }).then(function(response) {
             $rootScope.messages = response.data;
         });
         document.getElementById('my-message').focus();
@@ -215,9 +219,11 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             var newMessage = {
                 "sender": $rootScope.user.id,
                 "timestamp": new Date(),
-                "text": $scope.textMessage
+                "text": $scope.textMessage,
+				"chatroom": "General"
             };
-            $http.post('/messages', {sender: $rootScope.user.id, text: $scope.textMessage});
+            //$http.post('/messages', {sender: $rootScope.user.id, text: $scope.textMessage, chatroom: "hej"});
+			$http.post('/messages', newMessage);
             mySocket.emit('broadcast message', newMessage);
             $scope.textMessage = "";
             document.getElementById('my-message').focus();

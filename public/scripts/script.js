@@ -83,12 +83,17 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 	});
 });
 
+<<<<<<< HEAD
 app.controller('RightSideController', function ($http, $interval, $window, $location, $scope, $rootScope, mySocket) {
+=======
+app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket) {
+>>>>>>> christian
     $rootScope.userLogout = function() {
-        $location.path('/');
+        $http.get('/logout');
         mySocket.disconnect();
         $rootScope.user = null;
         $rootScope.showMenu = false;
+        $location.path('/');
     };
     $scope.changeRecipient = function changeRecipient() {
         $location.path('/private-messages');

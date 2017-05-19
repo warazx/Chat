@@ -2,8 +2,11 @@ var express = require('express');
 var mongo = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var bodyParser = require('body-parser');
+var session = require('express-session');
+var MongoStore = require('connect-mongo')(session);
 
 var app = express();
+
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
@@ -21,6 +24,13 @@ mongo.connect('mongodb://shutapp:shutapp123@ds133981.mlab.com:33981/shutapp', fu
     }
     db = database;
 });
+
+app.use(session({
+  secret: 'please shutapp',
+  resave: true,
+  saveUninitialized: false,
+  store: new MongoStore({url: 'mongodb://shutapp:shutapp123@ds133981.mlab.com:33981/shutapp'})
+}));
 
 app.post('/messages', function(req, res) {
     db.collection('chatMessages').insert({ sender: req.body.sender, timestamp: new Date(), text: req.body.text }).then(function() {
@@ -118,6 +128,26 @@ app.post('/signup', function(req, res) {
     });
 });
 
+<<<<<<< HEAD
+=======
+app.get('/logout', function(req, res, next) {
+    if(req.session) {
+        req.session.destroy();
+    }
+});
+
+app.get('/messages', function(req, res) {
+    db.collection('messages').find().sort({ "date": 1 }).toArray(function(error, result) {
+        if (error) {
+            res.status(500).send(error);
+            return;
+        }
+        //200 is an "okay" status code
+        res.status(200).send(result);
+    });
+});
+
+>>>>>>> christian
 //GET one or all users. Not finished!
 app.get('/users/:id?', function (req, res) {
     var searchObject = {};
@@ -152,6 +182,8 @@ app.get('/login/:username/:password', function (req, res) {
             res.status(401).send({});
         } else {
             console.log('Loginrequest for ' + user.username + ' successful.');
+            //Sets a cookie with the user id.
+            req.session.userId = user._id;
             res.status(200).send({
                 _id: user._id,
                 username: user.username,

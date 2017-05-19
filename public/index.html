@@ -23,7 +23,7 @@
                 <button id="settings-button" class="right-side-button">Inställningar</button>
                 <div id="user-list" class="side-menu-list">
                     <ul>
-                        <li ng-repeat="user in users" ng-click="changeRecipient()">{{user.name}}</li>
+                        <li ng-repeat="user in users" ng-click="changeRecipient($event)">{{user.name}}</li>
                     </ul>
                 </div>
                 <button id="logout-button" class="right-side-button" ng-click="userLogout()">Logga ut</button>

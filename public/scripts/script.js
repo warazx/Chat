@@ -15,7 +15,7 @@ app.config(function ($routeProvider) {
         controller: 'MessagesController',
         templateUrl: 'partials/messages.html',
         auth: function(user) {
-            return user
+            return user;
         }
     }).when('/settings', {
         controller: 'SettingsController',
@@ -48,6 +48,9 @@ app.directive("contenteditable", function() {
         }
     };
 });
+
+//Which room (chatroom or direct message room) that the user is currently in
+app.value('currentRoom', {});
 
 app.run(function($rootScope, $location, $interval, $http, mySocket) {
     mySocket.on('disconnect message', function(msg) {
@@ -83,14 +86,17 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 	});
 });
 
-app.controller('RightSideController', function ($http, $interval, $window, $location, $scope, $rootScope, mySocket) {
+app.controller('RightSideController', function ($http, $interval, $window, $location, $scope, $rootScope, mySocket, currentRoom) {
     $rootScope.userLogout = function() {
         $location.path('/');
         mySocket.disconnect();
         $rootScope.user = null;
         $rootScope.showMenu = false;
     };
-    $scope.changeRecipient = function changeRecipient() {
+    $scope.changeRecipient = function changeRecipient(event) {
+        currentRoom = this;
+        console.log(this);
+        event.style.backgroundColor = "#FFDDFF";
         $location.path('/private-messages');
         $rootScope.privateRecipient = this.user;
         if (!$rootScope.user) {
@@ -241,7 +247,7 @@ app.controller('PrivateMessagesController', function($rootScope, $scope, $http, 
                 "recipient": $rootScope.privateRecipient.id,
                 "timestamp": new Date(),
                 "text": $scope.textMessage
-            }
+            };
             $http.post('/private-messages', newPrivateMessage);
             $scope.textMessage = "";
             document.getElementById('my-message').focus();

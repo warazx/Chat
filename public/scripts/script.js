@@ -73,12 +73,13 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
     $scope.chatrooms = [{name: "general"}, {name: "leif"}, {name: "offtopic"}, {name: "sports"}];
 });
 
-app.controller('RightSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket) {
+app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket) {
     $rootScope.userLogout = function() {
-        $location.path('/');
+        $http.get('/logout');
         mySocket.disconnect();
         $rootScope.user = null;
         $rootScope.showMenu = false;
+        $location.path('/');
     };
 });
 

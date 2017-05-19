@@ -1,8 +1,13 @@
-<div id="login-container">
-    <form name="login-form" novalidate="true">
-        <label for="username-input">Användarnamn</label>
-        <input type="text" autofocus name="user" id="username-input" ng-model="login.username" ng-pattern="/^[0-9a-zA-Z]{3,12}$/" required="true">
-        <input type="submit" value="Logga in" ng-click="userLogin()">
-        <div ng-show="loginForm.userName.$error.pattern">Namnet kan endast innehålla bokstäver och siffror och ska vara mellan 6 och 12 tecken långt.</div>
-    </form>
+<div id="login-view">
+    <h1 id="login-title">ShutApp</h1>
+    <div id="login-container">
+        <form name="login-form" novalidate="true">
+            <label for="username-input">Användarnamn</label>
+            <input type="text" autofocus name="user" id="username-input" ng-model="login.username" ng-pattern="/^[0-9a-zA-Z]{3,20}$/" required="true">
+            <input type="submit" value="Logga in" ng-click="userLogin()">
+        </form>
+        <div id="error-messages">
+            <p class="error-message">{{errorMessage}}</p>
+        </div>
+    </div>
 </div>

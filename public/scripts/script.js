@@ -1,52 +1,8 @@
-var app = angular.module('app', ['ngRoute', 'ngSanitize', 'btford.socket-io', 'luegg.directives']);
+var app = angular.module('app', ['ngRoute', 'ngSanitize', 'btford.socket-io', 'luegg.directives','lr.upload']);
 
 app.factory('mySocket', function(socketFactory) {
     return socketFactory();
 });
-
-app.value('users', [
-    {
-        id : 1,
-        name : "1337Leif",
-        isUserOnline : false,
-        messages : []
-    },
-    {
-        id : 2,
-        name : "RegExRolf",
-        isUserOnline : false,
-        messages : [] },
-    {
-        id : 3,
-        name : "BooleanBob",
-        isUserOnline : true,
-        messages : []
-    },
-    {
-        id : 4,
-        name : "ErrorEmil",
-        isUserOnline : true,
-        messages : []
-    },
-    {
-        id : 5,
-        name : "SyntaxScotty",
-        isUserOnline : false,
-        messages : []
-    },
-    {
-        id : 6,
-        name : "ForLoopFred",
-        isUserOnline : false,
-        messages : []
-    },
-    {
-        id : 7,
-        name : "OutOfBoundsBoerjesson",
-        isUserOnline : false,
-        messages : []
-    }
-]);
 
 app.config(function ($routeProvider) {
     $routeProvider.when('/', {
@@ -55,12 +11,21 @@ app.config(function ($routeProvider) {
     }).when('/messages', {
         controller: 'MessagesController',
         templateUrl: 'partials/messages.html',
+
         auth: function(user) {
-            return user
+            return user;
         }
     }).when('/settings', {
         controller: 'SettingsController',
         templateUrl: 'partials/settings.html',
+
+        /*auth: function(user) {
+            return user;
+        }*/
+    }).when('/settings', {
+        controller: 'SettingsController',
+        templateUrl: 'partials/settings.html',
+
     });
 });
 
@@ -86,8 +51,8 @@ app.directive("contenteditable", function() {
     };
 });
 
-app.run(function($rootScope, $location) {
-    $rootScope.$on('$routeChangeStart', function(ev, next, curr) {
+app.run(function($rootScope, $location, $interval, $http, mySocket) {
+    /*$rootScope.$on('$routeChangeStart', function(ev, next, curr) {
         if (next.$$route) {
             var user = $rootScope.user;
             var auth = next.$$route.auth;
@@ -95,75 +60,162 @@ app.run(function($rootScope, $location) {
                 $location.path("/");
             }
         }
-    })
+    });*/
+    mySocket.on('disconnect message', function(msg) {
+        $rootScope.statusMessage = msg;
+    });
+    mySocket.on('active users', function(arr) {
+        $rootScope.users = arr;
+    });
+    /*$interval(function() {
+        $http.post('/heartbeat', {name: $rootScope.user.name});
+    }, 1000*60*5);*/
 });
 
-app.controller('SideController', function ($window, $scope, $rootScope, users) {
-    $scope.users = users;
+app.factory('loginManager', function($http, $q) {
+    return {
+        loginRequest: function(username) {
+            return $q(function(resolve) {
+                $http.get('./login/' + username).then(function(response) {
+                    resolve(response.data);
+                });
+            });
+        }
+    };
+});
 
-    $scope.userLogout = function() {
-        console.log("baaad");
-        $window.location.href = "/";
+/*app.factory('userManager', function($http, $q) {
+    return {
+        getActiveUsers: function() {
+            return $q(function(resolve) {
+                $http.get('./activeUsers').then(function(response) {
+                    resolve(response.data);
+                });
+            });
+        }
+    };
+});*/
+
+app.controller('SideController', function ($interval, $window, $location, $scope, $rootScope, mySocket) {
+    //Gets all current active users from the server.
+    $rootScope.userLogout = function() {
+        $location.path('/');
+        mySocket.disconnect();
+        $rootScope.user = null;
         $rootScope.showMenu = false;
     };
 });
 
-app.controller('LoginController', function ($scope, $rootScope, $location, users) {
-    $scope.users = users;
-    $scope.userLogin = function(login) {
-        //Check that username is not already in use by another user.
-        for (var i = 0; i < users.length; i++) {
-            if ($scope.login.username == users[i].name) {
-                if (users[i].isUserOnline) {
-                    alert('User is already logged in. Log in using a different username.');
-                } else {
-                    users[i].isUserOnline = true;
-                    $rootScope.user = users[i];
-                    $location.path("/messages");
+app.controller('LoginController', function ($window, $scope, $rootScope, $location, mySocket, loginManager) {
+    $scope.errorMessage = "";
+    $scope.userLogin = function() {
+        if ($scope.login === undefined || $scope.login.username === undefined || $scope.login.username === "") {
+            $scope.errorMessage = "Du måste välja ett användarnamn som innehåller minst tre tecken och max tjugo tecken." +
+                "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";
+        } else {
+            loginManager.loginRequest($scope.login.username).then(function(response) {
+                if (response.redirect) {
+                    console.log('i got here');
+                    $scope.errorMessage = "";
+                    $location.path(response.redirect);
                     $rootScope.showMenu = true;
+                    $rootScope.user = {
+                        name: $scope.login.username
+                    };
+                    mySocket.emit('connected', $rootScope.user.name);
+                    mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat in."});
+                } else {
+                    $scope.errorMessage = response.errorMsg;
+                    console.log($scope.errorMessage);
                 }
-            }
+            });
         }
-    }
+    };
 });
 
-app.controller('SettingsController', function ($scope, $rootScope, $location, users){
-	
-});
+
 
 app.controller('MessagesController', function ($scope,$rootScope, users, mySocket) {
     $scope.users = users;
     $scope.title = "Messages";
     $scope.messages = [];
     document.getElementById('my-message').focus();
+});
 
-    mySocket.on('broadcast message', function(msg){
-        console.log(msg);
-        $scope.messages.push(msg);
-    });
-
-    document.getElementById('my-message').onkeypress=function(e){
-        //keyCode 13 is the enter key
-        if(e.keyCode==13 && !e.shiftKey){
-            e.preventDefault();
-            if($scope.textMessage != "" && $scope.textMessage != "<br>") {
-                $scope.postMessage();
-            }
-        }
-    }
-
-    var currentId = 0; //Temp
-    $scope.postMessage = function() {
-        var newMessage = {
-            "sender": $rootScope.user.name,
-            "date": new Date(),
-            "text": $scope.textMessage
-        };
-        mySocket.emit('broadcast message', newMessage);
-        $scope.textMessage = "";
+app.controller('MessagesController', function ($scope,$rootScope, $http, $location, mySocket) {
+    //Checks if user object exist on rootScope and if not, redirects to loginpage.
+    if (!$rootScope.user) {
+        console.log("User not logged in! Redirecting to login.");
+        $location.path('/');
+    } else {
+        $http.get('/messages').then(function(response) {
+            $rootScope.messages = response.data;
+        });
+        $rootScope.messages = [];
         document.getElementById('my-message').focus();
-        currentId++;
 
-        return false;
-    };
+        mySocket.on('broadcast message', function(msg){
+            $rootScope.messages.push(msg);
+        });
+
+        mySocket.on('connect message', function(msg) {
+            $rootScope.statusMessage = msg;
+        });
+
+        document.getElementById('my-message').onkeypress=function(e){
+            //keyCode 13 is the enter key
+            if(e.keyCode==13 && !e.shiftKey){
+                e.preventDefault();
+                if($scope.textMessage !== "" && $scope.textMessage != "<br>") {
+                    $scope.postMessage();
+                }
+            }
+        };
+
+        var currentId = 0; //Temp
+        $scope.postMessage = function() {
+            var newMessage = {
+                "sender": $rootScope.user.name,
+                "date": new Date(),
+                "text": $scope.textMessage
+            };
+            $http.post('/messages', {sender: $rootScope.user.name, text: $scope.textMessage});
+            mySocket.emit('broadcast message', newMessage);
+            $scope.textMessage = "";
+            document.getElementById('my-message').focus();
+            currentId++;
+
+            return false;
+        };
+    }
+});
+
+/*
+app.controller('SettingsController', function ($scope, $rootScope, upload) {
+   
+    console.log($scope.myFile);
+  $scope.doUpload = function () {
+
+    upload({
+      url: '/upload',
+      method: 'POST',
+      data: {
+        userid: 123, // Only works in newer browsers
+        file: $scope.myFile, // a jqLite type="file" element, upload() will extract all the files from the input and put them into the FormData object before sending.
+      }
+    }).then(
+      function (response) {
+        console.log(response.data); // will output whatever you choose to return from the server on a successful upload
+      },
+      function (response) {
+          console.error(response); //  Will return if status code is above 200 and lower than 300, same as $http
+      }
+    );
+  };
+});
+*/
+
+
+app.controller('SettingsController', function ($scope, $rootScope,upload){
+        
 });

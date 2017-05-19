@@ -17,6 +17,8 @@ gulp.task('serve', function() {
     });
 });
 
-gulp.task('listen', function() { gulp.watch('scripts/*.js', ['jshint']); });
+gulp.task('listen', function() {
+    gulp.watch('public/scripts/*.js', ['jshint']);
+});
 
 gulp.task('default', ['listen', 'serve']);

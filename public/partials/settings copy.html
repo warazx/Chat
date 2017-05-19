@@ -1,12 +1,12 @@
-<upload-button
+<div
+  class="btn btn-primary btn-upload"
+  upload-button
   url="/upload"
   param="avatar"
   name="avatar"
-  data="{userid : 123456}"
+  data="userX"
   on-success="onSuccess(response)">Upload
-</upload-button>
-   <!-- <input url="/upload" on-upload="onUpload(file)" name="myFile" type="file" param="avatar"/> -->
-
+</div>
 <div id="settings-container" >
     <form name="settings-form" novalidate="true">
         <label for="username-setting-input">Användarnamn</label>

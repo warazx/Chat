@@ -8,4 +8,7 @@
     <div id="my-message-container">
         <div contenteditable="true" ng-model="textMessage" id="my-message"></div>
     </div>
+    <div id="status-message">
+        <span id="status-message-time">{{statusMessage.date | date: 'HH:mm'}}</span><span id="status-message-text">{{statusMessage.text}}</span>
+    </div>
 </div>

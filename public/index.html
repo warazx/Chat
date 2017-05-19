@@ -2,12 +2,13 @@
 <html ng-app="app">
     <head>
         <meta charset="UTF-8">
-        <title>Chat</title>
+        <title>ShutApp</title>
 		<link rel="stylesheet" href="css/style.css">
     </head>
     <body>
-        <div id="content">
-            <div id="container" ng-view></div>
+        <div id="content" ng-cloak>
+            <div id="container" ng-view>
+            </div>
             <div id="side-menu" ng-controller="SideController" ng-show="showMenu">
                 <div id="title">
                     <h1>ShutApp</h1>
@@ -17,9 +18,7 @@
                         <li ng-repeat="user in users">{{user.name}}</li>
                     </ul>
                 </div>
-                <div id="logout">
-                    <button id="logout-button" ng-click="userLogout()">Logga ut</button>
-                </div>
+                <button id="logout-button" ng-click="userLogout()">Logga ut</button>
             </div>
         </div>
         <script src="bower_components/angular/angular.js"></script>
@@ -28,6 +27,7 @@
         <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
         <script src="bower_components/angular-socket-io/socket.js"></script>
+        <script src='bower_components/angular-upload/angular-upload.min.js'></script>
 		<script src="scripts/script.js"></script>
     </body>
 </html>

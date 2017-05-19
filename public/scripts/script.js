@@ -95,10 +95,10 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
         $rootScope.showMenu = false;
         $location.path('/');
     };
-    $scope.changeRecipient = function changeRecipient(event) {
+    $scope.changeRecipient = function changeRecipient(index) {
         currentRoom = this;
         console.log(this);
-        event.style.backgroundColor = "#FFDDFF";
+        $rootScope.selected = index;
         $location.path('/private-messages');
         $rootScope.privateRecipient = this.user;
         if (!$rootScope.user) {

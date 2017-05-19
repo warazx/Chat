@@ -23,7 +23,8 @@
                 <button id="settings-button" class="right-side-button">Inställningar</button>
                 <div id="user-list" class="side-menu-list">
                     <ul>
-                        <li ng-repeat="user in users" ng-click="changeRecipient($event)">{{user.name}}</li>
+                        <li>You are logged in as {{user.name}}</li>
+                        <li ng-repeat="user in users track by $index" ng-click="changeRecipient($index)" ng-class="{markedRoom: selected==$index}">{{user.name}}</li>
                     </ul>
                 </div>
                 <button id="logout-button" class="right-side-button" ng-click="userLogout()">Logga ut</button>

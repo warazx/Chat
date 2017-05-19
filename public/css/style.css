@@ -325,3 +325,8 @@ a:hover {
 #status-message-text {
     font-size: 0.8rem;
 }
+
+.markedRoom {
+    background-color: #DDDDFF;
+    color: #595959;
+}

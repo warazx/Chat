@@ -86,12 +86,14 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 	});
 });
 
-app.controller('RightSideController', function ($http, $interval, $window, $location, $scope, $rootScope, mySocket, currentRoom) {
+
+app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket, currentRoom) {
     $rootScope.userLogout = function() {
-        $location.path('/');
+        $http.get('/logout');
         mySocket.disconnect();
         $rootScope.user = null;
         $rootScope.showMenu = false;
+        $location.path('/');
     };
     $scope.changeRecipient = function changeRecipient(event) {
         currentRoom = this;
@@ -177,7 +179,7 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
 });
 
 app.controller('SettingsController', function ($scope, $rootScope, $location, users){
-	
+
 });
 
 app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket) {
@@ -197,7 +199,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         mySocket.on('connect message', function(msg) {
             $rootScope.statusMessage = msg;
         });
-        
+
         document.getElementById('my-message').focus();
         document.getElementById('my-message').onkeypress=function(e){
             //keyCode 13 is the enter key

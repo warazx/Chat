@@ -94,6 +94,7 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
         }).then(function(response) {
             $rootScope.messages = response.data;
         });
+        $location.path('/messages');
     }
 });
 
@@ -117,7 +118,7 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
             $location.path('/');
         } else {
             $http({
-                url: '/private-messages',
+                url: '/messages',
                 method: "GET",
                 params: {user: $rootScope.user.id, otheruser: $rootScope.privateRecipient.id}
             }).then(function(response) {

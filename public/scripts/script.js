@@ -84,6 +84,17 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 	$http.get('chatrooms').then(function (response) {
 		$scope.chatrooms = response.data;
 	});
+    $scope.changeChatroom = function(index) {
+        $rootScope.selected = index;
+        $rootScope.selectedChatroom = this.chatroom._id;
+        $http({
+        	url: "/messages",
+			method: "GET",
+			params: {"chatroom": $rootScope.selectedChatroom},
+        }).then(function(response) {
+            $rootScope.messages = response.data;
+        });
+    }
 });
 
 
@@ -192,7 +203,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         $http({
         	url: "/messages",
 			method: "GET",
-			params: {chatroom: "General"}
+			params: {chatroom: "591d5683f36d281c81b1e5ea"} //This is the chatroom "General"
         }).then(function(response) {
             $rootScope.messages = response.data;
         });
@@ -220,7 +231,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
                 "sender": $rootScope.user.id,
                 "timestamp": new Date(),
                 "text": $scope.textMessage,
-				"chatroom": "General"
+				"chatroom": $rootScope.selectedChatroom
             };
             //$http.post('/messages', {sender: $rootScope.user.id, text: $scope.textMessage, chatroom: "hej"});
 			$http.post('/messages', newMessage);

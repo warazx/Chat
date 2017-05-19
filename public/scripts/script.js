@@ -14,6 +14,15 @@ app.config(function ($routeProvider) {
     }).when('/messages', {
         controller: 'MessagesController',
         templateUrl: 'partials/messages.html',
+<<<<<<< HEAD
+=======
+        auth: function(user) {
+            return user
+        }
+    }).when('/settings', {
+        controller: 'SettingsController',
+        templateUrl: 'partials/settings.html',
+>>>>>>> 61712558c256fcbd5840689da06639ae6ff94653
     });
 });
 
@@ -68,9 +77,13 @@ app.factory('signupManager', function($http) {
     };
 });
 
-app.controller('LeftSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket) {
-    // Temporary array of chatrooms.
-    $scope.chatrooms = [{name: "general"}, {name: "leif"}, {name: "offtopic"}, {name: "sports"}];
+app.controller('LeftSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket, $http) {
+	$http.get('chatrooms').then(function (data) {
+		console.log(data.data);
+		$scope.chatrooms = data.data;
+	});
+	// Temporary array of chatrooms.
+    //$scope.chatrooms = [{name: "general"}, {name: "leif"}, {name: "offtopic"}, {name: "sports"}];
 });
 
 app.controller('RightSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket) {
@@ -143,6 +156,7 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
     };
 });
 
+<<<<<<< HEAD
 app.controller('MessagesController', function ($scope,$rootScope, $http, $location, mySocket) {
     //Checks if user object exist on rootScope and if not, redirects to loginpage.
     if (!$rootScope.user) {
@@ -154,6 +168,17 @@ app.controller('MessagesController', function ($scope,$rootScope, $http, $locati
         });
         $rootScope.messages = [];
         document.getElementById('my-message').focus();
+=======
+app.controller('SettingsController', function ($scope, $rootScope, $location, users){
+	
+});
+
+app.controller('MessagesController', function ($scope,$rootScope, users, mySocket) {
+    $scope.users = users;
+    $scope.title = "Messages";
+    $scope.messages = [];
+    document.getElementById('my-message').focus();
+>>>>>>> 61712558c256fcbd5840689da06639ae6ff94653
 
         mySocket.on('broadcast message', function(msg){
             $rootScope.messages.push(msg);

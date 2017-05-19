@@ -29,6 +29,22 @@ app.post('/messages', function(req, res) {
     });
 });
 
+//detta är en endpoint på servern
+app.get('/chatrooms', function(req, res) {
+	//find alla chatrooms och lägg dessa till en lista
+	db.collection('chatrooms').find().toArray(function (error, result){
+		if(error) {
+			res.status(500).send(error);
+			return;
+		}
+		//result är en array med chatrooms-object i
+		console.log(result);
+		res.status(200).send(result);
+	});
+	//res.status(200).send("Halloj");
+	//console.log(chatrooms);
+});
+
 app.post('/signup', function(req, res) {
     //all usernames are stored as lowercase for simplicity
     var username = req.body.username.toLowerCase();

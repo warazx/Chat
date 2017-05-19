@@ -14,15 +14,15 @@ app.config(function ($routeProvider) {
     }).when('/messages', {
         controller: 'MessagesController',
         templateUrl: 'partials/messages.html',
-<<<<<<< HEAD
-=======
         auth: function(user) {
             return user
         }
     }).when('/settings', {
         controller: 'SettingsController',
-        templateUrl: 'partials/settings.html',
->>>>>>> 61712558c256fcbd5840689da06639ae6ff94653
+        templateUrl: 'partials/settings.html'
+    }).when('/private-messages', {
+        controller: 'PrivateMessagesController',
+        templateUrl: 'partials/messages.html'
     });
 });
 
@@ -82,16 +82,30 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 		console.log(data.data);
 		$scope.chatrooms = data.data;
 	});
-	// Temporary array of chatrooms.
-    //$scope.chatrooms = [{name: "general"}, {name: "leif"}, {name: "offtopic"}, {name: "sports"}];
 });
 
-app.controller('RightSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket) {
+app.controller('RightSideController', function ($http, $interval, $window, $location, $scope, $rootScope, mySocket) {
     $rootScope.userLogout = function() {
         $location.path('/');
         mySocket.disconnect();
         $rootScope.user = null;
         $rootScope.showMenu = false;
+    };
+    $scope.changeRecipient = function changeRecipient() {
+        $location.path('/private-messages');
+        $rootScope.privateRecipient = this.user;
+        if (!$rootScope.user) {
+            console.log("User not logged in! Redirecting to login.");
+            $location.path('/');
+        } else {
+            $http({
+                url: '/private-messages',
+                method: "GET",
+                params: {user: $rootScope.user.id, otheruser: $rootScope.privateRecipient.id}
+            }).then(function(response) {
+                $rootScope.messages = response.data;
+            });
+        }
     };
 });
 
@@ -146,7 +160,8 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
                 };
                 $location.path(res.data.redirect); //Redirects to /messages.
                 $rootScope.showMenu = true;
-                mySocket.emit('connected', $rootScope.user.name);
+                //send $rootScope.user to server.js, it receives it with socket.on('connected')
+                mySocket.emit('connected', $rootScope.user);
                 mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat in."});
             }, function(res) {
                 console.log('Login failed on server.');
@@ -156,38 +171,31 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
     };
 });
 
-<<<<<<< HEAD
-app.controller('MessagesController', function ($scope,$rootScope, $http, $location, mySocket) {
+app.controller('SettingsController', function ($scope, $rootScope, $location, users){
+	
+});
+
+app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket) {
     //Checks if user object exist on rootScope and if not, redirects to loginpage.
     if (!$rootScope.user) {
         console.log("User not logged in! Redirecting to login.");
         $location.path('/');
     } else {
+        $rootScope.messages = [];
         $http.get('/messages').then(function(response) {
+            console.log(response.data);
             $rootScope.messages = response.data;
         });
         $rootScope.messages = [];
         document.getElementById('my-message').focus();
-=======
-app.controller('SettingsController', function ($scope, $rootScope, $location, users){
-	
-});
-
-app.controller('MessagesController', function ($scope,$rootScope, users, mySocket) {
-    $scope.users = users;
-    $scope.title = "Messages";
-    $scope.messages = [];
-    document.getElementById('my-message').focus();
->>>>>>> 61712558c256fcbd5840689da06639ae6ff94653
-
         mySocket.on('broadcast message', function(msg){
             $rootScope.messages.push(msg);
         });
-
         mySocket.on('connect message', function(msg) {
             $rootScope.statusMessage = msg;
         });
-
+        
+        document.getElementById('my-message').focus();
         document.getElementById('my-message').onkeypress=function(e){
             //keyCode 13 is the enter key
             if(e.keyCode==13 && !e.shiftKey){
@@ -198,20 +206,48 @@ app.controller('MessagesController', function ($scope,$rootScope, users, mySocke
             }
         };
 
-        var currentId = 0; //Temp
         $scope.postMessage = function() {
             var newMessage = {
-                "sender": $rootScope.user.name,
-                "date": new Date(),
+                "sender": $rootScope.user.id,
+                "timestamp": new Date(),
                 "text": $scope.textMessage
             };
-            $http.post('/messages', {sender: $rootScope.user.name, text: $scope.textMessage});
+            $http.post('/messages', {sender: $rootScope.user.id, text: $scope.textMessage});
             mySocket.emit('broadcast message', newMessage);
             $scope.textMessage = "";
             document.getElementById('my-message').focus();
-            currentId++;
-
             return false;
+        };
+    }
+});
+
+app.controller('PrivateMessagesController', function($rootScope, $scope, $http, $location) {
+    if (!$rootScope.user) {
+        console.log("User not logged in! Redirecting to login.");
+        $location.path('/');
+    } else {
+        //this code is duplicated in MessagesController. Refactor?
+        document.getElementById('my-message').focus();
+        document.getElementById('my-message').onkeypress=function(e){
+            //keyCode 13 is the enter key
+            if(e.keyCode==13 && !e.shiftKey){
+                //prevents a new line from being written when only the enter key is pressed
+                e.preventDefault();
+                if($scope.textMessage !== "" && $scope.textMessage != "<br>") {
+                    $scope.postPrivateMessage();
+                }
+            }
+        };
+        $scope.postPrivateMessage = function() {
+            var newPrivateMessage = {
+                "sender": $rootScope.user.id,
+                "recipient": $rootScope.privateRecipient.id,
+                "timestamp": new Date(),
+                "text": $scope.textMessage
+            }
+            $http.post('/private-messages', newPrivateMessage);
+            $scope.textMessage = "";
+            document.getElementById('my-message').focus();
         };
     }
 });

@@ -263,10 +263,13 @@ app.controller('PrivateMessagesController', function($rootScope, $scope, $http, 
         $location.path('/');
     } else {
         mySocket.on('private message', function(message) {
+            if(message.sender == $rootScope.privateRecipient.id || message.sender == $rootScope.user.id) {
+                $rootScope.messages.push(message);
+            }
             console.log("I got a private message!");
-            $rootScope.messages.push(message);
+            
         });
-        //this code is duplicated in MessagesController. Refactor?
+        //this code is duplicated (except for postPrivateMessage()) in MessagesController. Refactor?
         document.getElementById('my-message').focus();
         document.getElementById('my-message').onkeypress=function(e){
             //keyCode 13 is the enter key

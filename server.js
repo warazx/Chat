@@ -111,8 +111,6 @@ app.post('/private-messages', function(req, res) {
     });
 });
 
-
-
 app.post('/signup', function(req, res) {
     //all usernames are stored as lowercase for simplicity
     var username = req.body.username.toLowerCase();
@@ -248,17 +246,22 @@ setInterval(function() {
 io.on('connection', function(socket){
     socket.on('connected', function(user) {
         socket.username = user.name;
-        socket.id = user.id;
         console.log(socket.username + " has connected.");
-        activeUsers.push({ name: socket.username, id: socket.id });
+        activeUsers.push({ name: socket.username, id: user.id, socketId: socket.id });
         io.emit('active users', activeUsers);
     });
-    //message
+    /*
     socket.on('broadcast message', function(message){
         io.emit('broadcast message', message);
     });
+    */
     socket.on('private message', function(message){
-        io.emit('private message', message);
+        console.log("message socketId: " + message.socketId);
+        console.log("my socketId: " + socket.id);
+        //send to the other person
+        socket.to(message.socketId).emit('private message', message);
+        //send to myself
+        socket.emit('private message', message);
     });
     socket.on('connect message', function(message) {
         socket.broadcast.emit('connect message', message);
@@ -274,18 +277,17 @@ io.on('connection', function(socket){
         socket.broadcast.emit('active users', activeUsers);
         socket.broadcast.emit('disconnect message', {timestamp: new Date(), text: socket.username + " har loggat ut."});
     });
-
-    //Testing private messages!
-    socket.on('join', function(data) {
-        socket.join(data.id);
-        console.log("joined! id:" + data.id);   //reached this
+    socket.on('join chatroom', function(chatroomId) {
+        socket.join(chatroomId, function() {
+            console.log(socket.rooms);
+        });
     });
-    socket.on('sendpersonalmessage', function(data) {
-        console.log("sending personal message: " + data.msg.text);
-        io.to('/#' + data.id).emit('leprivatemessage', data.msg);
-        console.log("sending to user: " + data.id);
+    socket.on('chatroom message', function(message) {
+        io.in(message.chatroom).emit('chatroom message', message);
     });
-
+    socket.on('leave chatroom', function(chatroomId) {
+        socket.leave(chatroomId);
+    });
 });
 
 

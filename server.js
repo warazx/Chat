@@ -248,9 +248,8 @@ setInterval(function() {
 io.on('connection', function(socket){
     socket.on('connected', function(user) {
         socket.username = user.name;
-        socket.id = user.id;
         console.log(socket.username + " has connected.");
-        activeUsers.push({ name: socket.username, id: socket.id });
+        activeUsers.push({ name: socket.username, id: user.id });
         io.emit('active users', activeUsers);
     });
     //message
@@ -273,6 +272,17 @@ io.on('connection', function(socket){
         console.log(socket.username + " has disconnected.");
         socket.broadcast.emit('active users', activeUsers);
         socket.broadcast.emit('disconnect message', {timestamp: new Date(), text: socket.username + " har loggat ut."});
+    });
+    socket.on('join chatroom', function(chatroomId) {
+        socket.join(chatroomId, function() {
+            console.log(socket.rooms);
+        });
+    });
+    socket.on('chatroom message', function(msg) {
+        io.in(msg.chatroom).emit('chatroom message', msg);
+    });
+    socket.on('leave chatroom', function(chatroomId) {
+        socket.leave(chatroomId);
     });
 });
 

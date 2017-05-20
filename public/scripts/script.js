@@ -86,6 +86,10 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 	});
     $scope.changeChatroom = function(index) {
         $rootScope.selected = index;
+        //Leave chatroom if already in one. Not sure if this should just be on the server side?
+        if($rootScope.selectedChatroom) {
+            mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
+        }
         $rootScope.selectedChatroom = this.chatroom._id;
         $http({
         	url: "/messages",
@@ -94,6 +98,7 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
         }).then(function(response) {
             $rootScope.messages = response.data;
         });
+        mySocket.emit('join chatroom', $rootScope.selectedChatroom);
         $location.path('/messages');
     }
 });
@@ -209,7 +214,12 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             $rootScope.messages = response.data;
         });
         document.getElementById('my-message').focus();
+        /*
         mySocket.on('broadcast message', function(msg){
+            $rootScope.messages.push(msg);
+        });
+        */
+        mySocket.on('chatroom message', function(msg) {
             $rootScope.messages.push(msg);
         });
         mySocket.on('connect message', function(msg) {
@@ -236,7 +246,9 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             };
             //$http.post('/messages', {sender: $rootScope.user.id, text: $scope.textMessage, chatroom: "hej"});
 			$http.post('/messages', newMessage);
-            mySocket.emit('broadcast message', newMessage);
+            //mySocket.emit('broadcast message', newMessage);
+            //Send message to the current chatroom
+            mySocket.emit('chatroom message', newMessage);
             $scope.textMessage = "";
             document.getElementById('my-message').focus();
             return false;

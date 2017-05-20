@@ -97,7 +97,6 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
     };
     $scope.changeRecipient = function changeRecipient(index) {
         currentRoom = this;
-        console.log(this);
         $rootScope.selected = index;
         $location.path('/private-messages');
         $rootScope.privateRecipient = this.user;
@@ -226,11 +225,19 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
     }
 });
 
-app.controller('PrivateMessagesController', function($rootScope, $scope, $http, $location) {
+app.controller('PrivateMessagesController', function($rootScope, $scope, $http, $location, mySocket) {
     if (!$rootScope.user) {
         console.log("User not logged in! Redirecting to login.");
         $location.path('/');
     } else {
+        //The user joins a 'room'
+        mySocket.emit('join', {id: $rootScope.user.id});
+        //Listens to private messages from other users
+        mySocket.on('leprivatemessage', function(data) {
+            console.log("received private message: " + data);
+            $rootScope.messages.push(data);
+        });
+
         //this code is duplicated in MessagesController. Refactor?
         document.getElementById('my-message').focus();
         document.getElementById('my-message').onkeypress=function(e){
@@ -251,6 +258,8 @@ app.controller('PrivateMessagesController', function($rootScope, $scope, $http, 
                 "text": $scope.textMessage
             };
             $http.post('/private-messages', newPrivateMessage);
+            //Sends the message to the other user
+            mySocket.emit('sendpersonalmessage', {id: $rootScope.privateRecipient.id, msg: newPrivateMessage});
             $scope.textMessage = "";
             document.getElementById('my-message').focus();
         };

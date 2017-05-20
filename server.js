@@ -246,7 +246,20 @@ io.on('connection', function(socket){
         socket.broadcast.emit('active users', activeUsers);
         socket.broadcast.emit('disconnect message', {timestamp: new Date(), text: socket.username + " har loggat ut."});
     });
+
+    //Testing private messages!
+    socket.on('join', function(data) {
+        socket.join(data.id);
+        console.log("joined! id:" + data.id);   //reached this
+    });
+    socket.on('sendpersonalmessage', function(data) {
+        console.log("sending personal message: " + data.msg.text);
+        io.to('/#' + data.id).emit('leprivatemessage', data.msg);
+        console.log("sending to user: " + data.id);
+    });
+
 });
+
 
 http.listen(port, function(){
     console.log('Listening on: ' + port);

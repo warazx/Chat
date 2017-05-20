@@ -193,15 +193,15 @@ app.controller('MessagesController', function ($scope,$rootScope, $http, $locati
 /*
 app.controller('SettingsController', function ($scope, $rootScope, upload) {
    
-    console.log($scope.myFile);
+   
   $scope.doUpload = function () {
-
+ console.log("filnamn:"+$scope.myFile);
     upload({
       url: '/upload',
       method: 'POST',
       data: {
         userid: 123, // Only works in newer browsers
-        file: $scope.myFile, // a jqLite type="file" element, upload() will extract all the files from the input and put them into the FormData object before sending.
+        avatar: $scope.avatar // a jqLite type="file" element, upload() will extract all the files from the input and put them into the FormData object before sending.
       }
     }).then(
       function (response) {
@@ -212,10 +212,12 @@ app.controller('SettingsController', function ($scope, $rootScope, upload) {
       }
     );
   };
-});
-*/
+});*/
 
 
-app.controller('SettingsController', function ($scope, $rootScope,upload){
-        
+
+app.controller('SettingsController', function ($scope, $rootScope){
+       
+        $scope.userid = 111;
+   
 });

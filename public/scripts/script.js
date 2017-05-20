@@ -84,6 +84,18 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 	$http.get('chatrooms').then(function (response) {
 		$scope.chatrooms = response.data;
 	});
+    $scope.changeChatroom = function(index) {
+        $rootScope.selected = index;
+        $rootScope.selectedChatroom = this.chatroom._id;
+        $http({
+        	url: "/messages",
+			method: "GET",
+			params: {"chatroom": $rootScope.selectedChatroom},
+        }).then(function(response) {
+            $rootScope.messages = response.data;
+        });
+        $location.path('/messages');
+    }
 });
 
 
@@ -105,7 +117,7 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
             $location.path('/');
         } else {
             $http({
-                url: '/private-messages',
+                url: '/messages',
                 method: "GET",
                 params: {user: $rootScope.user.id, otheruser: $rootScope.privateRecipient.id}
             }).then(function(response) {
@@ -188,7 +200,11 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         $location.path('/');
     } else {
         $rootScope.messages = [];
-        $http.get('/messages').then(function(response) {
+        $http({
+        	url: "/messages",
+			method: "GET",
+			params: {chatroom: "591d5683f36d281c81b1e5ea"} //This is the chatroom "General"
+        }).then(function(response) {
             $rootScope.messages = response.data;
         });
         document.getElementById('my-message').focus();
@@ -214,9 +230,11 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             var newMessage = {
                 "sender": $rootScope.user.id,
                 "timestamp": new Date(),
-                "text": $scope.textMessage
+                "text": $scope.textMessage,
+				"chatroom": $rootScope.selectedChatroom
             };
-            $http.post('/messages', {sender: $rootScope.user.id, text: $scope.textMessage});
+            //$http.post('/messages', {sender: $rootScope.user.id, text: $scope.textMessage, chatroom: "hej"});
+			$http.post('/messages', newMessage);
             mySocket.emit('broadcast message', newMessage);
             $scope.textMessage = "";
             document.getElementById('my-message').focus();

@@ -13,7 +13,7 @@
                 </div>
                 <div id="chatroom-list" class="side-menu-list">
                     <ul>
-                        <li ng-repeat="chatroom in chatrooms">#{{chatroom.name}}</li>
+                        <li ng-repeat="chatroom in chatrooms track by chatroom._id" ng-click="changeChatroom(chatroom._id)" ng-class="{markedRoom: selected==chatroom._id}">#{{chatroom.name}}</li>
                     </ul>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                 <div id="user-list" class="side-menu-list">
                     <ul>
                         <li>You are logged in as {{user.name}}</li>
-                        <li ng-repeat="user in users track by $index" ng-click="changeRecipient($index)" ng-class="{markedRoom: selected==$index}">{{user.name}}</li>
+                        <li ng-repeat="user in users track by user.id" ng-click="changeRecipient(user.id)" ng-class="{markedRoom: selected==user.id}">{{user.name}}</li>
                     </ul>
                 </div>
                 <button id="logout-button" class="right-side-button" ng-click="userLogout()">Logga ut</button>

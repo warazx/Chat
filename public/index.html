@@ -23,7 +23,7 @@
                 <button id="settings-button" class="right-side-button">Inställningar</button>
                 <div id="user-list" class="side-menu-list">
                     <ul>
-                        <li>You are logged in as {{user.name}}</li>
+                        <li>Du är inloggad som {{user.name}}</li>
                         <li ng-repeat="user in users track by user.id" ng-click="changeRecipient(user.id)" ng-class="{markedRoom: selected==user.id}">{{user.name}}</li>
                     </ul>
                 </div>

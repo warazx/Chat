@@ -200,6 +200,7 @@ app.controller('SettingsController', function ($scope, $rootScope, $location, us
 });
 
 app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket) {
+    $rootScope.selectedChatroom = "591d5683f36d281c81b1e5ea";   //"General"
     //Checks if user object exist on rootScope and if not, redirects to loginpage.
     if (!$rootScope.user) {
         console.log("User not logged in! Redirecting to login.");
@@ -256,11 +257,15 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
     }
 });
 
-app.controller('PrivateMessagesController', function($rootScope, $scope, $http, $location) {
+app.controller('PrivateMessagesController', function($rootScope, $scope, $http, $location, mySocket) {
     if (!$rootScope.user) {
         console.log("User not logged in! Redirecting to login.");
         $location.path('/');
     } else {
+        mySocket.on('private message', function(message) {
+            console.log("I got a private message!");
+            $rootScope.messages.push(message);
+        });
         //this code is duplicated in MessagesController. Refactor?
         document.getElementById('my-message').focus();
         document.getElementById('my-message').onkeypress=function(e){
@@ -280,7 +285,11 @@ app.controller('PrivateMessagesController', function($rootScope, $scope, $http, 
                 "timestamp": new Date(),
                 "text": $scope.textMessage
             };
+            //Post the message to the database
             $http.post('/private-messages', newPrivateMessage);
+            //Send a direct private message. socket.io needs the socketId to know where to send it.
+            newPrivateMessage.socketId = $rootScope.privateRecipient.socketId;
+            mySocket.emit('private message', newPrivateMessage);
             $scope.textMessage = "";
             document.getElementById('my-message').focus();
         };

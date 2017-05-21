@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ngRoute', 'ngSanitize', 'btford.socket-io', 'luegg.directives']);
+var app = angular.module('app', ['ngRoute', 'ngSanitize', 'btford.socket-io', 'luegg.directives','mgcrea.ngStrap','angular-smilies']);
 
 app.factory('mySocket', function(socketFactory) {
     return socketFactory();

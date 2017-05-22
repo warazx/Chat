@@ -102,6 +102,9 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 
 
 app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket, currentRoom) {
+	$scope.goToSettings = function(){
+		$location.path('/settings');
+	}
     $rootScope.userLogout = function() {
         $http.get('/logout');
         mySocket.disconnect();

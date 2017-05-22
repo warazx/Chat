@@ -172,6 +172,7 @@ a:hover {
 }
 
 #login-container,
+#settings-container,
 #signup-container {
     border: 1px solid #372731;
     border-radius: 0.5rem;
@@ -186,6 +187,18 @@ a:hover {
     margin: 0 37.5%;
     position: fixed;
     top: 40vh;
+}
+
+#settings-container {
+	max-height: 50%;
+    margin: 0 37.5% 0 calc(37.5% - 15rem);
+	text-align: center;
+	height: 100%;
+}
+
+#settings-img {
+	width: 128px;
+	height: 128px;
 }
 
 #login-container input[type=text],
@@ -283,9 +296,6 @@ a:hover {
     margin: 3.5rem 0;
 }
 
-#settings-container {
-	height: 100%;
-}
 
 #user-list {
     margin: 3.5rem 0 0;

@@ -21,7 +21,7 @@
             <div id="partial-container" ng-view>
             </div>
             <div id="right-side-menu" class="side-menu" ng-controller="RightSideController" ng-show="showMenu">
-                <button id="settings-button" class="right-side-button">Inställningar</button>
+                <button id="settings-button" class="right-side-button" type="button" ng-click="goToSettings()">Inställningar</button>
                 <div id="user-list" class="side-menu-list">
                     <ul>
                         <li>Du är inloggad som {{user.name}}</li>

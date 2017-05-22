@@ -36,7 +36,7 @@ app.use(session({
 
 app.post('/messages', function(req, res) {
     console.log(req.body.chatroom);
-    db.collection('chatMessages').insert({ sender: req.body.sender, timestamp: req.body.timestamp, text: req.body.text, chatroom: req.body.chatroom}).then(function() {
+    db.collection('chatMessages').insert({ senderId: req.body.senderId, senderName: req.body.senderName, timestamp: req.body.timestamp, text: req.body.text, chatroom: req.body.chatroom}).then(function() {
         //201 is a "created" status code
         res.status(201).send({});
     });
@@ -47,41 +47,17 @@ app.get('/messages', function(req, res) {
         var collection = 'privateMessages';
         var user = req.query.user;
         var otherUser = req.query.otheruser;
-        var findObject = {$or: [ {sender: user, recipient: otherUser}, {sender: otherUser, recipient: user} ] };
+        var findObject = {$or: [ {senderId: user, recipient: otherUser}, {senderId: otherUser, recipient: user} ] };
     } else {
         var collection = 'chatMessages';
         var findObject = {"chatroom":req.query.chatroom};
     }
 
-    db.collection(collection).find(findObject).sort({ "timestamp": -1 }).toArray(function(err, result) {
-        var callbackcounter = 0;
-        var newArray = [];
-        if(result.length == 0) {
-            res.status(200).send(result);
-        };
-
-        //Replaces userId with the username. Should be done with promise(?).
-        result.map(function(message) {
-            db.collection('users').findOne({_id: ObjectID(message.sender)}).then(function(doc) {
-                message.sender = doc.username;
-                callbackcounter++;
-                newArray.push(message);
-                if(callbackcounter == result.length) {
-                    //var date = new Date(newArray[0].timestamp);
-                    console.log(newArray[0].timestamp);
-                    newArray.sort(function(x,y) {return new Date(x.timestamp) - new Date(y.timestamp)});
-                    res.status(200).send(newArray);
-                }
-            });
-        });
-    });
-});
-
-app.get('/private-messages', function(req, res) {
-    var user = req.query.user;
-    var otherUser = req.query.otheruser;
-    var cursor = db.collection('privateMessages').find().sort({ "timestamp" : 1});
-    cursor.toArray(function(err, result) {
+    db.collection(collection).find(findObject).sort({ "timestamp": 1 }).toArray(function(err, result) {
+        //TODO: add error thing
+        if(err) {
+            res.status(500).send({});
+        }
         res.status(200).send(result);
     });
 });
@@ -101,11 +77,12 @@ app.get('/chatrooms', function(req, res) {
 
 app.post('/private-messages', function(req, res) {
     var newPrivateMessage = {
-        sender: req.body.sender,
+        senderId: req.body.senderId,
+        senderName: req.body.senderName,
         recipient: req.body.recipient,
         timestamp: new Date(),
         text: req.body.text
-    }
+    };
     db.collection('privateMessages').insert(newPrivateMessage).then(function(err, result) {
         if(!err) {
             res.status(201).send({});
@@ -168,18 +145,7 @@ app.get('/logout', function(req, res, next) {
         req.session.destroy();
     }
 });
-/*
- app.get('/messages', function(req, res) {
- db.collection('messages').find().sort({ "date": 1 }).toArray(function(error, result) {
- if (error) {
- res.status(500).send(error);
- return;
- }
- //200 is an "okay" status code
- res.status(200).send(result);
- });
- });
- */
+
 //GET one or all users. Not finished!
 app.get('/users/:id?', function (req, res) {
     var searchObject = {};
@@ -226,33 +192,7 @@ app.get('/login/:username/:password', function (req, res) {
         }
     });
 });
-/*
- var heartbeatUsers = [];
- app.post('/heartbeat', function(req, res) {
- var name = req.body.name;
- var exists = false;
- for (var i = 0; i < heartbeatUsers.length; i++) {
- if (heartbeatUsers[i].name == name) {
- heartbeatUsers[i].time = new Date();
- exists = true;
- }
- }
- if(!exists) {
- heartbeatUsers.push({name: name, time: new Date()});
- }
- console.log(heartbeatUsers);
- });
- setInterval(function() {
- var now = new Date();
- for (var i = heartbeatUsers.length - 1; i >= 0; i--) {
- var difference = now - heartbeatUsers[i].time; // Difference between the time right now and last heartbeat.
- var diffMins = Math.round(((difference % 86400000) % 3600000) / 60000);
- if (diffMins > 5) {
- heartbeatUsers.splice(i, 1);
- }
- }
- }, 1000*60*5);
- */
+
 io.on('connection', function(socket){
     socket.on('connected', function(user) {
         socket.username = user.name;
@@ -260,11 +200,6 @@ io.on('connection', function(socket){
         activeUsers.push({ name: socket.username, id: user.id, socketId: socket.id });
         io.emit('active users', activeUsers);
     });
-    /*
-     socket.on('broadcast message', function(message){
-     io.emit('broadcast message', message);
-     });
-     */
     socket.on('private message', function(message){
         console.log("message socketId: " + message.socketId);
         console.log("my socketId: " + socket.id);

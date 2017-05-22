@@ -1,0 +1,22 @@
+<div id="signup-view">
+    <div class="title-container">
+        <h1 id="signup-title">ShutApp</h1>
+    </div>
+    <div id="signup-container">
+        <form name="signup-form" novalidate="true">
+            <label for="signup-username-input">Användarnamn</label>
+            <input type="text" autofocus id="signup-username-input" ng-minlength="3" ng-maxlength="20" ng-model="signup.username" ng-pattern="/^[0-9a-zA-Z]{3,20}$/" required>
+            <label for="signup-email-input">E-mail</label>
+            <input type="email" id="signup-email-input" ng-minlength="5" ng-model="signup.email" required>
+            <label for="signup-password-input">Lösenord</label>
+            <input type="password" id="signup-password-input" ng-minlength="6" ng-maxlength="50" ng-model="signup.password" required>
+            <input type="submit" value="Registrera dig" ng-click="userSignup()">
+        </form>
+        <div id="error-messages">
+            <p class="error-message">{{errorMessage}}</p>
+        </div>
+        <div id="home-link-container">
+            <a href="#!/">Logga in?</a>
+        </div>
+    </div>
+</div>

@@ -160,7 +160,7 @@ a:hover {
     background-color: #372731;
 }
 
-#container {
+#partial-container {
     box-sizing: border-box;
     height: 100vh;
     width: 100vw;
@@ -171,7 +171,8 @@ a:hover {
     margin: 0;
 }
 
-#login-container {
+#login-container,
+#signup-container {
     border: 1px solid #372731;
     border-radius: 0.5rem;
     font-size: 1.2rem;
@@ -182,17 +183,24 @@ a:hover {
     background-color: #f2f0d5;
     color: #372731;
     min-width: 25%;
-    margin: 0 37.5% 40vh;
+    margin: 0 37.5%;
+    position: fixed;
+    top: 40vh;
 }
 
-#login-container input[type=text] {
+#login-container input[type=text],
+#signup-container input[type=text],
+#signup-container input[type="email"],
+#signup-container input[type="password"],
+#login-container input[type=password] {
     border: 1px solid #372731;
     border-radius: 0.1rem;
     width: 100%;
     margin: 0.5rem 0 0.5rem;
 }
 
-#login-container input[type=submit] {
+#login-container input[type=submit],
+#signup-container input[type=submit] {
     background-color: #ffffff;
     border: 1px solid #372731;
     border-radius: 0.2rem;
@@ -202,16 +210,32 @@ a:hover {
     margin: 0 0.5rem;
 }
 
-#login-container input[type=submit]:active {
+#login-container input[type=submit]:active,
+#signup-container input[type=submit]:active {
     background-color: #ebe9ce;
     color: #52414C;
     border: 1px solid #52414C;
 }
 
-#login-title {
-    margin: 0 34vw 3rem;
+#login-title,
+#signup-title {
     font-size: 6rem;
     color: white;
+    margin-left: 0;
+}
+
+.title-container {
+    min-width: 40%;
+    margin: 0 30% 0;
+    text-align: center;
+    position: fixed;
+    top: 10vh;
+}
+
+#signup-link-container,
+#home-link-container {
+    font-size: 0.9rem;
+    padding-bottom: 1rem;
 }
 
 .right-side-button {
@@ -256,6 +280,11 @@ a:hover {
     width: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+    margin: 3.5rem 0;
+}
+
+#settings-container {
+	height: 100%;
 }
 
 #user-list {
@@ -295,4 +324,9 @@ a:hover {
 
 #status-message-text {
     font-size: 0.8rem;
+}
+
+.markedRoom {
+    background-color: #DDDDFF;
+    color: #595959;
 }

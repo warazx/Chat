@@ -4,6 +4,7 @@
         <meta charset="UTF-8">
         <title>ShutApp</title>
 		<link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="bower_components/angular-smilies/dist/angular-smilies-embed.min.css">
     </head>
     <body>
         <div id="content" ng-cloak>
@@ -13,17 +14,18 @@
                 </div>
                 <div id="chatroom-list" class="side-menu-list">
                     <ul>
-                        <li ng-repeat="chatroom in chatrooms">#{{chatroom.name}}</li>
+                        <li ng-repeat="chatroom in chatrooms track by chatroom._id" ng-click="changeChatroom(chatroom._id)" ng-class="{markedRoom: selected==chatroom._id}">#{{chatroom.name}}</li>
                     </ul>
                 </div>
             </div>
-            <div id="container" ng-view>
+            <div id="partial-container" ng-view>
             </div>
             <div id="right-side-menu" class="side-menu" ng-controller="RightSideController" ng-show="showMenu">
                 <button id="settings-button" class="right-side-button">Inställningar</button>
                 <div id="user-list" class="side-menu-list">
                     <ul>
-                        <li ng-repeat="user in users">{{user.name}}</li>
+                        <li>Du är inloggad som {{user.name}}</li>
+                        <li ng-repeat="user in users track by user.id" ng-click="changeRecipient(user.id)" ng-class="{markedRoom: selected==user.id}">{{user.name}}</li>
                     </ul>
                 </div>
                 <button id="logout-button" class="right-side-button" ng-click="userLogout()">Logga ut</button>
@@ -35,6 +37,11 @@
         <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
         <script src="bower_components/angular-socket-io/socket.js"></script>
+        <!-- for adding emojis to chat -->
+        <script src="bower_components/angular-strap/dist/angular-strap.min.js"></script>
+        <script src="bower_components/angular-strap/dist/angular-strap.tpl.min.js"></script>
+        <script src="bower_components/angular-smilies/dist/angular-smilies.min.js"></script>
+
 		<script src="scripts/script.js"></script>
     </body>
 </html>

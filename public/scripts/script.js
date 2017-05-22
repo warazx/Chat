@@ -84,6 +84,15 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 	$http.get('chatrooms').then(function (response) {
 		$scope.chatrooms = response.data;
 	});
+    //get list of users with which we have had a conversation
+    $http({
+        	url: "/conversations",
+			method: "GET",
+			params: {"user": $rootScope.user},
+        }).then(function(response) {
+            $rootScope.messages = response.data;
+        });
+
     $scope.changeChatroom = function(index) {
         $rootScope.selected = index;
         //Leave chatroom if already in one. Not sure if this should just be on the server side?
@@ -214,11 +223,6 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             $rootScope.messages = response.data;
         });
         document.getElementById('my-message').focus();
-        /*
-        mySocket.on('broadcast message', function(msg){
-            $rootScope.messages.push(msg);
-        });
-        */
         mySocket.on('chatroom message', function(msg) {
             $rootScope.messages.push(msg);
         });

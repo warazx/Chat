@@ -84,6 +84,11 @@ app.get('/private-messages', function(req, res) {
     });
 });
 
+app.get('/conversations', function(req, res) {
+    var user = req.query.user;
+    db.collection('privateMessages').find({sender: user}, {recipient: 1, _id: 0}).toArray();
+});
+
 //This is an endpoint at the server
 app.get('/chatrooms', function(req, res) {
 	//find all chatrooms and add these to a list

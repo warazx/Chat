@@ -4,6 +4,8 @@ var ObjectID = require('mongodb').ObjectID;
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
+var bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 var app = express();
 
@@ -138,8 +140,15 @@ app.post('/signup', function(req, res) {
                     } else {
                         if(user === null) {
                             //Add user to the database
-                            db.collection('users').insert({username: username, email: req.body.email, password: req.body.password}).then(function() {
-                                res.status(201).send({redirect:'/'});
+                            bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    console.log(hash);
+                                    db.collection('users').insert({username: username, email: req.body.email, password: hash}).then(function() {
+                                        res.status(201).send({redirect:'/'});
+                                    });
+                                }
                             });
                         } else {
                             res.status(409).send({"reason":"email"});
@@ -200,10 +209,10 @@ app.get('/login/:username/:password', function (req, res) {
         } else if(user === null) {
             console.log('Loginrequest with invalid username.');
             res.status(401).send({});
-        } else if(user.password !== req.params.password) {
+        } else if(!bcrypt.compareSync(req.params.password, user.password)) {
             console.log('Loginrequest with invalid password.');
             res.status(401).send({});
-        } else {
+        } else if(bcrypt.compareSync(req.params.password, user.password)) {
             console.log('Loginrequest for ' + user.username + ' successful.');
             //Adds the userID to the session for the server to track.
             req.session.userId = user._id;
@@ -212,6 +221,8 @@ app.get('/login/:username/:password', function (req, res) {
                 username: user.username,
                 redirect: 'messages'
             });
+        } else {
+            console.log("Some other error...");
         }
     });
 });

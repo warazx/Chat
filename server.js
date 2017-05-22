@@ -53,7 +53,7 @@ app.get('/messages', function(req, res) {
         var findObject = {"chatroom":req.query.chatroom};
     }
 
-    db.collection(collection).find(findObject).sort({ "timestamp": 1 }).toArray(function(err, result) {
+    db.collection(collection).find(findObject).toArray(function(err, result) {
         //TODO: add error thing
         if(err) {
             res.status(500).send({});
@@ -251,7 +251,10 @@ io.on('connection', function(socket){
     });
     socket.on('chatroom message', function(message) {
         console.log("In server.js", message);
+        console.log("socket rooms: ", socket.rooms);
         io.in(message.chatroom).emit('chatroom message', message);
+        //Testing testing
+        //socket.emit('chatroom message', message);
     });
     socket.on('leave chatroom', function(chatroomId) {
         socket.leave(chatroomId);

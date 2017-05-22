@@ -261,7 +261,7 @@ a:hover {
 }
 
 #settings-button {
-    top: 0;
+    top: 1.7rem;
 }
 
 #messages-view {
@@ -288,7 +288,7 @@ a:hover {
 }
 
 #user-list {
-    margin: 3.5rem 0 0;
+    margin: 1.8rem 0 3rem;
 }
 
 #chatroom-list {
@@ -329,4 +329,10 @@ a:hover {
 .markedRoom {
     background-color: #DDDDFF;
     color: #595959;
+}
+
+#logged-in-user {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
 }

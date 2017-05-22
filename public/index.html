@@ -21,10 +21,10 @@
             <div id="partial-container" ng-view>
             </div>
             <div id="right-side-menu" class="side-menu" ng-controller="RightSideController" ng-show="showMenu">
+                <p id="logged-in-user">Du är inloggad som <b>{{user.name}}</b></p>
                 <button id="settings-button" class="right-side-button">Inställningar</button>
                 <div id="user-list" class="side-menu-list">
                     <ul>
-                        <li>Du är inloggad som {{user.name}}</li>
                         <li ng-repeat="user in users track by user.id" ng-click="changeRecipient(user.id)" ng-class="{markedRoom: selected==user.id}">{{user.name}}</li>
                     </ul>
                 </div>

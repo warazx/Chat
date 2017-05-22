@@ -2,7 +2,7 @@
     <div id="chat-messages" scroll-glue>
         <div class="chat-message" ng-repeat="message in messages track by $index">
             <span class="username">{{message.sender}}</span> <span class="timestamp">{{message.timestamp | date : 'MMM d, HH:mm'}}</span>
-            <div class="message-text" ng-bind-html="message.text"></div>
+            <div class="message-text" ng-bind-html="message.text | smilies"></div>
         </div>
     </div>
     <div id="my-message-container">

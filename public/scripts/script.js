@@ -45,14 +45,7 @@ app.directive("contenteditable", function() {
 
 //Which room (chatroom or direct message room) that the user is currently in
 app.value('currentRoom', {});
-/*
-app.run(function($rootScope, $location, $interval, $http, mySocket) {
 
-    /*$interval(function() {
-     $http.post('/heartbeat', {name: $rootScope.user.name});
-     }, 1000*60*5);
-});
-*/
 app.factory('loginManager', function($http) {
     return {
         loginRequest: function(username, password) {
@@ -134,6 +127,7 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
             }).then(function(response) {
                 $rootScope.messages = response.data;
             });
+            document.getElementById('my-message').focus();
         }
     };
 });

@@ -248,14 +248,11 @@ io.on('connection', function(socket){
         console.log("In server.js", message);
         console.log("socket rooms: ", socket.rooms);
         io.in(message.chatroom).emit('chatroom message', message);
-        //Testing testing
-        //socket.emit('chatroom message', message);
     });
     socket.on('leave chatroom', function(chatroomId) {
         socket.leave(chatroomId);
     });
 });
-
 
 http.listen(port, function(){
     console.log('Listening on: ' + port);

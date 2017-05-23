@@ -131,7 +131,7 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
     };
 });
 
-app.controller('SignupController', function ($scope, $rootScope, $location, signupManager, mySocket) {
+app.controller('SignupController', function ($scope, $rootScope, $location, signupManager) {
     $scope.errorMessage = "";
     $scope.userSignup = function() {
         //Shorten?
@@ -167,7 +167,7 @@ app.controller('SignupController', function ($scope, $rootScope, $location, sign
     };
 });
 
-app.controller('LoginController', function ($window, $scope, $rootScope, $location, mySocket, loginManager) {
+app.controller('LoginController', function ($window, $scope, $rootScope, $location, loginManager) {
     $scope.errorMessage = "";
     $scope.userLogin = function() {
         if ($scope.login === undefined || $scope.login.username === undefined || $scope.login.password === undefined) {

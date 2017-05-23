@@ -17,6 +17,9 @@ app.config(function ($routeProvider) {
     }).when('/settings', {
         controller: 'SettingsController',
         templateUrl: 'partials/settings.html'
+    }).when('/private-messages', {
+        controller: 'PrivateMessagesController',
+        templateUrl: 'partials/messages.html'
     });
 });
 
@@ -44,7 +47,7 @@ app.directive("contenteditable", function() {
 app.value('currentRoom', {});
 /*
 app.run(function($rootScope, $location, $interval, $http, mySocket) {
-    
+
     /*$interval(function() {
      $http.post('/heartbeat', {name: $rootScope.user.name});
      }, 1000*60*5);
@@ -247,7 +250,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             });
         }
         //$rootScope.messages = [];
-        
+
         document.getElementById('my-message').focus();
         document.getElementById('my-message').onkeypress=function(e){
             //keyCode 13 is the enter key
@@ -283,6 +286,24 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             return false;
         };
 
+        $scope.placeCaretAtEnd = function() {
+            var element = document.getElementById('my-message');
+            element.focus();
+            if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
+                var range = document.createRange();
+                range.selectNodeContents(element);
+                range.collapse(false);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+            } else if (typeof document.body.createTextRange != "undefined") {
+                var textRange = document.body.createTextRange();
+                textRange.moveToElementText(element);
+                textRange.collapse(false);
+                textRange.select();
+            }
+        };
+
         $scope.postPrivateMessage = function() {
             var newPrivateMessage = {
                 "senderId": $rootScope.user.id,
@@ -301,4 +322,3 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         };
     }
 });
-

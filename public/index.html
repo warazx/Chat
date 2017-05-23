@@ -30,7 +30,7 @@
                 <div id="user-list" class="side-menu-list">
                     <ul>
                         <li>Du är inloggad som {{user.name}}</li>
-                        <li ng-repeat="user in users track by user.id" ng-click="changeRecipient(user.id)" ng-class="{markedRoom: selected==user.id}">{{user.name}}</li>
+                        <li ng-repeat="user in users track by user.id" ng-click="changeRecipient(user.id)" ng-class="{markedRoom: selected==user.id, newMessage: newMessages.includes(user.id)}">{{user.name}}</li>
                     </ul>
                 </div>
                 <button id="logout-button" class="right-side-button" ng-click="userLogout()">Logga ut</button>

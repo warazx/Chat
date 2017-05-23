@@ -119,6 +119,10 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
         currentRoom = this;
         $rootScope.selected = index;
         $rootScope.privateRecipient = this.user;
+        if($rootScope.newMessages.includes(this.user.id)) {
+            console.log("I want to remove this user from newMessages");
+            $rootScope.newMessages.splice($rootScope.newMessages.indexOf(this.user.id), 1);
+        }
         if (!$rootScope.user) {
             console.log("User not logged in! Redirecting to login.");
             $location.path('/');
@@ -208,18 +212,19 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         $location.path('/');
     } else {
         if($rootScope.hasJustLoggedIn) {
+            //newMessages keeps track of which other users have sent us private messages
+            $rootScope.newMessages = [];
             mySocket.on('chatroom message', function(msg) {
                 console.log("I got a chatroom message!");
                 $rootScope.messages.push(msg);
             });
             mySocket.on('private message', function(message) {
-                if($rootScope.privateRecipient) {
-                    if(message.sender == $rootScope.privateRecipient.id || message.senderId == $rootScope.user.id) {
+                    if($rootScope.privateRecipient && (message.senderId == $rootScope.privateRecipient.id || message.senderId == $rootScope.user.id)) {
                         $rootScope.messages.push(message);
                     } else {
                         //TODO: mark sender in user list
+                        $rootScope.newMessages.push(message.senderId);
                     }
-                }
             });
             mySocket.on('connect message', function(msg) {
                 $rootScope.statusMessage = msg;

@@ -340,3 +340,8 @@ a:hover {
     background-color: #DDDDFF;
     color: #595959;
 }
+
+.newMessage {
+    list-style-type: disc;
+    color: #00EE00;
+}

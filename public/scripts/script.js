@@ -17,9 +17,6 @@ app.config(function ($routeProvider) {
     }).when('/settings', {
         controller: 'SettingsController',
         templateUrl: 'partials/settings.html'
-    }).when('/private-messages', {
-        controller: 'PrivateMessagesController',
-        templateUrl: 'partials/messages.html'
     });
 });
 
@@ -30,15 +27,12 @@ app.directive("contenteditable", function() {
         restrict: "A",
         require: "ngModel",
         link: function(scope, element, attrs, ngModel) {
-
             function read() {
                 ngModel.$setViewValue(element.html());
             }
-
             ngModel.$render = function() {
                 element.html(ngModel.$viewValue || "");
             };
-
             element.bind("blur keyup change", function() {
                 scope.$apply(read);
             });
@@ -48,19 +42,14 @@ app.directive("contenteditable", function() {
 
 //Which room (chatroom or direct message room) that the user is currently in
 app.value('currentRoom', {});
-
+/*
 app.run(function($rootScope, $location, $interval, $http, mySocket) {
-    mySocket.on('disconnect message', function(msg) {
-        $rootScope.statusMessage = msg;
-    });
-    mySocket.on('active users', function(arr) {
-        $rootScope.users = arr;
-    });
+    
     /*$interval(function() {
      $http.post('/heartbeat', {name: $rootScope.user.name});
-     }, 1000*60*5);*/
+     }, 1000*60*5);
 });
-
+*/
 app.factory('loginManager', function($http) {
     return {
         loginRequest: function(username, password) {
@@ -78,11 +67,24 @@ app.factory('signupManager', function($http) {
 });
 
 app.controller('LeftSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket, $http) {
-    $http.get('chatrooms').then(function (response) {
-        $scope.chatrooms = response.data;
+    console.log("Hej jag är Leftsidecontroller.");
+	$http.get('chatrooms').then(function (response) {
+		$scope.chatrooms = response.data;
+	});
+    /*
+    //get list of users with which we have had a conversation
+    $http({
+        url: "/conversations",
+        method: "GET",
+        params: {"userId": $rootScope.user.id}
+    }).then(function(response) {
+        $rootScope.messages = response.data;
     });
+    */
     $scope.changeChatroom = function(index) {
+        $rootScope.isPrivate = false;
         $rootScope.selected = index;
+        console.log("$rootScope.selected: ", $rootScope.selected);
         //Leave chatroom if already in one. Not sure if this should just be on the server side?
         if($rootScope.selectedChatroom) {
             mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
@@ -96,10 +98,10 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
             $rootScope.messages = response.data;
         });
         mySocket.emit('join chatroom', $rootScope.selectedChatroom);
+        document.getElementById('my-message').focus();
         $location.path('/messages');
     };
 });
-
 
 app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket, currentRoom) {
 	$scope.goToSettings = function(){
@@ -113,10 +115,9 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
         $location.path('/');
     };
     $scope.changeRecipient = function changeRecipient(index) {
+        $rootScope.isPrivate = true;
         currentRoom = this;
-        console.log(this);
         $rootScope.selected = index;
-        $location.path('/private-messages');
         $rootScope.privateRecipient = this.user;
         if (!$rootScope.user) {
             console.log("User not logged in! Redirecting to login.");
@@ -133,7 +134,7 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
     };
 });
 
-app.controller('SignupController', function ($scope, $rootScope, $location, signupManager, mySocket) {
+app.controller('SignupController', function ($scope, $rootScope, $location, signupManager) {
     $scope.errorMessage = "";
     $scope.userSignup = function() {
         //Shorten?
@@ -169,7 +170,7 @@ app.controller('SignupController', function ($scope, $rootScope, $location, sign
     };
 });
 
-app.controller('LoginController', function ($window, $scope, $rootScope, $location, mySocket, loginManager) {
+app.controller('LoginController', function ($window, $scope, $rootScope, $location, loginManager) {
     $scope.errorMessage = "";
     $scope.userLogin = function() {
         if ($scope.login === undefined || $scope.login.username === undefined || $scope.login.password === undefined) {
@@ -178,15 +179,15 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
         } else {
             loginManager.loginRequest($scope.login.username, $scope.login.password).then(function(res) {
                 console.log('Login successful.');
+                $rootScope.isPrivate = false;
+                //For test
+                $rootScope.hasJustLoggedIn = true;
                 $rootScope.user = {
                     id: res.data._id,
                     name: res.data.username
                 };
                 $location.path(res.data.redirect); //Redirects to /messages.
                 $rootScope.showMenu = true;
-                //send $rootScope.user to server.js, it receives it with socket.on('connected')
-                mySocket.emit('connected', $rootScope.user);
-                mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat in."});
             }, function(res) {
                 console.log('Login failed on server.');
                 $scope.errorMessage = "Felaktiga inloggningsuppgifter.";
@@ -200,12 +201,43 @@ app.controller('SettingsController', function ($scope, $rootScope, $location, us
 });
 
 app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket) {
-    $rootScope.selectedChatroom = "591d5683f36d281c81b1e5ea";   //"General"
     //Checks if user object exist on rootScope and if not, redirects to loginpage.
     if (!$rootScope.user) {
         console.log("User not logged in! Redirecting to login.");
         $location.path('/');
     } else {
+        if($rootScope.hasJustLoggedIn) {
+            mySocket.on('chatroom message', function(msg) {
+                console.log("I got a chatroom message!");
+                $rootScope.messages.push(msg);
+            });
+            mySocket.on('private message', function(message) {
+                if($rootScope.privateRecipient) {
+                    if(message.sender == $rootScope.privateRecipient.id || message.senderId == $rootScope.user.id) {
+                        $rootScope.messages.push(message);
+                    } else {
+                        //TODO: mark sender in user list
+                    }
+                }
+            });
+            mySocket.on('connect message', function(msg) {
+                $rootScope.statusMessage = msg;
+            });
+            mySocket.on('disconnect message', function(msg) {
+                $rootScope.statusMessage = msg;
+            });
+            mySocket.on('active users', function(arr) {
+                $rootScope.users = arr;
+            });
+
+            //send $rootScope.user to server.js, it receives it with socket.on('connected')
+            mySocket.emit('connected', $rootScope.user);
+            mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat in."});
+            $rootScope.hasJustLoggedIn = false;
+        }
+        $rootScope.selected = "591d5683f36d281c81b1e5ea";
+        $rootScope.selectedChatroom = "591d5683f36d281c81b1e5ea";   //"General"
+        mySocket.emit('join chatroom', $rootScope.selectedChatroom);
         $rootScope.messages = [];
         $http({
             url: "/messages",
@@ -214,27 +246,23 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         }).then(function(response) {
             $rootScope.messages = response.data;
         });
-        document.getElementById('my-message').focus();
-        /*
-         mySocket.on('broadcast message', function(msg){
-         $rootScope.messages.push(msg);
-         });
-         */
-        mySocket.on('chatroom message', function(msg) {
-            console.log("chatroom message", msg);
-            $rootScope.messages.push(msg);
-        });
-        mySocket.on('connect message', function(msg) {
-            $rootScope.statusMessage = msg;
-        });
-
+        
         document.getElementById('my-message').focus();
         document.getElementById('my-message').onkeypress=function(e){
             //keyCode 13 is the enter key
             if(e.keyCode==13 && !e.shiftKey){
+                //prevents a new line from being written when only the enter key is pressed
                 e.preventDefault();
                 if($scope.textMessage !== "" && $scope.textMessage != "<br>") {
-                    $scope.postMessage();
+                    if($rootScope.isPrivate) {
+                        console.log("I'm gonna post a private message!");
+                        $scope.postPrivateMessage();
+                    } else {
+                        console.log("I'm gonna post a chatroom message!");
+                        $scope.postMessage();
+                    }
+                    $scope.textMessage = "";
+                    document.getElementById('my-message').focus();
                 }
             }
         };
@@ -247,61 +275,29 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
                 "text": $scope.textMessage,
                 "chatroom": $rootScope.selectedChatroom
             };
-            //$http.post('/messages', {sender: $rootScope.user.id, text: $scope.textMessage, chatroom: "hej"});
             //Send message to the current chatroom
+            console.log("newMessage: ", newMessage);
             mySocket.emit('chatroom message', newMessage);
             $http.post('/messages', newMessage);
-            //mySocket.emit('broadcast message', newMessage);
-
-            $scope.textMessage = "";
-            document.getElementById('my-message').focus();
             return false;
         };
-    }
-});
 
-app.controller('PrivateMessagesController', function($rootScope, $scope, $http, $location, mySocket) {
-    if (!$rootScope.user) {
-        console.log("User not logged in! Redirecting to login.");
-        $location.path('/');
-    } else {
-        mySocket.on('private message', function(message) {
-            if(message.sender == $rootScope.privateRecipient.id || message.senderId == $rootScope.user.id) {
-                $rootScope.messages.push(message);
-            }
-            console.log("I got a private message!");
-
-        });
-        //this code is duplicated (except for postPrivateMessage()) in MessagesController. Refactor?
-        document.getElementById('my-message').focus();
-        document.getElementById('my-message').onkeypress=function(e){
-            //keyCode 13 is the enter key
-            if(e.keyCode==13 && !e.shiftKey){
-                //prevents a new line from being written when only the enter key is pressed
-                e.preventDefault();
-                if($scope.textMessage !== "" && $scope.textMessage != "<br>") {
-                    $scope.postPrivateMessage();
-                }
-            }
-        };
         $scope.postPrivateMessage = function() {
             var newPrivateMessage = {
                 "senderId": $rootScope.user.id,
                 "senderName": $rootScope.user.name,
-                "recipient": $rootScope.privateRecipient.id,
                 "timestamp": new Date(),
-                "text": $scope.textMessage
+                "text": $scope.textMessage,
+                "recipientId": $rootScope.privateRecipient.id,
+                "recipientName": $rootScope.privateRecipient.name
             };
+            //Send a direct private message. socket.io needs the socketId to know where to send it.
             newPrivateMessage.socketId = $rootScope.privateRecipient.socketId;
             mySocket.emit('private message', newPrivateMessage);
             //Post the message to the database
             newPrivateMessage.socketId = undefined;
             $http.post('/private-messages', newPrivateMessage);
-            //Send a direct private message. socket.io needs the socketId to know where to send it.
-
-
-            $scope.textMessage = "";
-            document.getElementById('my-message').focus();
         };
     }
 });
+

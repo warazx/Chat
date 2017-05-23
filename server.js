@@ -36,7 +36,7 @@ app.use(session({
 
 app.post('/messages', function(req, res) {
     console.log(req.body.chatroom);
-    db.collection('chatMessages').insert({ senderId: req.body.senderId, senderName: req.body.senderName, timestamp: req.body.timestamp, text: req.body.text, chatroom: req.body.chatroom}).then(function() {
+    db.collection('chatMessages').insert(req.body).then(function() {
         //201 is a "created" status code
         res.status(201).send({});
     });
@@ -47,13 +47,13 @@ app.get('/messages', function(req, res) {
         var collection = 'privateMessages';
         var user = req.query.user;
         var otherUser = req.query.otheruser;
-        var findObject = {$or: [ {senderId: user, recipient: otherUser}, {senderId: otherUser, recipient: user} ] };
+        var findObject = {$or: [ {senderId: user, recipientId: otherUser}, {senderId: otherUser, recipientId: user} ] };
     } else {
         var collection = 'chatMessages';
         var findObject = {"chatroom":req.query.chatroom};
     }
 
-    db.collection(collection).find(findObject).sort({ "timestamp": 1 }).toArray(function(err, result) {
+    db.collection(collection).find(findObject).toArray(function(err, result) {
         //TODO: add error thing
         if(err) {
             res.status(500).send({});
@@ -61,7 +61,20 @@ app.get('/messages', function(req, res) {
         res.status(200).send(result);
     });
 });
+/*
+app.get('/conversations', function(req, res) {
+    var user = req.query.user;
+    var sent = db.collection('privateMessages').find({senderId: userId}, {recipientId: 1, recipientName: 1, _id: 0}).toArray();
+    var uniqueArray = sent.filter(function(item, pos) {
+        var index = sent.findIndex(function(obj) {
+            return ;
+        });
+        
+    })
+    var received = db.collection('privateMessages').find({recipientId: userId}, {senderId: 1, senderName: 1, _id: 0}).toArray();
 
+});
+*/
 //This is an endpoint at the server
 app.get('/chatrooms', function(req, res) {
     //find all chatrooms and add these to a list
@@ -76,13 +89,8 @@ app.get('/chatrooms', function(req, res) {
 });
 
 app.post('/private-messages', function(req, res) {
-    var newPrivateMessage = {
-        senderId: req.body.senderId,
-        senderName: req.body.senderName,
-        recipient: req.body.recipient,
-        timestamp: new Date(),
-        text: req.body.text
-    };
+    var newPrivateMessage = req.body;
+    newPrivateMessage.timestamp = new Date();
     db.collection('privateMessages').insert(newPrivateMessage).then(function(err, result) {
         if(!err) {
             res.status(201).send({});
@@ -197,9 +205,23 @@ io.on('connection', function(socket){
     socket.on('connected', function(user) {
         socket.username = user.name;
         console.log(socket.username + " has connected.");
+        for (var i = 0; i < activeUsers.length; i++)  {
+            if (user.id == activeUsers[i].id) {
+                activeUsers.splice(i, 1);
+            }
+        }
+        activeUsers.push({ name: socket.username, id: user.id, socketId: socket.id });
+        console.log(activeUsers);
+        io.emit('active users', activeUsers);
+    });
+    /*
+    socket.on('connected', function(user) {
+        socket.username = user.name;
+        console.log(socket.username + " has connected.");
         activeUsers.push({ name: socket.username, id: user.id, socketId: socket.id });
         io.emit('active users', activeUsers);
     });
+    */
     socket.on('private message', function(message){
         console.log("message socketId: " + message.socketId);
         console.log("my socketId: " + socket.id);
@@ -224,16 +246,21 @@ io.on('connection', function(socket){
     });
     socket.on('join chatroom', function(chatroomId) {
         socket.join(chatroomId, function() {
-            console.log(socket.rooms);
+            console.log("socket.rooms: ", socket.rooms);
         });
     });
     socket.on('chatroom message', function(message) {
+        console.log("In server.js", message);
+        console.log("socket rooms: ", socket.rooms);
         io.in(message.chatroom).emit('chatroom message', message);
+        //Testing testing
+        //socket.emit('chatroom message', message);
     });
     socket.on('leave chatroom', function(chatroomId) {
         socket.leave(chatroomId);
     });
 });
+
 
 http.listen(port, function(){
     console.log('Listening on: ' + port);

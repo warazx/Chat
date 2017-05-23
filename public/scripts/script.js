@@ -106,7 +106,7 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket, currentRoom) {
 	$scope.goToSettings = function(){
 		$location.path('/settings');
-	}
+	};
     $rootScope.userLogout = function() {
         $http.get('/logout');
         mySocket.disconnect();
@@ -208,6 +208,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         $location.path('/');
     } else {
         if($rootScope.hasJustLoggedIn) {
+            mySocket.connect();
             mySocket.on('chatroom message', function(msg) {
                 console.log("I got a chatroom message!");
                 $rootScope.messages.push(msg);
@@ -257,6 +258,10 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         }).then(function(response) {
             $rootScope.messages = response.data;
         });
+<<<<<<< HEAD
+=======
+
+>>>>>>> tobias
         document.getElementById('my-message').focus();
         document.getElementById('my-message').onkeypress=function(e){
             //keyCode 13 is the enter key

@@ -124,7 +124,6 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
         $rootScope.selected = index;
         $rootScope.privateRecipient = this.user;
         if($rootScope.newMessages.includes(this.user.id)) {
-            console.log("I want to remove this user from newMessages");
             $rootScope.newMessages.splice($rootScope.newMessages.indexOf(this.user.id), 1);
         }
         if (!$rootScope.user) {
@@ -273,7 +272,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             if(e.keyCode==13 && !e.shiftKey){
                 //prevents a new line from being written when only the enter key is pressed
                 e.preventDefault();
-                if($scope.blankTrim($scope.textMessage) != "") {
+                if($scope.blankTrim($scope.textMessage) !== "") {
                     if($rootScope.isPrivate) {
                         console.log("I'm gonna post a private message!");
                         $scope.postPrivateMessage();

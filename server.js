@@ -62,9 +62,19 @@ app.get('/messages', function(req, res) {
     });
 });
 /*
+TODO: Fix this!
 app.get('/conversations', function(req, res) {
     var user = req.query.user;
-    var sent = db.collection('privateMessages').find({senderId: userId}, {recipientId: 1, recipientName: 1, _id: 0}).toArray();
+    var conversationUsers = [];
+    //var sent = db.collection('privateMessages').find({senderId: userId}, {recipientId: 1, recipientName: 1, _id: 0}).toArray();
+    var allUsers = db.collection('users').find({},{username: 1});
+    allUsers.forEach(function(otherUser) {
+        db.collection('privateMessages').findOne({$or: [ {senderId: user, recipientId: otherUser}, {senderId: otherUser, recipientId: user} ] }, {}).then(function(obj) {
+            //conversationUsers.push({id: otherUser, name: otherUser});
+        });
+    }, function(err) {
+        // done or error
+    });
     var uniqueArray = sent.filter(function(item, pos) {
         var index = sent.findIndex(function(obj) {
             return ;
@@ -75,6 +85,7 @@ app.get('/conversations', function(req, res) {
 
 });
 */
+
 //This is an endpoint at the server
 app.get('/chatrooms', function(req, res) {
     //find all chatrooms and add these to a list

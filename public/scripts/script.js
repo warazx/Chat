@@ -55,9 +55,6 @@ app.directive("contenteditable", function($rootScope) {
     };
 });
 
-//Which room (chatroom or direct message room) that the user is currently in
-app.value('currentRoom', {});
-
 app.factory('loginManager', function($http) {
     return {
         loginRequest: function(username, password) {
@@ -111,7 +108,7 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
     };
 });
 
-app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket, currentRoom) {
+app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket) {
 	$scope.goToSettings = function(){
 		$location.path('/settings');
 	};
@@ -124,7 +121,6 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
     };
     $scope.changeRecipient = function changeRecipient(index) {
         $rootScope.isPrivate = true;
-        currentRoom = this;
         $rootScope.selected = index;
         $rootScope.privateRecipient = this.user;
         if (!$rootScope.user) {

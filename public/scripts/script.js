@@ -109,7 +109,7 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket, currentRoom) {
 	$scope.goToSettings = function(){
 		$location.path('/settings');
-	}
+	};
     $rootScope.userLogout = function() {
         $http.get('/logout');
         mySocket.disconnect();
@@ -211,13 +211,14 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         $location.path('/');
     } else {
         if($rootScope.hasJustLoggedIn) {
+            mySocket.connect();
             mySocket.on('chatroom message', function(msg) {
                 console.log("I got a chatroom message!");
                 $rootScope.messages.push(msg);
             });
             mySocket.on('private message', function(message) {
                 if($rootScope.privateRecipient) {
-                    if(message.sender == $rootScope.privateRecipient.id || message.senderId == $rootScope.user.id) {
+                    if(message.senderId == $rootScope.privateRecipient.id || message.senderId == $rootScope.user.id) {
                         $rootScope.messages.push(message);
                     } else {
                         //TODO: mark sender in user list
@@ -249,6 +250,17 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
                 $rootScope.messages = response.data;
             });
         }
+        $rootScope.selected = "591d5683f36d281c81b1e5ea";
+        $rootScope.selectedChatroom = "591d5683f36d281c81b1e5ea";   //"General"
+        mySocket.emit('join chatroom', $rootScope.selectedChatroom);
+        $rootScope.messages = [];
+        $http({
+            url: "/messages",
+            method: "GET",
+            params: {chatroom: "591d5683f36d281c81b1e5ea"} //This is the chatroom "General"
+        }).then(function(response) {
+            $rootScope.messages = response.data;
+        });
         //$rootScope.messages = [];
 
         document.getElementById('my-message').focus();

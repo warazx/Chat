@@ -168,20 +168,11 @@ app.get('/logout', function(req, res, next) {
 //GET one or all users. Not finished!
 app.get('/users/:id?', function (req, res) {
     var searchObject = {};
-    if(req.params.id) {
-        searchObject = {
-            "_id": ObjectID(req.params.id)
-        }
-    }
+    if(req.params.id) searchObject = { "_id": ObjectID(req.params.id) };
     console.log(searchObject);
     db.collection('users').find(searchObject).toArray(function(err, result) {
-        if (err) {
-            return res.status(500).send(error);
-        }
-        var userObject = {
-            "id": result._id,
-            "name": result.username
-        }
+        if (err) return res.status(500).send(error);
+        var userObject = { "id": result._id, "name": result.username }
         res.status(200).send(userObject);
     });
 });
@@ -218,16 +209,12 @@ io.on('connection', function(socket){
         console.log(socket.username + " has connected.");
         var isInList = false;
         for (var i = 0; i < activeUsers.length; i++)  {
-            if (user.id == activeUsers[i].id) {
-                isInList = true;
-            }
+            if (user.id == activeUsers[i].id) isInList = true;
         }
         if (!isInList) activeUsers.push({ name: socket.username, id: user.id, socketId: socket.id });
-
         console.log("Active users: ", activeUsers);
         io.emit('active users', activeUsers);
     });
-
     socket.on('private message', function(message){
         console.log("message socketId: " + message.socketId);
         console.log("my socketId: " + socket.id);
@@ -244,9 +231,9 @@ io.on('connection', function(socket){
     });
     socket.on('disconnect', function() {
         activeUsers.splice(activeUsers.findIndex(function(obj) {
+            console.log(socket.username + " has disconnected.");
             return obj.name === socket.username;
         }), 1);
-        console.log(socket.username + " has disconnected.");
         socket.broadcast.emit('active users', activeUsers);
         socket.broadcast.emit('disconnect message', {timestamp: new Date(), text: socket.username + " har loggat ut."});
     });
@@ -259,14 +246,11 @@ io.on('connection', function(socket){
         console.log("In server.js", message);
         console.log("socket rooms: ", socket.rooms);
         io.in(message.chatroom).emit('chatroom message', message);
-        //Testing testing
-        //socket.emit('chatroom message', message);
     });
     socket.on('leave chatroom', function(chatroomId) {
         socket.leave(chatroomId);
     });
 });
-
 
 http.listen(port, function(){
     console.log('Listening on: ' + port);

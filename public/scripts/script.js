@@ -17,39 +17,44 @@ app.config(function ($routeProvider) {
     }).when('/settings', {
         controller: 'SettingsController',
         templateUrl: 'partials/settings.html'
+    }).when('/private-messages', {
+        controller: 'PrivateMessagesController',
+        templateUrl: 'partials/messages.html'
     });
 });
 
 //Code from http://fdietz.github.io/recipes-with-angular-js/common-user-interface-patterns/editing-text-in-place-using-html5-content-editable.html
 //Makes a div with contenteditable usable with ng-model
-app.directive("contenteditable", function() {
+app.directive("contenteditable", function($rootScope) {
     return {
         restrict: "A",
         require: "ngModel",
         link: function(scope, element, attrs, ngModel) {
+            var maxLength = 255;
             function read() {
                 ngModel.$setViewValue(element.html());
             }
-            ngModel.$render = function() {
+            ngModel.$render = function () {
                 element.html(ngModel.$viewValue || "");
             };
             element.bind("blur keyup change", function() {
                 scope.$apply(read);
             });
+            function limitText() {
+                if (element.html().length >= maxLength) {
+                    var transformedInput = element.html().substring(0, maxLength);
+                    ngModel.$setViewValue(transformedInput);
+                    ngModel.$render();
+                    $rootScope.placeCaretAtEnd();
+                    return transformedInput;
+                }
+                return element.html();
+            }
+            ngModel.$parsers.push(limitText);
         }
     };
 });
 
-//Which room (chatroom or direct message room) that the user is currently in
-app.value('currentRoom', {});
-/*
-app.run(function($rootScope, $location, $interval, $http, mySocket) {
-    
-    /*$interval(function() {
-     $http.post('/heartbeat', {name: $rootScope.user.name});
-     }, 1000*60*5);
-});
-*/
 app.factory('loginManager', function($http) {
     return {
         loginRequest: function(username, password) {
@@ -103,10 +108,10 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
     };
 });
 
-app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket, currentRoom) {
+app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket) {
 	$scope.goToSettings = function(){
 		$location.path('/settings');
-	}
+	};
     $rootScope.userLogout = function() {
         $http.get('/logout');
         mySocket.disconnect();
@@ -116,7 +121,6 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
     };
     $scope.changeRecipient = function changeRecipient(index) {
         $rootScope.isPrivate = true;
-        currentRoom = this;
         $rootScope.selected = index;
         $rootScope.privateRecipient = this.user;
         if($rootScope.newMessages.includes(this.user.id)) {
@@ -135,6 +139,7 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
             }).then(function(response) {
                 $rootScope.messages = response.data;
             });
+            document.getElementById('my-message').focus();
         }
     };
 });
@@ -206,6 +211,15 @@ app.controller('SettingsController', function ($scope, $rootScope, $location, us
 });
 
 app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket) {
+    //Shows error message in empty chatrooms/conversations when $rootScope.messages is empty.
+    $rootScope.$watch('messages', function (newValue, oldValue, scope) {
+        if (!$rootScope.messages || $rootScope.messages.length <= 0) {
+            $scope.noMessages = true;
+        } else {
+            $scope.noMessages = false;
+        }
+    }, true);
+
     //Checks if user object exist on rootScope and if not, redirects to loginpage.
     if (!$rootScope.user) {
         console.log("User not logged in! Redirecting to login.");
@@ -214,6 +228,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         if($rootScope.hasJustLoggedIn) {
             //newMessages keeps track of which other users have sent us private messages
             $rootScope.newMessages = [];
+            mySocket.connect();
             mySocket.on('chatroom message', function(msg) {
                 console.log("I got a chatroom message!");
                 $rootScope.messages.push(msg);
@@ -251,8 +266,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
                 $rootScope.messages = response.data;
             });
         }
-        //$rootScope.messages = [];
-        
+
         document.getElementById('my-message').focus();
         document.getElementById('my-message').onkeypress=function(e){
             //keyCode 13 is the enter key
@@ -288,6 +302,24 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             return false;
         };
 
+        $rootScope.placeCaretAtEnd = function() {
+            var element = document.getElementById('my-message');
+            element.focus();
+            if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
+                var range = document.createRange();
+                range.selectNodeContents(element);
+                range.collapse(false);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+            } else if (typeof document.body.createTextRange != "undefined") {
+                var textRange = document.body.createTextRange();
+                textRange.moveToElementText(element);
+                textRange.collapse(false);
+                textRange.select();
+            }
+        };
+
         $scope.postPrivateMessage = function() {
             var newPrivateMessage = {
                 "senderId": $rootScope.user.id,
@@ -321,4 +353,3 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         };
     }
 });
-

@@ -25,20 +25,32 @@ app.config(function ($routeProvider) {
 
 //Code from http://fdietz.github.io/recipes-with-angular-js/common-user-interface-patterns/editing-text-in-place-using-html5-content-editable.html
 //Makes a div with contenteditable usable with ng-model
-app.directive("contenteditable", function() {
+app.directive("contenteditable", function($rootScope) {
     return {
         restrict: "A",
         require: "ngModel",
         link: function(scope, element, attrs, ngModel) {
+            var maxLength = 255;
             function read() {
                 ngModel.$setViewValue(element.html());
             }
-            ngModel.$render = function() {
+            ngModel.$render = function () {
                 element.html(ngModel.$viewValue || "");
             };
             element.bind("blur keyup change", function() {
                 scope.$apply(read);
             });
+            function limitText() {
+                if (element.html().length >= maxLength) {
+                    var transformedInput = element.html().substring(0, maxLength);
+                    ngModel.$setViewValue(transformedInput);
+                    ngModel.$render();
+                    $rootScope.placeCaretAtEnd();
+                    return transformedInput;
+                }
+                return element.html();
+            }
+            ngModel.$parsers.push(limitText);
         }
     };
 });
@@ -280,7 +292,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             return false;
         };
 
-        $scope.placeCaretAtEnd = function() {
+        $rootScope.placeCaretAtEnd = function() {
             var element = document.getElementById('my-message');
             element.focus();
             if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {

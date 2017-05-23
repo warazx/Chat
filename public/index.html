@@ -22,13 +22,13 @@
             </div>
             <div id="right-side-menu" class="side-menu" ng-controller="RightSideController" ng-show="showMenu">
                 <p id="logged-in-user">Du är inloggad som <b>{{user.name}}</b></p>
-                <button id="settings-button" class="right-side-button" type="button" ng-click="goToSettings()">Inställningar</button>
+                <button id="settings-button" class="right-side-button" type="button" tabindex="-1" ng-click="goToSettings()">Inställningar</button>
                 <div id="user-list" class="side-menu-list">
                     <ul>
                         <li ng-repeat="user in users track by user.id" ng-click="changeRecipient(user.id)" ng-class="{markedRoom: selected==user.id}">{{user.name}}</li>
                     </ul>
                 </div>
-                <button id="logout-button" class="right-side-button" ng-click="userLogout()">Logga ut</button>
+                <button id="logout-button" class="right-side-button" tabindex="-1" ng-click="userLogout()">Logga ut</button>
             </div>
         </div>
         <script src="bower_components/angular/angular.js"></script>

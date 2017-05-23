@@ -83,7 +83,7 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
         method: "GET",
         params: {"userId": $rootScope.user.id}
     }).then(function(response) {
-        $rootScope.messages = response.data;
+        $rootScope.conversations = response.data;
     });
     */
     $scope.changeChatroom = function(index) {
@@ -123,6 +123,9 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
         $rootScope.isPrivate = true;
         $rootScope.selected = index;
         $rootScope.privateRecipient = this.user;
+        if($rootScope.newMessages.includes(this.user.id)) {
+            $rootScope.newMessages.splice($rootScope.newMessages.indexOf(this.user.id), 1);
+        }
         if (!$rootScope.user) {
             console.log("User not logged in! Redirecting to login.");
             $location.path('/');
@@ -208,7 +211,7 @@ app.controller('SettingsController', function ($scope, $rootScope, $location, us
 
 app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket) {
     //Shows error message in empty chatrooms/conversations when $rootScope.messages is empty.
-    $rootScope.$watch('messages', function (newValue, oldValue, scope) {
+    $rootScope.$watch('messages', function () {
         if (!$rootScope.messages || $rootScope.messages.length <= 0) {
             $scope.noMessages = true;
         } else {
@@ -228,19 +231,20 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         $location.path('/');
     } else {
         if($rootScope.hasJustLoggedIn) {
+            //newMessages keeps track of which other users have sent us private messages
+            $rootScope.newMessages = [];
             mySocket.connect();
             mySocket.on('chatroom message', function(msg) {
                 console.log("I got a chatroom message!");
                 $rootScope.messages.push(msg);
             });
             mySocket.on('private message', function(message) {
-                if($rootScope.privateRecipient) {
-                    if(message.senderId == $rootScope.privateRecipient.id || message.senderId == $rootScope.user.id) {
+                    if($rootScope.privateRecipient && (message.senderId == $rootScope.privateRecipient.id || message.senderId == $rootScope.user.id)) {
                         $rootScope.messages.push(message);
                     } else {
                         //TODO: mark sender in user list
+                        $rootScope.newMessages.push(message.senderId);
                     }
-                }
             });
             mySocket.on('connect message', function(msg) {
                 $rootScope.statusMessage = msg;
@@ -274,7 +278,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             if(e.keyCode==13 && !e.shiftKey){
                 //prevents a new line from being written when only the enter key is pressed
                 e.preventDefault();
-                if($scope.textMessage !== "" && $scope.textMessage != "<br>") {
+                if($scope.blankTrim($scope.textMessage) !== "") {
                     if($rootScope.isPrivate) {
                         console.log("I'm gonna post a private message!");
                         $scope.postPrivateMessage();
@@ -336,6 +340,21 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             //Post the message to the database
             newPrivateMessage.socketId = undefined;
             $http.post('/private-messages', newPrivateMessage);
+        };
+
+        $scope.blankTrim = function blankTrim(str) {
+            var newStr = str;
+            while(newStr.indexOf("&nbsp;") >= 0) {
+                newStr = newStr.replace("&nbsp;", "");
+            }
+            while(newStr.indexOf("<br>") >= 0) {
+                newStr = newStr.replace("<br>", "");
+            }
+            /*
+            newStr.replace(/\&nbsp;/g, "");
+            newStr.replace(/\<br\>/g, "");
+            */
+            return newStr.trim();
         };
     }
 });

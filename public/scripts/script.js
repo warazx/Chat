@@ -207,6 +207,15 @@ app.controller('SettingsController', function ($scope, $rootScope, $location, us
 });
 
 app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket) {
+    //Shows error message in empty chatrooms/conversations when $rootScope.messages is empty.
+    $rootScope.$watch('messages', function (newValue, oldValue, scope) {
+        if (!$rootScope.messages || $rootScope.messages.length <= 0) {
+            $scope.noMessages = true;
+        } else {
+            $scope.noMessages = false;
+        }
+    }, true);
+
     //Checks if user object exist on rootScope and if not, redirects to loginpage.
     if (!$rootScope.user) {
         console.log("User not logged in! Redirecting to login.");

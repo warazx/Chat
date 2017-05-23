@@ -44,7 +44,7 @@ app.directive("contenteditable", function() {
 app.value('currentRoom', {});
 /*
 app.run(function($rootScope, $location, $interval, $http, mySocket) {
-    
+
     /*$interval(function() {
      $http.post('/heartbeat', {name: $rootScope.user.name});
      }, 1000*60*5);
@@ -213,7 +213,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             });
             mySocket.on('private message', function(message) {
                 if($rootScope.privateRecipient) {
-                    if(message.sender == $rootScope.privateRecipient.id || message.senderId == $rootScope.user.id) {
+                    if(message.senderId == $rootScope.privateRecipient.id || message.senderId == $rootScope.user.id) {
                         $rootScope.messages.push(message);
                     } else {
                         //TODO: mark sender in user list
@@ -246,7 +246,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         }).then(function(response) {
             $rootScope.messages = response.data;
         });
-        
+
         document.getElementById('my-message').focus();
         document.getElementById('my-message').onkeypress=function(e){
             //keyCode 13 is the enter key
@@ -300,4 +300,3 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         };
     }
 });
-

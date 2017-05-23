@@ -82,6 +82,7 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
     });
     */
     $scope.changeChatroom = function(index) {
+        $location.path('/messages');
         $rootScope.isPrivate = false;
         $rootScope.selected = index;
         console.log("$rootScope.selected: ", $rootScope.selected);
@@ -99,7 +100,6 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
         });
         mySocket.emit('join chatroom', $rootScope.selectedChatroom);
         document.getElementById('my-message').focus();
-        $location.path('/messages');
     };
 });
 
@@ -123,6 +123,7 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
             console.log("User not logged in! Redirecting to login.");
             $location.path('/');
         } else {
+            $location.path('/messages');
             $http({
                 url: '/messages',
                 method: "GET",
@@ -234,6 +235,16 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             mySocket.emit('connected', $rootScope.user);
             mySocket.emit('connect message', {date: new Date(), text: $rootScope.user.name + " har loggat in."});
             $rootScope.hasJustLoggedIn = false;
+            $rootScope.selected = "591d5683f36d281c81b1e5ea";
+            $rootScope.selectedChatroom = "591d5683f36d281c81b1e5ea";   //"General"
+            mySocket.emit('join chatroom', $rootScope.selectedChatroom);
+            $http({
+                url: "/messages",
+                method: "GET",
+                params: {chatroom: "591d5683f36d281c81b1e5ea"} //This is the chatroom "General"
+            }).then(function(response) {
+                $rootScope.messages = response.data;
+            });
         }
         $rootScope.selected = "591d5683f36d281c81b1e5ea";
         $rootScope.selectedChatroom = "591d5683f36d281c81b1e5ea";   //"General"
@@ -246,7 +257,6 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         }).then(function(response) {
             $rootScope.messages = response.data;
         });
-
         document.getElementById('my-message').focus();
         document.getElementById('my-message').onkeypress=function(e){
             //keyCode 13 is the enter key

@@ -212,7 +212,7 @@ app.controller('SettingsController', function ($scope, $rootScope, $location, us
 
 app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket) {
     //Shows error message in empty chatrooms/conversations when $rootScope.messages is empty.
-    $rootScope.$watch('messages', function (newValue, oldValue, scope) {
+    $rootScope.$watch('messages', function () {
         if (!$rootScope.messages || $rootScope.messages.length <= 0) {
             $scope.noMessages = true;
         } else {

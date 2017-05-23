@@ -44,7 +44,7 @@ app.directive("contenteditable", function() {
 app.value('currentRoom', {});
 /*
 app.run(function($rootScope, $location, $interval, $http, mySocket) {
-    
+
     /*$interval(function() {
      $http.post('/heartbeat', {name: $rootScope.user.name});
      }, 1000*60*5);
@@ -106,7 +106,7 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket, currentRoom) {
 	$scope.goToSettings = function(){
 		$location.path('/settings');
-	}
+	};
     $rootScope.userLogout = function() {
         $http.get('/logout');
         mySocket.disconnect();
@@ -246,7 +246,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         }).then(function(response) {
             $rootScope.messages = response.data;
         });
-        
+
         document.getElementById('my-message').focus();
         document.getElementById('my-message').onkeypress=function(e){
             //keyCode 13 is the enter key
@@ -300,4 +300,3 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         };
     }
 });
-

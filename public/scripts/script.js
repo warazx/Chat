@@ -216,6 +216,12 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         }
     }, true);
 
+    if (mySocket) {
+        $rootScope.$watch('mySocket.id', function() {
+            console.log("NEW SOCKET ID:" + mySocket.id);
+        });
+    }
+
     //Checks if user object exist on rootScope and if not, redirects to loginpage.
     if (!$rootScope.user) {
         console.log("User not logged in! Redirecting to login.");

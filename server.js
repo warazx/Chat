@@ -69,7 +69,7 @@ app.get('/conversations', function(req, res) {
         var index = sent.findIndex(function(obj) {
             return ;
         });
-        
+
     })
     var received = db.collection('privateMessages').find({recipientId: userId}, {senderId: 1, senderName: 1, _id: 0}).toArray();
 
@@ -205,23 +205,18 @@ io.on('connection', function(socket){
     socket.on('connected', function(user) {
         socket.username = user.name;
         console.log(socket.username + " has connected.");
+        var isInList = false;
         for (var i = 0; i < activeUsers.length; i++)  {
             if (user.id == activeUsers[i].id) {
-                activeUsers.splice(i, 1);
+                isInList = true;
             }
         }
-        activeUsers.push({ name: socket.username, id: user.id, socketId: socket.id });
-        console.log(activeUsers);
+        if (!isInList) activeUsers.push({ name: socket.username, id: user.id, socketId: socket.id });
+
+        console.log("Active users: ", activeUsers);
         io.emit('active users', activeUsers);
     });
-    /*
-    socket.on('connected', function(user) {
-        socket.username = user.name;
-        console.log(socket.username + " has connected.");
-        activeUsers.push({ name: socket.username, id: user.id, socketId: socket.id });
-        io.emit('active users', activeUsers);
-    });
-    */
+
     socket.on('private message', function(message){
         console.log("message socketId: " + message.socketId);
         console.log("my socketId: " + socket.id);

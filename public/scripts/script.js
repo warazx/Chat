@@ -250,18 +250,6 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
                 $rootScope.messages = response.data;
             });
         }
-        $rootScope.selected = "591d5683f36d281c81b1e5ea";
-        $rootScope.selectedChatroom = "591d5683f36d281c81b1e5ea";   //"General"
-        mySocket.emit('join chatroom', $rootScope.selectedChatroom);
-        $rootScope.messages = [];
-        $http({
-            url: "/messages",
-            method: "GET",
-            params: {chatroom: "591d5683f36d281c81b1e5ea"} //This is the chatroom "General"
-        }).then(function(response) {
-            $rootScope.messages = response.data;
-        });
-        //$rootScope.messages = [];
 
         document.getElementById('my-message').focus();
         document.getElementById('my-message').onkeypress=function(e){

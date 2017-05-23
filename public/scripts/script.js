@@ -78,7 +78,7 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
         method: "GET",
         params: {"userId": $rootScope.user.id}
     }).then(function(response) {
-        $rootScope.messages = response.data;
+        $rootScope.conversations = response.data;
     });
     */
     $scope.changeChatroom = function(index) {
@@ -254,7 +254,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             if(e.keyCode==13 && !e.shiftKey){
                 //prevents a new line from being written when only the enter key is pressed
                 e.preventDefault();
-                if($scope.textMessage !== "" && $scope.textMessage != "<br>") {
+                if($scope.textMessage.trim() !== "" && $scope.textMessage.trim() != "<br>") {
                     if($rootScope.isPrivate) {
                         console.log("I'm gonna post a private message!");
                         $scope.postPrivateMessage();

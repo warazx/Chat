@@ -16,6 +16,11 @@
                     <ul>
                         <li ng-repeat="chatroom in chatrooms track by chatroom._id" ng-click="changeChatroom(chatroom._id)" ng-class="{markedRoom: selected==chatroom._id}">#{{chatroom.name}}</li>
                     </ul>
+                    <!--
+                    <ul>
+                        <li ng-repeat="conversation in conversations track by conversation._id" ng-click="changeRecipient(conversation._id)" ng-class="{markedRoom: selected==conversation._id}">{{conversation.name}}</li>
+                    </ul>
+                    -->
                 </div>
             </div>
             <div id="partial-container" ng-view>

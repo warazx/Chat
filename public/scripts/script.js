@@ -254,7 +254,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             if(e.keyCode==13 && !e.shiftKey){
                 //prevents a new line from being written when only the enter key is pressed
                 e.preventDefault();
-                if($scope.textMessage.trim() !== "" && $scope.textMessage.trim() != "<br>") {
+                if($scope.blankTrim($scope.textMessage) != "") {
                     if($rootScope.isPrivate) {
                         console.log("I'm gonna post a private message!");
                         $scope.postPrivateMessage();
@@ -298,6 +298,21 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             //Post the message to the database
             newPrivateMessage.socketId = undefined;
             $http.post('/private-messages', newPrivateMessage);
+        };
+
+        $scope.blankTrim = function blankTrim(str) {
+            var newStr = str;
+            while(newStr.indexOf("&nbsp;") >= 0) {
+                newStr = newStr.replace("&nbsp;", "");
+            }
+            while(newStr.indexOf("<br>") >= 0) {
+                newStr = newStr.replace("<br>", "");
+            }
+            /*
+            newStr.replace(/\&nbsp;/g, "");
+            newStr.replace(/\<br\>/g, "");
+            */
+            return newStr.trim();
         };
     }
 });

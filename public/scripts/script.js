@@ -207,6 +207,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         $location.path('/');
     } else {
         if($rootScope.hasJustLoggedIn) {
+            mySocket.connect();
             mySocket.on('chatroom message', function(msg) {
                 console.log("I got a chatroom message!");
                 $rootScope.messages.push(msg);

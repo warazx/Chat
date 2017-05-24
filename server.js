@@ -9,7 +9,10 @@ var storage = multer.diskStorage({
     cb(null, __dirname + '/uploads')
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname)
+    var originalname = file.originalname;
+    var fileExtension = originalname.split(".")[1];
+    var filename = req.body.userid;
+    cb(null, filename + '.' + fileExtension)
   }
 })
 var upload = multer({ storage: storage })
@@ -79,7 +82,8 @@ app.get('/login/:name', function (req, res) {
 app.post('/upload', upload.single('avatar'), function (req, res, next) {
     res.send({user: req.body.userid,
             filename: req.file.originalname});
-    console.log(req.file.originalname);
+    console.log(req.body);
+    console.log(req.body);
   // req.file is the `avatar` file
   // req.body will hold the text fields, if there were any
 });

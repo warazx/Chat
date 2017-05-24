@@ -217,7 +217,7 @@ app.controller('SettingsController', function ($scope, $rootScope, upload) {
 
 
 app.controller('SettingsController', function ($scope, $rootScope){
-       
-        $scope.userid = 111;
-   
+       var user = {};
+       user.userid = "testuser";
+       $scope.user = user;
 });

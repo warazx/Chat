@@ -225,6 +225,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         $location.path('/');
     } else {
         if($rootScope.hasJustLoggedIn) {
+            var whistleAudio = new Audio('sounds/whistle.mp3');
             //newMessages keeps track of which other users have sent us private messages
             $rootScope.newMessages = [];
             mySocket.connect();
@@ -236,8 +237,8 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
                     if($rootScope.privateRecipient && (message.senderId == $rootScope.privateRecipient.id || message.senderId == $rootScope.user.id)) {
                         $rootScope.messages.push(message);
                     } else {
-                        //TODO: mark sender in user list
                         $rootScope.newMessages.push(message.senderId);
+                        whistleAudio.play();
                     }
             });
             mySocket.on('connect message', function(msg) {

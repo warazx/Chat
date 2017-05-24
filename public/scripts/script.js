@@ -50,13 +50,16 @@ app.run(function($rootScope, $location, $interval, $http, mySocket) {
      }, 1000*60*5);
 });
 */
+
+
 app.factory('loginManager', function($http) {
     return {
         loginRequest: function(username, password) {
             return $http.get('login/' + username + '/' + password);
         }
     };
-});
+}); 
+
 
 app.factory('signupManager', function($http) {
     return {
@@ -65,6 +68,8 @@ app.factory('signupManager', function($http) {
         }
     };
 });
+
+
 
 app.controller('LeftSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket, $http) {
     console.log("Hej jag är Leftsidecontroller.");

@@ -71,6 +71,14 @@ app.factory('signupManager', function($http) {
     };
 });
 
+app.factory('userManager', function($http) {
+    return {
+        updateUsername: function(newUsername) {
+            return $http.post('/users/update', newUsername);
+        }
+    };
+});
+
 app.controller('LeftSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket, $http) {
     console.log("Hej jag är Leftsidecontroller.");
 	$http.get('chatrooms').then(function (response) {
@@ -111,10 +119,16 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket) {
 	$scope.goToSettings = function(){
 		$location.path('/settings');
+        if($rootScope.selectedChatroom) {
+            mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
+            $rootScope.selectedChatroom = null;
+            $rootScope.selected = null;
+        }
 	};
     $rootScope.userLogout = function() {
         $http.get('/logout');
         mySocket.disconnect();
+        mySocket.removeAllListeners();
         $rootScope.user = null;
         $rootScope.showMenu = false;
         $location.path('/');
@@ -205,10 +219,27 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
     };
 });
 
-app.controller('SettingsController', function ($scope, $rootScope){
+app.controller('SettingsController', function ($scope, $rootScope, userManager){
+    // get the user id for the profile picture
     var user = {};
     user.userid = $rootScope.user.id;
     $scope.user = user;
+
+    $scope.errorMessage = "";
+    $scope.settings = {
+        username: $rootScope.user.name
+    };
+    $scope.changeUsername = function() {
+        userManager.updateUsername({
+            "id": $rootScope.user.id,
+            "username": $scope.settings.username
+        }).then(function() {
+            $rootScope.user.name = $scope.settings.username;
+            $scope.errorMessage = "Användarnamnet har ändrats.";
+        }, function() {
+            $scope.errorMessage = "Användarnamnet gick inte att ändra.";
+        });
+    };
 });
 
 app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket) {

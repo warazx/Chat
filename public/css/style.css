@@ -54,7 +54,6 @@ a:hover {
 #my-message {
     font-family: Catamaran-Light, sans-serif;
     box-sizing: border-box;
-    width: 97%;
     min-height: 1.7em;
     max-height: 7.2em;
     font-size: 1em;
@@ -63,13 +62,12 @@ a:hover {
     padding: 0.1em;
     margin: 1em;
     overflow-y: auto;
-    max-width: 75vw;
+    max-width: 97%;
     word-wrap: break-word;
 }
 
 #my-message-container {
     box-sizing: border-box;
-    width: 94%;
     border: 2px solid #DDCA99;
     border-radius: 0.5em;
     padding: 0.2em;
@@ -159,7 +157,6 @@ a:hover {
 #partial-container {
     box-sizing: border-box;
     height: 100vh;
-    width: 100vw;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -278,6 +275,20 @@ a:hover {
     flex-direction: column;
     padding: 1rem 1rem 0;
     background-color: #FFFFFF;
+    width: calc(100vw - 32rem);
+}
+
+#login-view, #signup-view {
+    width: 100vw;
+}
+#settings-view {
+    background-color: white;
+    height: 100%;
+    width: calc(100vw - 30rem);
+}
+
+#settings-container {
+    top: 20vh;
 }
 
 #title {

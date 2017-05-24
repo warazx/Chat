@@ -18,6 +18,8 @@ var activeUsers = [];
 var port = 3000;
 var db;
 
+var filename
+
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 
@@ -27,10 +29,10 @@ var storage = multer.diskStorage({
     cb(null, __dirname + '/uploads')
   },
   filename: function (req, file, cb) {
-    var originalname = file.originalname;
-    var fileExtension = originalname.split(".")[1];
-    var filename = req.body.userid;
-    cb(null, filename + '.' + fileExtension)
+    //var originalname = file.originalname;
+    //var fileExtension = originalname.split(".")[1];
+    //var filename = req.body.userid;
+    cb(null, createProfilePictureFileName(file.originalname, req.body.userid))
   }
 })
 var upload = multer({ storage: storage })
@@ -79,11 +81,13 @@ app.get('/messages', function(req, res) {
 
 // Save users profile picture on disc. See mutler.discStorage
 app.post('/upload', upload.single('avatar'), function (req, res, next) {
-    //save file to db?
-    res.status(201).send({});
-    /*res.send({user: req.body.userid,
-            filename: req.file.originalname});
-    console.log(req.body);*/
+    //save file path to user collection in database
+    db.collection('users').findOneAndUpdate(
+        {"_id": ObjectID(req.body.userid) }, 
+        { $set: {"picturePath": "/uploads/" + createProfilePictureFileName(req.file.originalname, req.body.userid)}
+        }).then(function() {
+        res.status(201).send();
+    });
 });
 /*
 TODO: Fix this!
@@ -201,6 +205,44 @@ app.get('/users/:id?', function (req, res) {
     });
 });
 
+app.post('/users/update', function (req, res) {
+    var id = req.body.id;
+    var newUsername = req.body.username.toLowerCase();
+    db.collection('users').findOne({"username": newUsername}).then(function(doc) {
+        if(!doc) {
+            db.collection('users').findOneAndUpdate({"_id": ObjectID(id) }, { $set: {"username": newUsername}}).then(function(err) {
+                console.log('updated username');
+                updateMessages();
+                res.status(200).send();
+            });
+        } else {
+            console.log('failed update');
+            res.status(400).send({});
+        }
+    })
+
+    //Updates all messages in the database with the new username.
+    updateMessages = function() {
+        console.log('Updating database messages for user: ' + id);
+        db.collection('privateMessages').updateMany({"senderId": id }, { $set: {"senderName": newUsername}}).then(function(doc) {
+            console.log('Found:' + doc.matchedCount, 'Modified:' + doc.modifiedCount);
+        });
+        db.collection('privateMessages').updateMany({"recipientId": id }, { $set: {"recipientName": newUsername}}).then(function(doc) {
+            console.log('Found:' + doc.matchedCount, 'Modified:' + doc.modifiedCount);
+        });
+        db.collection('chatMessages').updateMany({"senderId": id }, { $set: {"senderName": newUsername}}).then(function(doc) {
+            console.log('Found:' + doc.matchedCount, 'Modified:' + doc.modifiedCount);
+        });
+        for(var i = 0; i < activeUsers.length; i++) {
+            if(activeUsers[i].id == id) {
+                console.log('changed username in activeUsers.');
+                activeUsers[i].name = newUsername;
+                io.emit('active users', activeUsers);
+            }
+        }
+    };
+});
+
 app.get('/login/:username/:password', function (req, res) {
     db.collection('users').findOne({username: req.params.username.toLowerCase()}, function(err, user) {
         if(err) {
@@ -279,3 +321,10 @@ io.on('connection', function(socket){
 http.listen(port, function(){
     console.log('Listening on: ' + port);
 });
+
+function createProfilePictureFileName(originalFileName, userId){
+    //var originalname = file.originalname;
+    var fileExtension = originalFileName.split(".")[1];
+    //var filename = req.body.userid;
+    return userId + '.' + fileExtension;
+}

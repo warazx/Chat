@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ngRoute', 'ngSanitize', 'btford.socket-io', 'luegg.directives','mgcrea.ngStrap','angular-smilies']);
+var app = angular.module('app', ['ngRoute', 'ngSanitize', 'btford.socket-io', 'luegg.directives','mgcrea.ngStrap','angular-smilies','lr.upload']);
 
 app.factory('mySocket', function(socketFactory) {
     return socketFactory();
@@ -220,6 +220,11 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
 });
 
 app.controller('SettingsController', function ($scope, $rootScope, userManager){
+    // get the user id for the profile picture
+    var user = {};
+    user.userid = $rootScope.user.id;
+    $scope.user = user;
+
     $scope.errorMessage = "";
     $scope.settings = {
         username: $rootScope.user.name

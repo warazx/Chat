@@ -2,6 +2,13 @@
     <div id="settings-container">
     	<label for="userpic">Användarbild</label><br>
     	<img src="http://weknowmemes.com/wp-content/uploads/2014/07/how-software-developers-see-the-end-user-gif.jpg" id="settings-img">
+        <div
+            upload-button
+            url="/upload"
+            param="avatar"
+            name="avatar"
+            data="user">
+        </div> 
         <form name="settings-form" novalidate="true">
             <label for="username-setting-input">Användarnamn</label><br>
             <input type="text" id="username-setting-input" ng-model="settings.username"><br>

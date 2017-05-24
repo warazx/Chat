@@ -120,6 +120,7 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
     $rootScope.userLogout = function() {
         $http.get('/logout');
         mySocket.disconnect();
+        mySocket.removeAllListeners();
         $rootScope.user = null;
         $rootScope.showMenu = false;
         $location.path('/');
@@ -223,12 +224,6 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             $scope.noMessages = false;
         }
     }, true);
-
-    if (mySocket) {
-        $rootScope.$watch('mySocket.id', function() {
-            console.log("NEW SOCKET ID:" + mySocket.id);
-        });
-    }
 
     //Checks if user object exist on rootScope and if not, redirects to loginpage.
     if (!$rootScope.user) {

@@ -1,12 +1,16 @@
 <div id="messages-view">
     <div id="chat-messages" scroll-glue>
+        <p ng-show="noMessages"> Det finns inga meddelanden att visa i denna konversation. </p>
         <div class="chat-message" ng-repeat="message in messages | orderBy:'timestamp'">
             <span class="username">{{message.senderName}}</span> <span class="timestamp">{{message.timestamp | date : 'MMM d, HH:mm'}}</span>
             <div class="message-text" ng-bind-html="message.text | smilies"></div>
         </div>
     </div>
-    <div id="my-message-container">
-        <div contenteditable="true" ng-model="textMessage" id="my-message"></div>
+    <div id="message-container">
+        <span class="input-group-addon" smilies-selector="textMessage" smilies-placement="left" smilies-title="Smilies"></span>
+        <div id="my-message-container">
+            <div contenteditable="true" ng-model="textMessage" ng-focus="placeCaretAtEnd()" focus-on-change="textMessage" id="my-message"></div>
+        </div>
     </div>
     <div id="status-message">
         <span id="status-message-time">{{statusMessage.date | date: 'HH:mm'}}</span><span id="status-message-text">{{statusMessage.text}}</span>

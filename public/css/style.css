@@ -69,18 +69,14 @@ a:hover {
 
 #my-message-container {
     box-sizing: border-box;
-    width: 100%;
+    width: 94%;
     border: 2px solid #DDCA99;
     border-radius: 0.5em;
     padding: 0.2em;
+    margin-left: 3rem;
 }
 
 .chat-message {
-    /* Bubble around message
-    background-color: #f5f5f5;
-    padding: 1rem;
-    border: 1px solid #e1e1e1;
-    border-radius: 0.5rem;*/
     font-family: Catamaran-Light, sans-serif;
     font-size: 1em;
     margin-bottom: 0.5rem;
@@ -274,7 +270,7 @@ a:hover {
 }
 
 #settings-button {
-    top: 0;
+    top: 1.7rem;
 }
 
 #messages-view {
@@ -298,7 +294,7 @@ a:hover {
 
 
 #user-list {
-    margin: 3.5rem 0 0;
+    margin: 1.8rem 0 3rem;
 }
 
 #chatroom-list {
@@ -339,4 +335,55 @@ a:hover {
 .markedRoom {
     background-color: #DDDDFF;
     color: #595959;
+}
+
+.newMessage {
+    list-style-type: disc;
+    color: #00EE00;
+}
+
+#logged-in-user {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.input-group-addon {
+    position: fixed;
+    border: 2px solid #DDCA99;
+    border-radius: 0.5em;
+    padding: 0.2em;
+    width: 2rem;
+    height: 3.7rem;
+}
+
+.smilies-selector {
+    width: 100%;
+    vertical-align: middle;
+    margin: 65% 23%;
+}
+
+.popover {
+    display: flex;
+    border: 1px solid #8a8a8a;
+    border-radius: 0.3rem;
+    background-color: #ededed;
+    width: 7rem;
+    top: -14rem !important;
+    left: -2.5rem !important;
+    text-align: center;
+}
+
+.popover-title {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.3rem 0 0 0;
+    background-color: lightgray;
+    border-bottom: 1px solid #bfbfbf;
+    border-radius: 0.3rem 0.3rem 0 0;
+    margin: 0 0 0.3rem !important;
+}
+
+.arrow {
+    background-color: black;
 }

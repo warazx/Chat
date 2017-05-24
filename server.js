@@ -86,6 +86,7 @@ app.post('/upload', upload.single('avatar'), function (req, res, next) {
         }).then(function() {
         res.status(201).send();
     });
+    res.status(200).send();
 });
 
 /*

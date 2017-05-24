@@ -111,6 +111,11 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket) {
 	$scope.goToSettings = function(){
 		$location.path('/settings');
+        if($rootScope.selectedChatroom) {
+            mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
+            $rootScope.selectedChatroom = null;
+            $rootScope.selected = null;
+        }
 	};
     $rootScope.userLogout = function() {
         $http.get('/logout');

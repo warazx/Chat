@@ -3,9 +3,10 @@
 	<img src="userpic.jpg" id="settings-img">
     <form name="settings-form" novalidate="true">
         <label for="username-setting-input">Användarnamn</label><br>
-        <input type="text" id="username-setting-input" ng-model="login.username"><br>
-        <input type="submit" value="Ändra" ng-click="userLogin()">
+        <input type="text" id="username-setting-input" ng-model="settings.username"><br>
+        <input type="submit" value="Ändra" ng-click="changeUsername()">
     </form>
-	
-	
+	<div id="error-messages">
+		<p class="error-message">{{errorMessage}}</p>
+	</div>
 </div>

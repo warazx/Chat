@@ -166,6 +166,44 @@ app.get('/users/:id?', function (req, res) {
     });
 });
 
+app.post('/users/update', function (req, res) {
+    var id = req.body.id;
+    var newUsername = req.body.username.toLowerCase();
+    db.collection('users').findOne({"username": newUsername}).then(function(doc) {
+        if(!doc) {
+            db.collection('users').findOneAndUpdate({"_id": ObjectID(id) }, { $set: {"username": newUsername}}).then(function(err) {
+                console.log('updated username');
+                updateMessages();
+                res.status(200).send();
+            });
+        } else {
+            console.log('failed update');
+            res.status(400).send({});
+        }
+    })
+
+    //Updates all messages in the database with the new username.
+    updateMessages = function() {
+        console.log('Updating database messages for user: ' + id);
+        db.collection('privateMessages').updateMany({"senderId": id }, { $set: {"senderName": newUsername}}).then(function(doc) {
+            console.log('Found:' + doc.matchedCount, 'Modified:' + doc.modifiedCount);
+        });
+        db.collection('privateMessages').updateMany({"recipientId": id }, { $set: {"recipientName": newUsername}}).then(function(doc) {
+            console.log('Found:' + doc.matchedCount, 'Modified:' + doc.modifiedCount);
+        });
+        db.collection('chatMessages').updateMany({"senderId": id }, { $set: {"senderName": newUsername}}).then(function(doc) {
+            console.log('Found:' + doc.matchedCount, 'Modified:' + doc.modifiedCount);
+        });
+        for(var i = 0; i < activeUsers.length; i++) {
+            if(activeUsers[i].id == id) {
+                console.log('changed username in activeUsers.');
+                activeUsers[i].name = newUsername;
+                io.emit('active users', activeUsers);
+            }
+        }
+    };
+});
+
 app.get('/login/:username/:password', function (req, res) {
     db.collection('users').findOne({username: req.params.username.toLowerCase()}, function(err, user) {
         if(err) {

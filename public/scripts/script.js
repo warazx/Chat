@@ -71,6 +71,14 @@ app.factory('signupManager', function($http) {
     };
 });
 
+app.factory('userManager', function($http) {
+    return {
+        updateUsername: function(newUsername) {
+            return $http.post('/users/update', newUsername);
+        }
+    };
+});
+
 app.controller('LeftSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket, $http) {
     console.log("Hej jag är Leftsidecontroller.");
 	$http.get('chatrooms').then(function (response) {
@@ -210,8 +218,22 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
     };
 });
 
-app.controller('SettingsController', function ($scope, $rootScope, $location, users){
-
+app.controller('SettingsController', function ($scope, $rootScope, userManager){
+    $scope.errorMessage = "";
+    $scope.settings = {
+        username: $rootScope.user.name
+    };
+    $scope.changeUsername = function() {
+        userManager.updateUsername({
+            "id": $rootScope.user.id,
+            "username": $scope.settings.username
+        }).then(function() {
+            $rootScope.user.name = $scope.settings.username;
+            $scope.errorMessage = "Användarnamnet har ändrats.";
+        }, function() {
+            $scope.errorMessage = "Användarnamnet gick inte att ändra.";
+        });
+    };
 });
 
 app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket) {

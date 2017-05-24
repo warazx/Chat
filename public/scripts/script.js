@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ngRoute', 'ngSanitize', 'btford.socket-io', 'luegg.directives','mgcrea.ngStrap','angular-smilies']);
+var app = angular.module('app', ['ngRoute', 'ngSanitize', 'btford.socket-io', 'luegg.directives','mgcrea.ngStrap','angular-smilies','lr.upload']);
 
 app.factory('mySocket', function(socketFactory) {
     return socketFactory();
@@ -205,8 +205,10 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
     };
 });
 
-app.controller('SettingsController', function ($scope, $rootScope, $location, users){
-
+app.controller('SettingsController', function ($scope, $rootScope){
+    var user = {};
+    user.userid = $rootScope.user.id;
+    $scope.user = user;
 });
 
 app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket) {

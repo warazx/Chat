@@ -4,6 +4,7 @@ var ObjectID = require('mongodb').ObjectID;
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
+var multer  = require('multer')
 var bcrypt = require('bcrypt');
 const saltRounds = 10;
 
@@ -19,6 +20,20 @@ var db;
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
+
+// Store profile picture on disc, specify path
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, __dirname + '/uploads')
+  },
+  filename: function (req, file, cb) {
+    var originalname = file.originalname;
+    var fileExtension = originalname.split(".")[1];
+    var filename = req.body.userid;
+    cb(null, filename + '.' + fileExtension)
+  }
+})
+var upload = multer({ storage: storage })
 
 mongo.connect('mongodb://shutapp:shutapp123@ds133981.mlab.com:33981/shutapp', function(err, database) {
     if (err) {
@@ -60,6 +75,15 @@ app.get('/messages', function(req, res) {
         }
         res.status(200).send(result);
     });
+});
+
+// Save users profile picture on disc. See mutler.discStorage
+app.post('/upload', upload.single('avatar'), function (req, res, next) {
+    //save file to db?
+    res.status(201).send({});
+    /*res.send({user: req.body.userid,
+            filename: req.file.originalname});
+    console.log(req.body);*/
 });
 /*
 TODO: Fix this!

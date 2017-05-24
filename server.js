@@ -30,9 +30,6 @@ var storage = multer.diskStorage({
     cb(null, __dirname + '/uploads')
   },
   filename: function (req, file, cb) {
-    //var originalname = file.originalname;
-    //var fileExtension = originalname.split(".")[1];
-    //var filename = req.body.userid;
     cb(null, createProfilePictureFileName(file.originalname, req.body.userid))
   }
 })
@@ -84,7 +81,7 @@ app.get('/messages', function(req, res) {
 app.post('/upload', upload.single('avatar'), function (req, res, next) {
     //save file path to user collection in database
     db.collection('users').findOneAndUpdate(
-        {"_id": ObjectID(req.body.userid) }, 
+        {"_id": ObjectID(req.body.userid) },
         { $set: {"picturePath": "/uploads/" + createProfilePictureFileName(req.file.originalname, req.body.userid)}
         }).then(function() {
         res.status(201).send();
@@ -218,7 +215,7 @@ app.post('/users/update', function (req, res) {
             db.collection('users').findOneAndUpdate({"_id": ObjectID(id) }, { $set: {"username": newUsername}}).then(function(err) {
                 console.log('updated username');
                 updateMessages();
-                res.status(200).send();
+                res.status(200).send({});
             });
         } else {
             console.log('failed update');
@@ -292,10 +289,9 @@ io.on('connection', function(socket){
         var index = activeUsers.findIndex(function(activeUser) {
             return activeUser.id === message.recipientId;
         });
-        message.socketId = activeUsers[index].socketId;
 
         //Send to the other person
-        socket.to(message.socketId).emit('private message', message);
+        socket.to(activeUsers[index].socketId).emit('private message', message);
         //Send to myself
         socket.emit('private message', message);
     });
@@ -317,6 +313,7 @@ io.on('connection', function(socket){
         socket.join(chatroomId, function() {
             console.log("socket.rooms: ", socket.rooms);
         });
+        socket.emit('join chatroom');
     });
     socket.on('chatroom message', function(message) {
         console.log("In server.js", message);

@@ -1,7 +1,7 @@
 <div id="messages-view">
     <div id="chat-messages" scroll-glue>
         <p ng-show="noMessages"> Det finns inga meddelanden att visa i denna konversation. </p>
-        <div class="chat-message" ng-repeat="message in messages | orderBy:'timestamp'">
+        <div class="chat-message" ng-repeat="message in messages | orderBy:'timestamp' track by $index">
             <span class="username">{{message.senderName}}</span> <span class="timestamp">{{message.timestamp | date : 'MMM d, HH:mm'}}</span>
             <div class="message-text" ng-bind-html="message.text | smilies"></div>
         </div>

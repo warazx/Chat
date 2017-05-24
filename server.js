@@ -242,6 +242,7 @@ app.get('/login/:username/:password', function (req, res) {
 });
 
 io.on('connection', function(socket){
+    console.log("socket id:", socket.id);
     socket.on('connected', function(user) {
         socket.username = user.name;
         console.log(socket.username + " has connected.");
@@ -254,11 +255,15 @@ io.on('connection', function(socket){
         io.emit('active users', activeUsers);
     });
     socket.on('private message', function(message){
-        console.log("message socketId: " + message.socketId);
-        console.log("my socketId: " + socket.id);
-        //send to the other person
+        //Gets correct socketId for recipient.
+        var index = activeUsers.findIndex(function(activeUser) {
+            return activeUser.id === message.recipientId;
+        });
+        message.socketId = activeUsers[index].socketId;
+
+        //Send to the other person
         socket.to(message.socketId).emit('private message', message);
-        //send to myself
+        //Send to myself
         socket.emit('private message', message);
     });
     socket.on('connect message', function(message) {

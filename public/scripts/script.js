@@ -87,7 +87,6 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 	});
 
     //get list of users with which we have had a conversation
-    /*
     $http({
         url: "/conversations",
         method: "GET",
@@ -95,7 +94,7 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
     }).then(function(response) {
         $rootScope.conversations = response.data;
     });
-    */
+    
     $scope.changeChatroom = function(index) {
         $location.path('/messages');
         $rootScope.isPrivate = false;

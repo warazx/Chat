@@ -87,23 +87,46 @@ app.post('/upload', upload.single('avatar'), function (req, res, next) {
         res.status(201).send();
     });
 });
-
 /*
+db.collection('chatMessages').find().sort({ "timestamp": 1 }).toArray(function(err, result) {
+        var callbackcounter = 0;
+        var newArray = [];
+
+        //Replaces userId with the username. Should be done with promise(?).
+        result.map(function(message) {
+            db.collection('users').findOne({_id: ObjectID(message.sender)}).then(function(doc) {
+                message.sender = doc.username;
+                callbackcounter++;
+                newArray.push(message);
+                if(callbackcounter == result.length) {
+                    res.status(200).send(newArray);
+                }
+            });
+        });
+    });
+*/
 //TODO: Fix this!
 app.get('/conversations', function(req, res) {
     var userId = req.query.userId;
     var conversationUsers = [];
+    var collectionCounter = 0;
     //var sent = db.collection('privateMessages').find({senderId: userId}, {recipientId: 1, recipientName: 1, _id: 0}).toArray();
+    var collectionSize = new Array(db.collection('users').count());
     var allUsers = db.collection('users').find({},{username: 1});
     allUsers.forEach(function(otherUser) {
         db.collection('privateMessages').findOne({$or: [ {senderId: new ObjectID(userId), recipientId: otherUser._id}, {senderId: otherUser._id, recipientId: new ObjectID(userId)} ] }, {}).then(function(obj) {
+            collectionCounter++;
             if(obj) {
                 conversationUsers.push({id: otherUser._id, name: otherUser.username});
+                if(collectionCounter == collectionSize) {
+                    res.status(200).send(conversationUsers);
+                }
             }
         });
     }, function(err) {
-        // done or error
     });
+
+    
     /*
     var uniqueArray = sent.filter(function(item, pos) {
         var index = sent.findIndex(function(obj) {
@@ -112,9 +135,9 @@ app.get('/conversations', function(req, res) {
 
     })
     var received = db.collection('privateMessages').find({recipientId: userId}, {senderId: 1, senderName: 1, _id: 0}).toArray();
-
+    */
 });
-*/
+
 
 //This is an endpoint at the server
 app.get('/chatrooms', function(req, res) {

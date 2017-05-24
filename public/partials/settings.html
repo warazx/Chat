@@ -7,7 +7,9 @@
             url="/upload"
             param="avatar"
             name="avatar"
-            data="user">
+            data="user"
+            on-success="onSuccess(response)"
+            on-error="onError(response)">
         </div> 
         <form name="settings-form" novalidate="true">
             <label for="username-setting-input">Användarnamn</label><br>
@@ -15,7 +17,7 @@
             <input type="submit" value="Ändra" ng-click="changeUsername()">
         </form>
     	<div id="error-messages">
-    		<p class="error-message">{{errorMessage}}</p>
+    		<p id="error-message" class="error-message">{{errorMessage}}</p>
     	</div>
     </div>
 </div>

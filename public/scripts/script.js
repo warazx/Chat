@@ -221,10 +221,20 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
 });
 
 app.controller('SettingsController', function ($scope, $rootScope, $location, mySocket, whistleAudio, userManager){
-    // get the user id for the profile picture
-    var user = {};
-    user.userid = $rootScope.user.id;
-    $scope.user = user;
+    // Get the user id for the profile picture
+    $scope.user = {
+        userid: $rootScope.user.id
+    };
+    // Callsback if profile picture upload success
+    $scope.onSuccess = function (response) {
+        $scope.errorMessage = "Bilden är uppladdad";
+        document.getElementById("error-message").style.color = "green";
+    };
+    // Callsback if profile picture upload fail
+    $scope.onError = function (response) {
+        $scope.errorMessage = "Bilden kunde inte laddas upp";
+        document.getElementById("error-message").style.color = "red";
+    }
 
     $scope.errorMessage = "";
     $scope.settings = {
@@ -237,8 +247,10 @@ app.controller('SettingsController', function ($scope, $rootScope, $location, my
         }).then(function() {
             $rootScope.user.name = $scope.settings.username;
             $scope.errorMessage = "Användarnamnet har ändrats.";
+            document.getElementById("error-message").style.color = "green";
         }, function() {
             $scope.errorMessage = "Användarnamnet gick inte att ändra.";
+            document.getElementById("error-message").style.color = "red";
         });
     };
 });

@@ -6,6 +6,7 @@ var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 var bcrypt = require('bcrypt');
 const saltRounds = 10;
+var ObjectID = require('mongodb').ObjectID;
 
 var app = express();
 
@@ -61,20 +62,24 @@ app.get('/messages', function(req, res) {
         res.status(200).send(result);
     });
 });
+
 /*
-TODO: Fix this!
+//TODO: Fix this!
 app.get('/conversations', function(req, res) {
-    var user = req.query.user;
+    var userId = req.query.userId;
     var conversationUsers = [];
     //var sent = db.collection('privateMessages').find({senderId: userId}, {recipientId: 1, recipientName: 1, _id: 0}).toArray();
     var allUsers = db.collection('users').find({},{username: 1});
     allUsers.forEach(function(otherUser) {
-        db.collection('privateMessages').findOne({$or: [ {senderId: user, recipientId: otherUser}, {senderId: otherUser, recipientId: user} ] }, {}).then(function(obj) {
-            //conversationUsers.push({id: otherUser, name: otherUser});
+        db.collection('privateMessages').findOne({$or: [ {senderId: new ObjectID(userId), recipientId: otherUser._id}, {senderId: otherUser._id, recipientId: new ObjectID(userId)} ] }, {}).then(function(obj) {
+            if(obj) {
+                conversationUsers.push({id: otherUser._id, name: otherUser.username});
+            }
         });
     }, function(err) {
         // done or error
     });
+    /*
     var uniqueArray = sent.filter(function(item, pos) {
         var index = sent.findIndex(function(obj) {
             return ;

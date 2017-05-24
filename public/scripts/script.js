@@ -71,13 +71,16 @@ app.factory('signupManager', function($http) {
     };
 });
 
+app.value('whistleAudio', new Audio('sounds/whistle.mp3'));
+
 app.controller('LeftSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket, $http) {
     console.log("Hej jag är Leftsidecontroller.");
 	$http.get('chatrooms').then(function (response) {
 		$scope.chatrooms = response.data;
 	});
-    /*
+
     //get list of users with which we have had a conversation
+    /*
     $http({
         url: "/conversations",
         method: "GET",
@@ -205,11 +208,11 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
     };
 });
 
-app.controller('SettingsController', function ($scope, $rootScope, $location, users){
+app.controller('SettingsController', function ($scope, $rootScope, $location, users, mySocket, whistleAudio){
 
 });
 
-app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket) {
+app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket, whistleAudio) {
     //Shows error message in empty chatrooms/conversations when $rootScope.messages is empty.
     $rootScope.$watch('messages', function () {
         if (!$rootScope.messages || $rootScope.messages.length <= 0) {
@@ -225,7 +228,8 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         $location.path('/');
     } else {
         if($rootScope.hasJustLoggedIn) {
-            var whistleAudio = new Audio('sounds/whistle.mp3');
+            
+            
             //newMessages keeps track of which other users have sent us private messages
             $rootScope.newMessages = [];
             mySocket.connect();

@@ -134,6 +134,7 @@ a:hover {
 .side-menu ul li {
     padding-left: 1.5em;
     font-family: Catamaran-Thin;
+    list-style-position: inside;
 }
 
 #left-side-menu {
@@ -349,8 +350,10 @@ a:hover {
 }
 
 .newMessage {
-    list-style-type: disc;
-    color: #00EE00;
+    background-repeat: no-repeat;
+    background-position: 0px 50%;
+    list-style-image: url(../bell.png);
+    color: #00FE54;
 }
 
 #logged-in-user {

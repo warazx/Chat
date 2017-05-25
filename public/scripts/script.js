@@ -425,8 +425,8 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             }
         };
 
-<<<<<<< .merge_file_wBrVsp
-=======
+
+
         $scope.postPrivateMessage = function() {
             var newPrivateMessage = {
                 "senderId": $rootScope.user.id,
@@ -445,7 +445,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             //$http.post('/private-messages', newPrivateMessage);
         };
 
->>>>>>> .merge_file_ZFrz2Y
+
         $scope.blankTrim = function blankTrim(str) {
             var newStr = str;
             while(newStr.indexOf("&nbsp;") >= 0) {

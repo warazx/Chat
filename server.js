@@ -87,84 +87,21 @@ app.post('/upload', upload.single('avatar'), function (req, res, next) {
     });
     res.status(200).send();
 });
-/*
-db.collection('chatMessages').find().sort({ "timestamp": 1 }).toArray(function(err, result) {
-        var callbackcounter = 0;
-        var newArray = [];
 
-        //Replaces userId with the username. Should be done with promise(?).
-        result.map(function(message) {
-            db.collection('users').findOne({_id: ObjectID(message.sender)}).then(function(doc) {
-                message.sender = doc.username;
-                callbackcounter++;
-                newArray.push(message);
-                if(callbackcounter == result.length) {
-                    res.status(200).send(newArray);
-                }
-            });
-        });
-    });
-*/
-//TODO: Fix this!
+//Get list of users with which we have had a conversation
 app.get('/conversations', function(req, res) {
-    console.log("trying to get conversation partners");
     var userId = req.query.userid;
-    console.log("userId: " + userId);
-    /*
-    db.collection('privateMessages').aggregate([{
-        $match: {
-            senderId: userId
-        }
-    }
-
-    ])
-
-    db.collection('users').aggregate([{
-            $match: {
-                 _id: new ObjectID(userId)
-            }
-        }, {
-            $lookup: {
-                from: "privateMessages",
-                localField: "_id",
-                foreignField: "senderId",
-                as: "privateMessages"
-            }
-        }, {
-            $lookup: {
-                from: "privateMessages",
-                localField: "_id",
-                foreignField: "recipientId",
-                as: "privateMessages"
-            }
-        }, {
-            $match: {
-                privateMessages: { $exists: true, $ne: [] } 
-            }
-    }], function(err, result) {
-        console.log("trying to send results");
-        console.log("result", result);
-        res.status(200).send(result);
-    });
-    */
-    
     var conversationUsers = [];
     var collectionCounter = 0;
-    //var sent = db.collection('privateMessages').find({senderId: userId}, {recipientId: 1, recipientName: 1, _id: 0}).toArray();
     db.collection('users').count().then(function(collectionSize) {
-        var allUsers = db.collection('users').find({});
-        allUsers.forEach(function(otherUser) {
+        db.collection('users').find().forEach(function(otherUser) {
             var otherUserId = otherUser._id.toString();
-            console.log("otherUserId: " + otherUserId);
             db.collection('privateMessages').findOne({$or: [{ "senderId": userId, "recipientId": otherUserId }, { "senderId": otherUserId, "recipientId": userId }] }).then(function(obj) {
                 collectionCounter++;
                 if(obj) {
-                    console.log("conversation user: " + otherUser.username);
-                    console.log("collectionCounter: " + collectionCounter);
                     conversationUsers.push({id: otherUserId, name: otherUser.username});
                 }
                 if(collectionCounter == collectionSize) {
-                    console.log("trying to send users: ", conversationUsers);
                     res.status(200).send(conversationUsers);
                 }
             });
@@ -174,8 +111,6 @@ app.get('/conversations', function(req, res) {
     });
 });
 
-
-//This is an endpoint at the server
 app.get('/chatrooms', function(req, res) {
     //find all chatrooms and add these to a list
     db.collection('chatrooms').find().toArray(function (error, result){

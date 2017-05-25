@@ -54,35 +54,73 @@ app.directive("contenteditable", function($rootScope) {
         }
     };
 });
-
+// gör en factory som heter usermanger och lägg nedanstående kod i den nya prova o se om det funkar
+/*
 app.factory('loginManager', function($http) {
     return {
         loginRequest: function(username, password) {
             return $http.get('login/' + username + '/' + password);
         }
     };
+});*/
+
+app.factory('userManager', function($http) {
+    var userManager = {};
+	
+	userManager.login = function(username, password) {
+		return $http.get('login/' + username + '/' + password);
+	};
+	
+	userManager.logout = function() {
+		 return $http.get('/logout');
+	};
+	
+	userManager.signupuser = function(signupCredentials) {
+		return $http.post('signup', signupCredentials);
+	};
+	
+	userManager.updateUsername = function(newUsername) {
+		return $http.post('/users/update', newUsername);
+	};
+	return userManager;
 });
 
+/*
 app.factory('signupManager', function($http) {
     return {
         signupRequest: function(signupCredentials) {
             return $http.post('signup', signupCredentials);
         }
     };
+});*/
+
+app.factory('messageManager', function($http) {
+	var messageManger = {};
+	
+	messageManger.getChatrooms = function() {
+		return $http.get('chatrooms');
+	};
+	messageManger.postMessages = function(newMessage) {
+		return $http.post('/messages', newMessage);
+	};
+	
+	messageManger.postPrivateMessages = function(newPrivateMessage) {
+		return $http.post('/private-messages', newPrivateMessage);
+	};
+	
+	
+    return messageManger;
 });
 
-app.factory('userManager', function($http) {
-    return {
-        updateUsername: function(newUsername) {
-            return $http.post('/users/update', newUsername);
-        }
-    };
-});
+
 
 app.value('whistleAudio', new Audio('sounds/whistle.mp3'));
 
-app.controller('LeftSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket, $http) {
-	$http.get('chatrooms').then(function (response) {
+
+app.controller('LeftSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket, $http, messageManager) {
+    console.log("Hej jag är Leftsidecontroller.");
+
+	messageManager.getChatrooms().then(function (response) {
 		$scope.chatrooms = response.data;
 	});
     console.log("$rootScope.user: " + $rootScope.user.id + " " + $rootScope.user.name);
@@ -121,7 +159,7 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
     };
 });
 
-app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket) {
+app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket, userManager) {
 	$scope.goToSettings = function(){
 		$location.path('/settings');
         if($rootScope.selectedChatroom) {
@@ -131,7 +169,7 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
         }
 	};
     $rootScope.userLogout = function() {
-        $http.get('/logout');
+		userManager.logout();
         mySocket.disconnect();
         mySocket.removeAllListeners();
         $rootScope.user = null;
@@ -162,7 +200,7 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
     };
 });
 
-app.controller('SignupController', function ($scope, $rootScope, $location, signupManager) {
+app.controller('SignupController', function ($scope, $rootScope, $location, userManager) {
     $scope.errorMessage = "";
     $scope.userSignup = function() {
         //Shorten?
@@ -174,7 +212,7 @@ app.controller('SignupController', function ($scope, $rootScope, $location, sign
             if($scope.signup.password === undefined) message += "\nDu måste välja ett lösenord som innehåller minst sex tecken och max 50 tecken.";
             $scope.errorMessage = message;
         } else {
-            signupManager.signupRequest({
+            userManager.signupuser({
                 username: $scope.signup.username,
                 email: $scope.signup.email,
                 password: $scope.signup.password
@@ -197,15 +235,15 @@ app.controller('SignupController', function ($scope, $rootScope, $location, sign
         }
     };
 });
-
-app.controller('LoginController', function ($window, $scope, $rootScope, $location, loginManager) {
+//
+app.controller('LoginController', function ($window, $scope, $rootScope, $location, userManager) {
     $scope.errorMessage = "";
     $scope.userLogin = function() {
         if ($scope.login === undefined || $scope.login.username === undefined || $scope.login.password === undefined) {
             console.log('Invalid logininformation.');
             $scope.errorMessage = "Felaktiga inloggningsuppgifter.";
         } else {
-            loginManager.loginRequest($scope.login.username, $scope.login.password).then(function(res) {
+            userManager.login($scope.login.username, $scope.login.password).then(function(res) {
                 console.log('Login successful.');
                 $rootScope.isPrivate = false;
                 //For test
@@ -223,6 +261,7 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
         }
     };
 });
+
 
 app.controller('SettingsController', function ($scope, $rootScope, $location, mySocket, whistleAudio, userManager){
     // Get the user id for the profile picture
@@ -259,7 +298,8 @@ app.controller('SettingsController', function ($scope, $rootScope, $location, my
     };
 });
 
-app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket, whistleAudio) {
+
+app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket, messageManager, whistleAudio) {
     //Shows error message in empty chatrooms/conversations when $rootScope.messages is empty.
     mySocket.removeAllListeners();
     $rootScope.$watch('messages', function () {
@@ -347,7 +387,8 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             //Send message to the current chatroom
             console.log("newMessage: ", newMessage);
             mySocket.emit('chatroom message', newMessage);
-            $http.post('/messages', newMessage);
+			messageManager.postMessages(newMessage);
+            //$http.post('/messages', newMessage);
             return false;
         };
 
@@ -384,6 +425,27 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             }
         };
 
+<<<<<<< .merge_file_wBrVsp
+=======
+        $scope.postPrivateMessage = function() {
+            var newPrivateMessage = {
+                "senderId": $rootScope.user.id,
+                "senderName": $rootScope.user.name,
+                "timestamp": new Date(),
+                "text": $scope.textMessage,
+                "recipientId": $rootScope.privateRecipient.id,
+                "recipientName": $rootScope.privateRecipient.name
+            };
+            //Send a direct private message. socket.io needs the socketId to know where to send it.
+            newPrivateMessage.socketId = $rootScope.privateRecipient.socketId;
+            mySocket.emit('private message', newPrivateMessage);
+            //Post the message to the database
+            newPrivateMessage.socketId = undefined;
+			messageManager.postPrivateMessages(newPrivateMessage);
+            //$http.post('/private-messages', newPrivateMessage);
+        };
+
+>>>>>>> .merge_file_ZFrz2Y
         $scope.blankTrim = function blankTrim(str) {
             var newStr = str;
             while(newStr.indexOf("&nbsp;") >= 0) {

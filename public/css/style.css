@@ -313,6 +313,11 @@ a:hover {
     margin: 3.5rem 0 0;
 }
 
+#chatroom-list p {
+    margin-left: 1rem;
+    margin-bottom: 0.2rem;
+}
+
 .error-message {
     height: auto;
     font-size: 0.8rem;

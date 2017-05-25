@@ -362,12 +362,10 @@ app.controller('MessagesController', function ($scope, $rootScope, $location, my
                 "recipientId": $rootScope.privateRecipient.id,
                 "recipientName": $rootScope.privateRecipient.name
             };
-            //Send a direct private message. socket.io needs the socketId to know where to send it.
-            newPrivateMessage.socketId = $rootScope.privateRecipient.socketId;
+            //Send a direct private message.
             mySocket.emit('private message', newPrivateMessage);
             //Post the message to the database
-            newPrivateMessage.socketId = undefined;
-            messageManager.postPrivateMessage(newPrivateMessage);
+            messageManager.postPrivateMessages(newPrivateMessage);
         };
 
         $scope.blankTrim = function blankTrim(str) {

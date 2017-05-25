@@ -329,6 +329,17 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
                 $rootScope.messages.push(msg);
             });
             mySocket.on('private message', function(message) {
+                //Trying to add user to user conversations list
+                if(message.senderId == $rootScope.user.id) {
+                    if(!$rootScope.conversations.map(function(obj){return obj.id}).includes(message.recipientId)) {
+                        $rootScope.conversations.push({name: message.recipientName, id: message.recipientId});
+                    }
+                } else {
+                    if(!$rootScope.conversations.map(function(obj){return obj.id}).includes(message.senderId)) {
+                        $rootScope.conversations.push({name: message.senderName, id: message.senderId});
+                    }
+                }
+
                 if($rootScope.privateRecipient && (message.senderId == $rootScope.privateRecipient.id || message.senderId == $rootScope.user.id)) {
                     $rootScope.messages.push(message);
                 } else {
@@ -411,6 +422,12 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             mySocket.emit('private message', newPrivateMessage);
             //Post the message to the database
             $http.post('/private-messages', newPrivateMessage);
+            /*
+            //Trying to add the user to user conversation list
+            if(!$rootScope.conversations.map(function(obj){return obj.id}).includes(newPrivateMessage.recipientId)) {
+                $rootScope.conversations.push({name: newPrivateMessage.recipientName, id: newPrivateMessage.recipientId});
+            }
+            */
         };
 
         $rootScope.placeCaretAtEnd = function() {

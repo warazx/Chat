@@ -146,7 +146,6 @@ app.get('/conversations', function(req, res) {
         res.status(200).send(result);
     });
     */
-    // {$or: [ {senderId: userId, recipientId: otherUser._id}, {senderId: otherUser._id, recipientId: ObjectID(userId)} ] }
     
     var conversationUsers = [];
     var collectionCounter = 0;

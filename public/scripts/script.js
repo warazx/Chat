@@ -59,9 +59,6 @@ app.config(function ($routeProvider) {
     }).when('/settings', {
         controller: 'SettingsController',
         templateUrl: 'partials/settings.html'
-    }).when('/private-messages', {
-        controller: 'PrivateMessagesController',
-        templateUrl: 'partials/messages.html'
     });
 });
 
@@ -165,13 +162,15 @@ app.controller('SignupController', function ($scope, $rootScope, $location, user
     $scope.errorMessage = "";
     $rootScope.successMessage = "";
     $scope.userSignup = function () {
-        if ($scope.signup === undefined || $scope.signup.email === undefined || $scope.signup.username === undefined || $scope.signup.password === undefined) {
+        if ($scope.signup === undefined || $scope.signup.email === undefined || $scope.signup.username === undefined || $scope.signup.password === undefined || $scope.signup.passwordagain === undefined) {
             var message = "";
             if ($scope.signup.username === undefined) message += "Du måste välja ett användarnamn som innehåller minst tre tecken och max 20 tecken." +
                 "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";
             if ($scope.signup.email === undefined) message += "\nFelaktig emailadress.";
             if ($scope.signup.password === undefined) message += "\nDu måste välja ett lösenord som innehåller minst sex tecken och max 50 tecken.";
             $scope.errorMessage = message;
+        } else if($scope.signup.password !== $scope.signup.passwordagain) {
+            $scope.errorMessage = "Du skrev in lösenordet olika i de två fälten.";
         } else {
             userManager.signupuser({
                 username: $scope.signup.username,
@@ -277,6 +276,13 @@ app.controller('MessagesController', function ($scope, $rootScope, $location, my
         });
         mySocket.on('join chatroom', function () {
             document.getElementById('my-message').focus();
+        });
+        mySocket.on('change username', function(obj) {
+            for(var i=0; i<$rootScope.conversations.length; i++) {
+                if($rootScope.conversations[i].id == obj.id) {
+                    $rootScope.conversations[i].name = obj.newUserName;
+                }
+            }
         });
 
         //send $rootScope.user to server.js, it receives it with socket.on('connected')
@@ -416,6 +422,7 @@ app.controller('SettingsController', function ($scope, $rootScope, mySocket, whi
                 $scope.errorMessage = "Användarnamnet gick inte att ändra.";
                 document.getElementById("error-message").style.color = "red";
             });
+            mySocket.emit('change username', {"id": $rootScope.user.id, "newUserName": $scope.settings.username});
         } else {
             $scope.errorMessage = "Du måste välja ett användarnamn som innehåller minst tre tecken och max 20 tecken." +
                 "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";

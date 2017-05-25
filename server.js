@@ -323,6 +323,9 @@ io.on('connection', function(socket){
     socket.on('leave chatroom', function(chatroomId) {
         socket.leave(chatroomId);
     });
+    socket.on('change username', function(obj) {
+        io.emit('change username', obj);
+    });
 });
 
 http.listen(port, function(){

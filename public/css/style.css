@@ -185,7 +185,7 @@ a:hover {
     min-width: 25%;
     margin: 0 37.5%;
     position: fixed;
-    top: 13.5rem;
+    top: 9rem;
 }
 
 #settings-container {
@@ -234,6 +234,7 @@ a:hover {
     font-size: 6rem;
     color: white;
     margin-left: 0;
+    margin-top: 0.2em;
 }
 /*
 .user-image-frame {
@@ -270,7 +271,7 @@ a:hover {
     margin: 0 30% 0;
     text-align: center;
     position: fixed;
-    top: 0.5rem;
+    top: 0;
 }
 
 #signup-link-container,
@@ -311,6 +312,7 @@ a:hover {
     padding: 1rem 1rem 0;
     background-color: #FFFFFF;
     width: calc(100vw - 32rem);
+    height: 100vh;
 }
 
 #login-view, #signup-view {
@@ -448,4 +450,8 @@ a:hover {
 
 .arrow {
     background-color: black;
+}
+
+[ng-cloak] {
+    display: none !important;
 }

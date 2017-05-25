@@ -7,7 +7,6 @@ var MongoStore = require('connect-mongo')(session);
 var multer  = require('multer')
 var bcrypt = require('bcrypt');
 const saltRounds = 10;
-var ObjectID = require('mongodb').ObjectID;
 
 var app = express();
 
@@ -77,7 +76,7 @@ app.get('/messages', function(req, res) {
     });
 });
 
-// Save users profile picture on disc. See mutler.discStorage
+// Save users profile picture on disc. See multer.discStorage
 app.post('/upload', upload.single('avatar'), function (req, res, next) {
     //save file path to user collection in database
     db.collection('users').findOneAndUpdate(
@@ -107,35 +106,72 @@ db.collection('chatMessages').find().sort({ "timestamp": 1 }).toArray(function(e
 */
 //TODO: Fix this!
 app.get('/conversations', function(req, res) {
-    var userId = req.query.userId;
+    console.log("trying to get conversation partners");
+    var userId = req.query.userid;
+    console.log("userId: " + userId);
+    /*
+    db.collection('privateMessages').aggregate([{
+        $match: {
+            senderId: userId
+        }
+    }
+
+    ])
+
+    db.collection('users').aggregate([{
+            $match: {
+                 _id: new ObjectID(userId)
+            }
+        }, {
+            $lookup: {
+                from: "privateMessages",
+                localField: "_id",
+                foreignField: "senderId",
+                as: "privateMessages"
+            }
+        }, {
+            $lookup: {
+                from: "privateMessages",
+                localField: "_id",
+                foreignField: "recipientId",
+                as: "privateMessages"
+            }
+        }, {
+            $match: {
+                privateMessages: { $exists: true, $ne: [] } 
+            }
+    }], function(err, result) {
+        console.log("trying to send results");
+        console.log("result", result);
+        res.status(200).send(result);
+    });
+    */
+    // {$or: [ {senderId: userId, recipientId: otherUser._id}, {senderId: otherUser._id, recipientId: ObjectID(userId)} ] }
+    
     var conversationUsers = [];
     var collectionCounter = 0;
     //var sent = db.collection('privateMessages').find({senderId: userId}, {recipientId: 1, recipientName: 1, _id: 0}).toArray();
-    var collectionSize = new Array(db.collection('users').count());
-    var allUsers = db.collection('users').find({},{username: 1});
-    allUsers.forEach(function(otherUser) {
-        db.collection('privateMessages').findOne({$or: [ {senderId: new ObjectID(userId), recipientId: otherUser._id}, {senderId: otherUser._id, recipientId: new ObjectID(userId)} ] }, {}).then(function(obj) {
-            collectionCounter++;
-            if(obj) {
-                conversationUsers.push({id: otherUser._id, name: otherUser.username});
+    db.collection('users').count().then(function(collectionSize) {
+        var allUsers = db.collection('users').find({});
+        allUsers.forEach(function(otherUser) {
+            var otherUserId = otherUser._id.toString();
+            console.log("otherUserId: " + otherUserId);
+            db.collection('privateMessages').findOne({$or: [{ "senderId": userId, "recipientId": otherUserId }, { "senderId": otherUserId, "recipientId": userId }] }).then(function(obj) {
+                collectionCounter++;
+                if(obj) {
+                    console.log("conversation user: " + otherUser.username);
+                    console.log("collectionCounter: " + collectionCounter);
+                    conversationUsers.push({id: otherUserId, name: otherUser.username});
+                }
                 if(collectionCounter == collectionSize) {
+                    console.log("trying to send users: ", conversationUsers);
                     res.status(200).send(conversationUsers);
                 }
-            }
+            });
+        }, function(err) {
+            console.log(err);
         });
-    }, function(err) {
     });
-
-    
-    /*
-    var uniqueArray = sent.filter(function(item, pos) {
-        var index = sent.findIndex(function(obj) {
-            return ;
-        });
-
-    })
-    var received = db.collection('privateMessages').find({recipientId: userId}, {senderId: 1, senderName: 1, _id: 0}).toArray();
-    */
 });
 
 
@@ -313,8 +349,10 @@ io.on('connection', function(socket){
             return activeUser.id === message.recipientId;
         });
 
-        //Send to the other person
-        socket.to(activeUsers[index].socketId).emit('private message', message);
+        if(index >= 0) {
+            //Send to the other person
+            socket.to(activeUsers[index].socketId).emit('private message', message);
+        }
         //Send to myself
         socket.emit('private message', message);
     });

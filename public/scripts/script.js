@@ -85,16 +85,21 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
 	$http.get('chatrooms').then(function (response) {
 		$scope.chatrooms = response.data;
 	});
-
+    console.log("$rootScope.user: " + $rootScope.user.id + " " + $rootScope.user.name);
     //get list of users with which we have had a conversation
     $http({
         url: "/conversations",
         method: "GET",
-        params: {"userId": $rootScope.user.id}
+        params: {"userid": $rootScope.user.id}
     }).then(function(response) {
         $rootScope.conversations = response.data;
     });
     
+    /*
+    $rootScope.conversations = [
+        {}
+    ];
+    */
     $scope.changeChatroom = function(index) {
         $location.path('/messages');
         $rootScope.isPrivate = false;
@@ -133,7 +138,7 @@ app.controller('RightSideController', function ($http, $window, $location, $scop
         $rootScope.showMenu = false;
         $location.path('/');
     };
-    $scope.changeRecipient = function changeRecipient(index) {
+    $rootScope.changeRecipient = function changeRecipient(index) {
         $rootScope.isPrivate = true;
         $rootScope.selected = index;
         $rootScope.privateRecipient = this.user;
@@ -334,6 +339,21 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             return false;
         };
 
+        $scope.postPrivateMessage = function() {
+            var newPrivateMessage = {
+                "senderId": $rootScope.user.id,
+                "senderName": $rootScope.user.name,
+                "timestamp": new Date(),
+                "text": $scope.textMessage,
+                "recipientId": $rootScope.privateRecipient.id,
+                "recipientName": $rootScope.privateRecipient.name
+            };
+            //Send a direct private message.
+            mySocket.emit('private message', newPrivateMessage);
+            //Post the message to the database
+            $http.post('/private-messages', newPrivateMessage);
+        };
+
         $rootScope.placeCaretAtEnd = function() {
             var element = document.getElementById('my-message');
             element.focus();
@@ -350,21 +370,6 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
                 textRange.collapse(false);
                 textRange.select();
             }
-        };
-
-        $scope.postPrivateMessage = function() {
-            var newPrivateMessage = {
-                "senderId": $rootScope.user.id,
-                "senderName": $rootScope.user.name,
-                "timestamp": new Date(),
-                "text": $scope.textMessage,
-                "recipientId": $rootScope.privateRecipient.id,
-                "recipientName": $rootScope.privateRecipient.name
-            };
-            //Send a direct private message.
-            mySocket.emit('private message', newPrivateMessage);
-            //Post the message to the database
-            $http.post('/private-messages', newPrivateMessage);
         };
 
         $scope.blankTrim = function blankTrim(str) {

@@ -18,7 +18,7 @@ var activeUsers = [];
 var port = 3000;
 var db;
 
-var filename
+var filename;
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
@@ -363,12 +363,14 @@ io.on('connection', function(socket){
         io.emit('disconnect message', message);
     });
     socket.on('disconnect', function() {
-        activeUsers.splice(activeUsers.findIndex(function(obj) {
-            console.log(socket.username + " has disconnected.");
-            return obj.name === socket.username;
-        }), 1);
-        socket.broadcast.emit('active users', activeUsers);
-        socket.broadcast.emit('disconnect message', {timestamp: new Date(), text: socket.username + " har loggat ut."});
+        if (activeUsers.findIndex(function(obj) {return obj.name === socket.username;}) != -1) {
+            activeUsers.splice(activeUsers.findIndex(function(obj) {
+                console.log(socket.username + " has disconnected.");
+                return obj.name === socket.username;
+            }), 1);
+            socket.broadcast.emit('active users', activeUsers);
+            socket.broadcast.emit('disconnect message', {timestamp: new Date(), text: socket.username + " har loggat ut."});
+        }
     });
     socket.on('join chatroom', function(chatroomId) {
         socket.join(chatroomId, function() {

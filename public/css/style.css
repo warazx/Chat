@@ -455,3 +455,12 @@ a:hover {
 [ng-cloak] {
     display: none !important;
 }
+
+.myUser {
+    color: #FFFFFF;
+    text-shadow: 0px 0px 1px #FFFFFF;
+}
+
+.myUser::after, .myUser:after {
+    content: " (du)";
+}

@@ -141,9 +141,9 @@ app.controller('RightSideController', function ($location, $scope, $rootScope, m
     $rootScope.changeRecipient = function changeRecipient(index) {
         $rootScope.isPrivate = true;
         $rootScope.selected = index;
-        $rootScope.privateRecipient = this.user;
-        if ($rootScope.newMessages.includes(this.user.id)) {
-            $rootScope.newMessages.splice($rootScope.newMessages.indexOf(this.user.id), 1);
+        $rootScope.privateRecipient = this.privateRoom;
+        if ($rootScope.newMessages.includes(this.privateRoom.id)) {
+            $rootScope.newMessages.splice($rootScope.newMessages.indexOf(this.privateRoom.id), 1);
         }
         if (!$rootScope.user) {
             console.log("User not logged in! Redirecting to login.");

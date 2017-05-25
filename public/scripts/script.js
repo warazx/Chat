@@ -163,6 +163,7 @@ app.controller('RightSideController', function ($location, $scope, $rootScope, m
 
 app.controller('SignupController', function ($scope, $rootScope, $location, userManager) {
     $scope.errorMessage = "";
+    $rootScope.successMessage = "";
     $scope.userSignup = function () {
         if ($scope.signup === undefined || $scope.signup.email === undefined || $scope.signup.username === undefined || $scope.signup.password === undefined) {
             var message = "";
@@ -178,6 +179,7 @@ app.controller('SignupController', function ($scope, $rootScope, $location, user
                 password: $scope.signup.password
             }).then(function (res) { //Successful codes 100-399.
                 console.log("Signup OK. Redirecting to login.");
+                $rootScope.successMessage = "Användare registrerad.";
                 $location.path(res.data.redirect);
             }, function (res) { //Failed codes 400-599+?
                 console.log("Signup failed.");
@@ -198,6 +200,7 @@ app.controller('SignupController', function ($scope, $rootScope, $location, user
 
 app.controller('LoginController', function ($scope, $rootScope, $location, userManager) {
     $scope.errorMessage = "";
+
     $scope.userLogin = function () {
         if ($scope.login === undefined || $scope.login.username === undefined || $scope.login.password === undefined) {
             console.log('Invalid logininformation.');
@@ -217,6 +220,7 @@ app.controller('LoginController', function ($scope, $rootScope, $location, userM
                 $scope.errorMessage = "Felaktiga inloggningsuppgifter.";
             });
         }
+        $rootScope.successMessage = "";
     };
 });
 

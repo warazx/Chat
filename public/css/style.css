@@ -361,6 +361,15 @@ a:hover {
     word-wrap: normal;
 }
 
+.success-message {
+    height: auto;
+    font-size: 0.8rem;
+    color: green;
+    margin: 0.7rem auto 1rem;
+    white-space: pre-wrap;
+    word-wrap: normal;
+}
+
 #status-message {
     min-height: 2rem;
     padding: 0 auto;

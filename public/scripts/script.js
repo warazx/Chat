@@ -264,6 +264,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $location, my
                 $rootScope.newMessages.push(message.senderId);
                 whistleAudio.play();
             }
+            $scope.textMessage = "";
         });
         mySocket.on('connect message', function (msg) {
             $rootScope.statusMessage = msg;
@@ -365,7 +366,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $location, my
             //Send a direct private message.
             mySocket.emit('private message', newPrivateMessage);
             //Post the message to the database
-            messageManager.postPrivateMessages(newPrivateMessage);
+            messageManager.postPrivateMessage(newPrivateMessage);
         };
 
         $scope.blankTrim = function blankTrim(str) {

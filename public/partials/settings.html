@@ -11,7 +11,7 @@
         </div> 
         <form name="settings-form" novalidate="true">
             <label for="username-setting-input">Användarnamn</label><br>
-            <input type="text" id="username-setting-input" ng-model="settings.username"><br>
+            <input type="text" id="username-setting-input" ng-minlength="3" ng-maxlength="20" ng-pattern="/^[0-9a-zA-Z]{3,20}$/" ng-model="settings.username"><br>
             <input type="submit" value="Ändra" ng-click="changeUsername()">
         </form>
     	<div id="error-messages">

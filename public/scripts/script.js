@@ -231,15 +231,21 @@ app.controller('SettingsController', function ($scope, $rootScope, $location, my
         username: $rootScope.user.name
     };
     $scope.changeUsername = function() {
-        userManager.updateUsername({
-            "id": $rootScope.user.id,
-            "username": $scope.settings.username
-        }).then(function() {
-            $rootScope.user.name = $scope.settings.username;
-            $scope.errorMessage = "Användarnamnet har ändrats.";
-        }, function() {
-            $scope.errorMessage = "Användarnamnet gick inte att ändra.";
-        });
+        if($scope.settings.username) {
+            userManager.updateUsername({
+                "id": $rootScope.user.id,
+                "username": $scope.settings.username
+            }).then(function() {
+                $rootScope.user.name = $scope.settings.username;
+                $scope.errorMessage = "Användarnamnet har ändrats.";
+            }, function() {
+                $scope.errorMessage = "Användarnamnet gick inte att ändra.";
+            });
+        } else {
+            $scope.errorMessage = "Du måste välja ett användarnamn som innehåller minst tre tecken och max 20 tecken." +
+                "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";
+        }
+
     };
 });
 

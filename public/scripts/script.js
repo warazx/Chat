@@ -117,7 +117,7 @@ app.factory('messageManager', function($http) {
 app.value('whistleAudio', new Audio('sounds/whistle.mp3'));
 
 
-app.controller('LeftSideController', function ($interval, $window, $location, $scope, $rootScope, mySocket, $http, messageManager) {
+app.controller('LeftSideController', function ($location, $scope, $rootScope, mySocket, $http, messageManager) {
     console.log("Hej jag är Leftsidecontroller.");
 
 	messageManager.getChatrooms().then(function (response) {
@@ -159,7 +159,7 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
     };
 });
 
-app.controller('RightSideController', function ($http, $window, $location, $scope, $rootScope, mySocket, userManager) {
+app.controller('RightSideController', function ($http, $location, $scope, $rootScope, mySocket, userManager) {
 	$scope.goToSettings = function(){
 		$location.path('/settings');
         if($rootScope.selectedChatroom) {
@@ -236,7 +236,7 @@ app.controller('SignupController', function ($scope, $rootScope, $location, user
     };
 });
 //
-app.controller('LoginController', function ($window, $scope, $rootScope, $location, userManager) {
+app.controller('LoginController', function ($scope, $rootScope, $location, userManager) {
     $scope.errorMessage = "";
     $scope.userLogin = function() {
         if ($scope.login === undefined || $scope.login.username === undefined || $scope.login.password === undefined) {
@@ -263,7 +263,7 @@ app.controller('LoginController', function ($window, $scope, $rootScope, $locati
 });
 
 
-app.controller('SettingsController', function ($scope, $rootScope, $location, mySocket, whistleAudio, userManager){
+app.controller('SettingsController', function ($scope, $rootScope, mySocket, whistleAudio, userManager){
     // Get the user id for the profile picture
     $scope.user = {
         userid: $rootScope.user.id

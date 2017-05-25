@@ -169,13 +169,15 @@ app.controller('RightSideController', function ($http, $location, $scope, $rootS
 app.controller('SignupController', function ($scope, $rootScope, $location, userManager) {
     $scope.errorMessage = "";
     $scope.userSignup = function () {
-        if ($scope.signup === undefined || $scope.signup.email === undefined || $scope.signup.username === undefined || $scope.signup.password === undefined) {
+        if ($scope.signup === undefined || $scope.signup.email === undefined || $scope.signup.username === undefined || $scope.signup.password === undefined || $scope.signup.passwordagain === undefined) {
             var message = "";
             if ($scope.signup.username === undefined) message += "Du måste välja ett användarnamn som innehåller minst tre tecken och max 20 tecken." +
                 "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";
             if ($scope.signup.email === undefined) message += "\nFelaktig emailadress.";
             if ($scope.signup.password === undefined) message += "\nDu måste välja ett lösenord som innehåller minst sex tecken och max 50 tecken.";
             $scope.errorMessage = message;
+        } else if($scope.signup.password !== $scope.signup.passwordagain) {
+            $scope.errorMessage = "Du skrev in lösenordet olika i de två fälten.";
         } else {
             userManager.signupuser({
                 username: $scope.signup.username,

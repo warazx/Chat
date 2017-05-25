@@ -180,7 +180,7 @@ a:hover {
     min-width: 25%;
     margin: 0 37.5%;
     position: fixed;
-    top: 15rem;
+    top: 13.5rem;
 }
 
 #settings-container {
@@ -236,7 +236,7 @@ a:hover {
     margin: 0 30% 0;
     text-align: center;
     position: fixed;
-    top: 2rem;
+    top: 0.5rem;
 }
 
 #signup-link-container,

@@ -10,6 +10,8 @@
             <input type="email" id="signup-email-input" ng-minlength="5" ng-model="signup.email" required>
             <label for="signup-password-input">Lösenord</label>
             <input type="password" id="signup-password-input" ng-minlength="6" ng-maxlength="50" ng-model="signup.password" required>
+            <label for="signup-password-input-again">Lösenord igen</label>
+            <input type="password" id="signup-password-input-again" ng-minlength="6" ng-maxlength="50" ng-model="signup.passwordagain" required>
             <input type="submit" value="Registrera dig" ng-click="userSignup()">
         </form>
         <div id="error-messages">

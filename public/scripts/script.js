@@ -392,10 +392,6 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             while(newStr.indexOf("<br>") >= 0) {
                 newStr = newStr.replace("<br>", "");
             }
-            /*
-            newStr.replace(/\&nbsp;/g, "");
-            newStr.replace(/\<br\>/g, "");
-            */
             return newStr.trim();
         };
     }

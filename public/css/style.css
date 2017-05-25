@@ -101,12 +101,17 @@ a:hover {
 }
 
 .message-text {
-    /*font-family: Catamaran-Light;*/
+    /*font-family: Catamaran-Light;
+    display: inline-block;*/
     font-size: 1em;
     max-width: 78vw;
     word-wrap: break-word;
 }
-
+/*
+.message-content {
+    display: inline-block;
+}
+*/
 #content {
     display: flex;
     flex-direction: row;
@@ -230,6 +235,35 @@ a:hover {
     color: white;
     margin-left: 0;
 }
+/*
+.user-image-frame {
+    border: 1px solid #8d8d8d;
+    border-radius: 0.2rem;
+    display: inline-block;
+    vertical-align: top;
+    width: 3.5rem;
+    height: 3.5rem;
+    overflow: hidden;
+}
+
+.user-image-container {
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.user-image {
+    display: block;
+    min-width: 100%;
+    min-height: 100%;
+    max-height: 3.5rem;
+    margin: auto;
+    position: absolute;
+    top: -100%;
+    right: -100%;
+    bottom: -100%;
+    left: -100%;
+}*/
 
 .title-container {
     min-width: 40%;

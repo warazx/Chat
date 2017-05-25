@@ -8,19 +8,15 @@ app.factory('mySocket', function (socketFactory) {
 
 app.factory('userManager', function ($http) {
     var userManager = {};
-
     userManager.login = function (username, password) {
         return $http.get('login/' + username + '/' + password);
     };
-
     userManager.logout = function () {
         return $http.get('/logout');
     };
-
     userManager.signupuser = function (signupCredentials) {
         return $http.post('signup', signupCredentials);
     };
-
     userManager.updateUsername = function (newUsername) {
         return $http.post('/users/update', newUsername);
     };
@@ -28,19 +24,26 @@ app.factory('userManager', function ($http) {
 });
 
 app.factory('messageManager', function ($http) {
-    var messageManger = {};
-
-    messageManger.getChatrooms = function () {
+    var messageManager = {};
+    messageManager.getChatrooms = function () {
         return $http.get('chatrooms');
     };
-    messageManger.postMessages = function (newMessage) {
+    messageManager.getMessages = function (chatroomId) {
+        return $http.get('/messages?chatroom=' + chatroomId);
+    };
+    messageManager.getPrivateMessages = function (user, otheruser) {
+        return $http.get('/messages?user=' + user + '&otheruser=' + otheruser);
+    };
+    messageManager.getConversations = function (userId) {
+        return $http.get('/conversations?userid=' + userId);
+    };
+    messageManager.postMessages = function (newMessage) {
         return $http.post('/messages', newMessage);
     };
-
-    messageManger.postPrivateMessages = function (newPrivateMessage) {
+    messageManager.postPrivateMessage = function (newPrivateMessage) {
         return $http.post('/private-messages', newPrivateMessage);
     };
-    return messageManger;
+    return messageManager;
 });
 
 app.config(function ($routeProvider) {
@@ -95,18 +98,15 @@ app.directive("contenteditable", function ($rootScope) {
 });
 
 
-app.controller('LeftSideController', function ($location, $scope, $rootScope, mySocket, $http, messageManager) {
+app.controller('LeftSideController', function ($location, $scope, $rootScope, mySocket, messageManager) {
     messageManager.getChatrooms().then(function (response) {
         $scope.chatrooms = response.data;
     });
     //get list of users with which we have had a conversation
-    $http({
-        url: "/conversations",
-        method: "GET",
-        params: { "userid": $rootScope.user.id }
-    }).then(function (response) {
-        $rootScope.conversations = response.data;
+    messageManager.getConversations($rootScope.user.id).then(function(res) {
+        $rootScope.conversations = res.data;
     });
+
     $scope.changeChatroom = function (index) {
         $location.path('/messages');
         $rootScope.isPrivate = false;
@@ -117,18 +117,14 @@ app.controller('LeftSideController', function ($location, $scope, $rootScope, my
             mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
         }
         $rootScope.selectedChatroom = this.chatroom._id;
-        $http({
-            url: "/messages",
-            method: "GET",
-            params: { "chatroom": $rootScope.selectedChatroom },
-        }).then(function (response) {
-            $rootScope.messages = response.data;
+        messageManager.getMessages($rootScope.selectedChatroom).then(function(res) {
+            $rootScope.messages = res.data;
         });
         mySocket.emit('join chatroom', $rootScope.selectedChatroom);
     };
 });
 
-app.controller('RightSideController', function ($http, $location, $scope, $rootScope, mySocket, userManager) {
+app.controller('RightSideController', function ($location, $scope, $rootScope, mySocket, userManager, messageManager) {
     $scope.goToSettings = function () {
         $location.path('/settings');
         if ($rootScope.selectedChatroom) {
@@ -157,12 +153,8 @@ app.controller('RightSideController', function ($http, $location, $scope, $rootS
             $location.path('/');
         } else {
             $location.path('/messages');
-            $http({
-                url: '/messages',
-                method: "GET",
-                params: { user: $rootScope.user.id, otheruser: $rootScope.privateRecipient.id }
-            }).then(function (response) {
-                $rootScope.messages = response.data;
+            messageManager.getPrivateMessages($rootScope.user.id, $rootScope.privateRecipient.id).then(function(res) {
+                $rootScope.messages = res.data;
             });
             document.getElementById('my-message').focus();
         }
@@ -228,7 +220,7 @@ app.controller('LoginController', function ($scope, $rootScope, $location, userM
     };
 });
 
-app.controller('MessagesController', function ($scope, $rootScope, $http, $location, mySocket, messageManager, whistleAudio) {
+app.controller('MessagesController', function ($scope, $rootScope, $location, mySocket, messageManager, whistleAudio) {
     //Shows error message in empty chatrooms/conversations when $rootScope.messages is empty.
     mySocket.removeAllListeners();
     $rootScope.$watch('messages', function () {
@@ -288,12 +280,8 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
         $rootScope.selected = "591d5683f36d281c81b1e5ea";
         $rootScope.selectedChatroom = $rootScope.selected;   //"General"
         mySocket.emit('join chatroom', $rootScope.selectedChatroom);
-        $http({
-            url: "/messages",
-            method: "GET",
-            params: { chatroom: "591d5683f36d281c81b1e5ea" } //This is the chatroom "General"
-        }).then(function (response) {
-            $rootScope.messages = response.data;
+        messageManager.getMessages($rootScope.selectedChatroom).then(function(res) {
+            $rootScope.messages = res.data;
         });
 
         document.getElementById('my-message').focus();
@@ -340,7 +328,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             //Send a direct private message.
             mySocket.emit('private message', newPrivateMessage);
             //Post the message to the database
-            $http.post('/private-messages', newPrivateMessage);
+            messageManager.postPrivateMessage(newPrivateMessage);
         };
 
         $rootScope.placeCaretAtEnd = function () {
@@ -375,7 +363,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $http, $locat
             mySocket.emit('private message', newPrivateMessage);
             //Post the message to the database
             newPrivateMessage.socketId = undefined;
-            messageManager.postPrivateMessages(newPrivateMessage);
+            messageManager.postPrivateMessage(newPrivateMessage);
         };
 
         $scope.blankTrim = function blankTrim(str) {

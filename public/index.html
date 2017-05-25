@@ -19,7 +19,7 @@
                     </ul>
                     <p>Privata konversationer</p>
                     <ul>
-                        <li ng-repeat="privateRoom in conversations track by privateRoom.id" ng-click="changeRecipient(privateRoom.id)" ng-class="{myUser: user.id == privateRoom.id, markedRoom: selected==privateRoom.id, newMessage: newMessages.includes(privateRoom.id)}">{{privateRoom.name}}</li>
+                        <li ng-repeat="privateRoom in conversations | orderBy: 'name' track by privateRoom.id" ng-click="changeRecipient(privateRoom.id)" ng-class="{myUser: user.id == privateRoom.id, markedRoom: selected==privateRoom.id, newMessage: newMessages.includes(privateRoom.id)}">{{privateRoom.name}}</li>
                     </ul>
                 </div>
             </div>
@@ -30,7 +30,7 @@
                 <button id="settings-button" class="right-side-button" type="button" tabindex="-1" ng-click="goToSettings()">Inställningar</button>
                 <div id="user-list" class="side-menu-list">
                     <ul>
-                        <li ng-repeat="privateRoom in users track by privateRoom.id" ng-click="changeRecipient(privateRoom.id)" ng-class="{myUser: user.id == privateRoom.id, markedRoom: selected==privateRoom.id, newMessage: newMessages.includes(privateRoom.id)}">{{privateRoom.name}}</li>
+                        <li ng-repeat="privateRoom in users | orderBy: 'name' track by privateRoom.id" ng-click="changeRecipient(privateRoom.id)" ng-class="{myUser: user.id == privateRoom.id, markedRoom: selected==privateRoom.id, newMessage: newMessages.includes(privateRoom.id)}">{{privateRoom.name}}</li>
                     </ul>
                 </div>
                 <button id="logout-button" class="right-side-button" tabindex="-1" ng-click="userLogout()">Logga ut</button>

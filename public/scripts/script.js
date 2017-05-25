@@ -66,19 +66,19 @@ app.factory('loginManager', function($http) {
 
 app.factory('userManager', function($http) {
     var userManager = {};
-	
+
 	userManager.login = function(username, password) {
 		return $http.get('login/' + username + '/' + password);
 	};
-	
+
 	userManager.logout = function() {
 		 return $http.get('/logout');
 	};
-	
+
 	userManager.signupuser = function(signupCredentials) {
 		return $http.post('signup', signupCredentials);
 	};
-	
+
 	userManager.updateUsername = function(newUsername) {
 		return $http.post('/users/update', newUsername);
 	};
@@ -96,19 +96,19 @@ app.factory('signupManager', function($http) {
 
 app.factory('messageManager', function($http) {
 	var messageManger = {};
-	
+
 	messageManger.getChatrooms = function() {
 		return $http.get('chatrooms');
 	};
 	messageManger.postMessages = function(newMessage) {
 		return $http.post('/messages', newMessage);
 	};
-	
+
 	messageManger.postPrivateMessages = function(newPrivateMessage) {
 		return $http.post('/private-messages', newPrivateMessage);
 	};
-	
-	
+
+
     return messageManger;
 });
 
@@ -132,7 +132,7 @@ app.controller('LeftSideController', function ($interval, $window, $location, $s
     }).then(function(response) {
         $rootScope.conversations = response.data;
     });
-    
+
     /*
     $rootScope.conversations = [
         {}
@@ -284,17 +284,23 @@ app.controller('SettingsController', function ($scope, $rootScope, $location, my
         username: $rootScope.user.name
     };
     $scope.changeUsername = function() {
-        userManager.updateUsername({
-            "id": $rootScope.user.id,
-            "username": $scope.settings.username
-        }).then(function() {
-            $rootScope.user.name = $scope.settings.username;
-            $scope.errorMessage = "Användarnamnet har ändrats.";
-            document.getElementById("error-message").style.color = "green";
-        }, function() {
-            $scope.errorMessage = "Användarnamnet gick inte att ändra.";
+        if($scope.settings.username) {
+            userManager.updateUsername({
+                "id": $rootScope.user.id,
+                "username": $scope.settings.username
+            }).then(function() {
+                $rootScope.user.name = $scope.settings.username;
+                $scope.errorMessage = "Användarnamnet har ändrats.";
+                document.getElementById("error-message").style.color = "green";
+            }, function() {
+                $scope.errorMessage = "Användarnamnet gick inte att ändra.";
+                document.getElementById("error-message").style.color = "red";
+            });
+        } else {
+            $scope.errorMessage = "Du måste välja ett användarnamn som innehåller minst tre tecken och max 20 tecken." +
+                "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";
             document.getElementById("error-message").style.color = "red";
-        });
+        }
     };
 });
 

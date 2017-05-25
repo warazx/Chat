@@ -269,6 +269,8 @@ app.get('/users/:id?', function (req, res) {
 app.post('/users/update', function (req, res) {
     var id = req.body.id;
     var newUsername = req.body.username.toLowerCase();
+
+    if (!newUsername.match(/[0-9a-zA-Z]{3,20}/)) res.status(400).send({});
     db.collection('users').findOne({"username": newUsername}).then(function(doc) {
         if(!doc) {
             db.collection('users').findOneAndUpdate({"_id": ObjectID(id) }, { $set: {"username": newUsername}}).then(function(err) {

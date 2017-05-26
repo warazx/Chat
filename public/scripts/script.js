@@ -126,9 +126,10 @@ app.controller('RightSideController', function ($location, $scope, $rootScope, m
         $location.path('/settings');
         if ($rootScope.selectedChatroom) {
             mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
-            $rootScope.selectedChatroom = null;
-            $rootScope.selected = null;
+            $rootScope.selectedChatroom = undefined;
         }
+        $rootScope.privateRecipient = undefined;
+        $rootScope.selected = null;
     };
     $rootScope.userLogout = function () {
         userManager.logout();
@@ -139,6 +140,7 @@ app.controller('RightSideController', function ($location, $scope, $rootScope, m
         $location.path('/');
     };
     $rootScope.changeRecipient = function changeRecipient(index) {
+        $rootScope.selectedChatroom = undefined;
         $rootScope.isPrivate = true;
         $rootScope.selected = index;
         $rootScope.privateRecipient = this.privateRoom;
@@ -288,7 +290,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $location, my
         //send $rootScope.user to server.js, it receives it with socket.on('connected')
         mySocket.emit('connected', $rootScope.user);
         mySocket.emit('connect message', { date: new Date(), text: $rootScope.user.name + " har loggat in." });
-        if($rootScope.selectedChatroom == null) {
+        if(!$rootScope.selectedChatroom && !$rootScope.privateRecipient) {
             $rootScope.selected = "591d5683f36d281c81b1e5ea";
             $rootScope.selectedChatroom = $rootScope.selected;   //"General"
             mySocket.emit('join chatroom', $rootScope.selectedChatroom);

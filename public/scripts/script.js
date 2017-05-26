@@ -288,9 +288,12 @@ app.controller('MessagesController', function ($scope, $rootScope, $location, my
         //send $rootScope.user to server.js, it receives it with socket.on('connected')
         mySocket.emit('connected', $rootScope.user);
         mySocket.emit('connect message', { date: new Date(), text: $rootScope.user.name + " har loggat in." });
-        $rootScope.selected = "591d5683f36d281c81b1e5ea";
-        $rootScope.selectedChatroom = $rootScope.selected;   //"General"
-        mySocket.emit('join chatroom', $rootScope.selectedChatroom);
+        if($rootScope.selectedChatroom == null) {
+            $rootScope.selected = "591d5683f36d281c81b1e5ea";
+            $rootScope.selectedChatroom = $rootScope.selected;   //"General"
+            mySocket.emit('join chatroom', $rootScope.selectedChatroom);
+        }
+        
         messageManager.getMessages($rootScope.selectedChatroom).then(function(res) {
             $rootScope.messages = res.data;
         });

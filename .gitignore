@@ -6,6 +6,8 @@
 # Ionic gitignore
 platforms
 plugins
+shutAppMobile/www/lib
+shutAppMobile/www/dist
 
 ### Angular ###
 ## Angular ##

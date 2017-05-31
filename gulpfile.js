@@ -29,7 +29,7 @@ gulp.task('serve', function() {
 gulp.task('scripts', function() {
   return gulp.src(watchedFiles)
     .pipe(concat('concat.js'))
-    .pipe(gulp.dest('./public/scripts/'));
+    .pipe(gulp.dest('./public/dist/'));
 });
 
 gulp.task('listen', function() {

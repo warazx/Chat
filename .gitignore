@@ -1,7 +1,7 @@
 # Created by https://www.gitignore.io/api/node,bower,angular,webstorm
 
 # Do not include concat file.
-/public/scripts/concat.js
+/public/dist/concat.js
 
 ### Angular ###
 ## Angular ##

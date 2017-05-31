@@ -1,62 +1,6 @@
-var app = angular.module('app', ['lib', 'controllers', 'ngRoute', 'ngSanitize', 'btford.socket-io', 'luegg.directives', 'mgcrea.ngStrap', 'angular-smilies', 'lr.upload']);
+var controllers = angular.module('controllers', []);
 
-app.value('whistleAudio', new Audio('sounds/whistle.mp3'));
-
-app.factory('mySocket', function (socketFactory) {
-    return socketFactory();
-});
-
-app.config(function ($routeProvider) {
-    $routeProvider.when('/', {
-        controller: 'LoginController',
-        templateUrl: 'partials/login.html'
-    }).when('/signup', {
-        controller: 'SignupController',
-        templateUrl: 'partials/signup.html'
-    }).when('/messages', {
-        controller: 'MessagesController',
-        templateUrl: 'partials/messages.html'
-    }).when('/settings', {
-        controller: 'SettingsController',
-        templateUrl: 'partials/settings.html'
-    });
-});
-
-//Code from http://fdietz.github.io/recipes-with-angular-js/common-user-interface-patterns/editing-text-in-place-using-html5-content-editable.html
-//Makes a div with contenteditable usable with ng-model
-app.directive("contenteditable", function ($rootScope) {
-    return {
-        restrict: "A",
-        require: "ngModel",
-        link: function (scope, element, attrs, ngModel) {
-            var maxLength = 255;
-            function read() {
-                ngModel.$setViewValue(element.html());
-            }
-            ngModel.$render = function () {
-                element.html(ngModel.$viewValue || "");
-            };
-            element.bind("blur keyup change", function () {
-                scope.$apply(read);
-            });
-            function limitText() {
-                if (element.html().length >= maxLength) {
-                    var transformedInput = element.html().substring(0, maxLength);
-                    ngModel.$setViewValue(transformedInput);
-                    ngModel.$render();
-                    $rootScope.placeCaretAtEnd();
-                    return transformedInput;
-                }
-                return element.html();
-            }
-            ngModel.$parsers.push(limitText);
-        }
-    };
-});
-<<<<<<< Updated upstream
-
-
-app.controller('LeftSideController', function ($location, $scope, $rootScope, mySocket, messageManager) {
+controllers.controller('LeftSideController', function ($location, $scope, $rootScope, mySocket, messageManager) {
     messageManager.getChatrooms().then(function (response) {
         $scope.chatrooms = response.data;
     });
@@ -82,15 +26,14 @@ app.controller('LeftSideController', function ($location, $scope, $rootScope, my
     };
 });
 
-app.controller('RightSideController', function ($location, $scope, $rootScope, mySocket, userManager, messageManager) {
+controllers.controller('RightSideController', function ($location, $scope, $rootScope, mySocket, userManager, messageManager) {
     $scope.goToSettings = function () {
         $location.path('/settings');
         if ($rootScope.selectedChatroom) {
             mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
-            $rootScope.selectedChatroom = undefined;
+            $rootScope.selectedChatroom = null;
+            $rootScope.selected = null;
         }
-        $rootScope.privateRecipient = undefined;
-        $rootScope.selected = null;
     };
     $rootScope.userLogout = function () {
         userManager.logout();
@@ -101,7 +44,6 @@ app.controller('RightSideController', function ($location, $scope, $rootScope, m
         $location.path('/');
     };
     $rootScope.changeRecipient = function changeRecipient(index) {
-        $rootScope.selectedChatroom = undefined;
         $rootScope.isPrivate = true;
         $rootScope.selected = index;
         $rootScope.privateRecipient = this.privateRoom;
@@ -121,7 +63,7 @@ app.controller('RightSideController', function ($location, $scope, $rootScope, m
     };
 });
 
-app.controller('SignupController', function ($scope, $rootScope, $location, userManager) {
+controllers.controller('SignupController', function ($scope, $rootScope, $location, userManager) {
     $scope.errorMessage = "";
     $rootScope.successMessage = "";
     $scope.userSignup = function () {
@@ -160,7 +102,7 @@ app.controller('SignupController', function ($scope, $rootScope, $location, user
     };
 });
 
-app.controller('LoginController', function ($scope, $rootScope, $location, userManager) {
+controllers.controller('LoginController', function ($scope, $rootScope, $location, userManager) {
     $scope.errorMessage = "";
 
     $scope.userLogin = function () {
@@ -186,7 +128,7 @@ app.controller('LoginController', function ($scope, $rootScope, $location, userM
     };
 });
 
-app.controller('MessagesController', function ($scope, $rootScope, $location, mySocket, messageManager, whistleAudio) {
+controllers.controller('MessagesController', function ($scope, $rootScope, $location, mySocket, messageManager, whistleAudio) {
     //Shows error message in empty chatrooms/conversations when $rootScope.messages is empty.
     mySocket.removeAllListeners();
     $rootScope.$watch('messages', function () {
@@ -251,12 +193,9 @@ app.controller('MessagesController', function ($scope, $rootScope, $location, my
         //send $rootScope.user to server.js, it receives it with socket.on('connected')
         mySocket.emit('connected', $rootScope.user);
         mySocket.emit('connect message', { date: new Date(), text: $rootScope.user.name + " har loggat in." });
-        if(!$rootScope.selectedChatroom && !$rootScope.privateRecipient) {
-            $rootScope.selected = "591d5683f36d281c81b1e5ea";
-            $rootScope.selectedChatroom = $rootScope.selected;   //"General"
-            mySocket.emit('join chatroom', $rootScope.selectedChatroom);
-        }
-        
+        $rootScope.selected = "591d5683f36d281c81b1e5ea";
+        $rootScope.selectedChatroom = $rootScope.selected;   //"General"
+        mySocket.emit('join chatroom', $rootScope.selectedChatroom);
         messageManager.getMessages($rootScope.selectedChatroom).then(function(res) {
             $rootScope.messages = res.data;
         });
@@ -354,7 +293,7 @@ app.controller('MessagesController', function ($scope, $rootScope, $location, my
     }
 });
 
-app.controller('SettingsController', function ($scope, $rootScope, mySocket, whistleAudio, userManager) {
+controllers.controller('SettingsController', function ($scope, $rootScope, mySocket, whistleAudio, userManager) {
     // Get the user id for the profile picture
     $scope.user = {
         userid: $rootScope.user.id
@@ -396,5 +335,3 @@ app.controller('SettingsController', function ($scope, $rootScope, mySocket, whi
         }
     };
 });
-=======
->>>>>>> Stashed changes

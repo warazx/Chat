@@ -1,3 +1,9 @@
+/*-----------------------------------
+Starta med 'gulp' i terminalen.
+Varje gång en watchedFiles ändras körs JsHint, cuncat på filerna och startar om servern.
+Lägg till filvägar i watchedFiles om du vill att fler filer kollas.
+-----------------------------------*/
+
 var gulp = require('gulp'),
     jshint = require('gulp-jshint'),
     gulpLiveServer = require('gulp-live-server'),

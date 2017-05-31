@@ -3,6 +3,10 @@
 # Do not include concat file.
 /public/dist/concat.js
 
+# Ionic gitignore
+platforms
+plugins
+
 ### Angular ###
 ## Angular ##
 # compiled output

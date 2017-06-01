@@ -6,6 +6,7 @@ var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 var multer  = require('multer')
 var bcrypt = require('bcrypt');
+var cors = require('cors');
 const saltRounds = 10;
 
 var app = express();
@@ -22,6 +23,7 @@ var filename;
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
+app.use(cors());
 
 // Store profile picture on disc, specify path
 var storage = multer.diskStorage({

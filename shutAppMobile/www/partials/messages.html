@@ -1,0 +1,25 @@
+<ion-view view-title="Meddelanden">
+    <ion-nav-bar class="bar-stable">
+      <ion-nav-back-button>
+      </ion-nav-back-button>
+    </ion-nav-bar>
+    <ion-content>
+      <div id="chat-messages" scroll-glue>
+        <p ng-show="noMessages"> Det finns inga meddelanden att visa i denna konversation. </p>
+        <div class="chat-message" ng-repeat="message in messages | orderBy:'timestamp' track by $index">
+          <span class="username">{{message.senderName}}</span> <span class="timestamp">{{message.timestamp | date : 'MMM d, HH:mm'}}</span>
+          <div class="message-text" ng-bind-html="message.text"></div>
+        </div>
+      </div>
+    </ion-content>
+    <div class="list light-grey bottommsg message-input-container">
+      <div class="item item-input-inset light-grey message-input">
+        <label class="item-input-wrapper line-light-grey nopadtop">
+          <input class="line-light-grey" type="text" ng-enter="postMessage()" ng-model="textMessage">
+        </label>
+        <div class="divsend">
+          <button class="button button-clear ion-android-send iconsend" ng-click="postMessage()"></button>
+        </div>
+      </div>
+    </div>
+</ion-view>

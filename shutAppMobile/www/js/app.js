@@ -128,7 +128,6 @@ app.controller('SignupController', function ($location, $scope, $rootScope, user
   };
 });
 
-
 app.controller('MessagesController', function ($rootScope, $scope, $ionicScrollDelegate, $ionicSideMenuDelegate, messageManager) {
   messageManager.getMessages('591d5683f36d281c81b1e5ea').then(function(res) {
     $rootScope.messages = res.data;
@@ -144,10 +143,6 @@ app.controller('MessagesController', function ($rootScope, $scope, $ionicScrollD
   $scope.toggleLeft = function() {
         $ionicSideMenuDelegate.toggleLeft();
   };
-});
-
-app.controller('SettingsController', function ($rootScope, messageManager) {
-    $rootScope.jepp = "Settings";
 });
 
 app.controller('LeftSideController', function ($rootScope, $scope, messageManager, socket) {
@@ -232,9 +227,30 @@ app.controller('LeftSideController', function ($rootScope, $scope, messageManage
 })
 */
 
+app.controller('SettingsController', function ($location, $scope, $rootScope, userManager) {
+  $scope.errorMessage = "";
 
+  $scope.changeUsername = function(newUsername) {
+    if(newUsername) {
+        userManager.updateUsername({
+            "id": $rootScope.user.id,
+            "username": newUsername
+        }).then(function () {
+            $rootScope.user.name = newUsername;
+            $scope.errorMessage = "Användarnamnet har ändrats.";
+        }, function () {
+            $scope.errorMessage = "Användarnamnet gick inte att ändra.";
+        });
+        //TODO: Turn on again after sockets work
+        //mySocket.emit('change username', {"id": $rootScope.user.id, "newUserName": newUsername});
+    } else {
+        $scope.errorMessage = "Du måste välja ett användarnamn som innehåller minst tre tecken och max 20 tecken." +
+            "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";
+    }
+  };
 
-app.controller('SettingsController', function ($rootScope, messageManager) {
-  $rootScope.jepp = "Settings";
+  $scope.logout = function() {
+    $rootScope.user = {};
+    $location.path('/login');
+  };
 });
-

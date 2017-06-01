@@ -1,4 +1,4 @@
-<ion-view view-title="Login">
+<ion-view view-title="">
     <ion-nav-bar class="bar-stable">
       <ion-nav-back-button>
       </ion-nav-back-button>
@@ -8,19 +8,18 @@
         <div class="list">
             <form name="login-form" novalidate>
                 <div class="input-field-container">
-                <label for="login-username-input" class="item item-input item-floating-label">
-                    <span class="input-label">Användarnamn</span>
-                    <input type="text" placeholder="Användarnamn" id="login-username-input" ng-minlength="3" ng-maxlength="20" ng-model="login.username" ng-pattern="/^[0-9a-zA-Z]{3,20}$/" required>
-                </label>
-                <label for="login-password-input" class="item item-input item-floating-label">
-                    <span class="input-label">Lösenord</span>
-                    <input type="password" placeholder="Lösenord" id="login-password-input" ng-minlength="6" ng-maxlength="50" ng-model="login.password" required>
-                </label>
-            </div>
-                <input type="submit" value="Logga in" ng-click="userLogin(login)" class="button button-block button-shutapp">
+                    <label for="login-username-input" class="item item-input item-floating-label">
+                        <span class="input-label">Användarnamn</span>
+                        <input type="text" placeholder="Användarnamn" id="login-username-input" ng-minlength="3" ng-maxlength="20" ng-model="login.username" ng-pattern="/^[0-9a-zA-Z]{3,20}$/" required>
+                    </label>
+                    <label for="login-password-input" class="item item-input item-floating-label">
+                        <span class="input-label">Lösenord</span>
+                        <input type="password" placeholder="Lösenord" id="login-password-input" ng-minlength="6" ng-maxlength="50" ng-model="login.password" required>
+                    </label>
+                </div>
+                <input type="submit" value="Logga in" ng-click="userLogin()" class="button button-block button-shutapp">
             </form>
         </div>
-        {{login}}
         <p>----Temporär routing-----</p>
         <a href="#/messages">
             <button class="button button-block button-positive">

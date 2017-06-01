@@ -57,15 +57,21 @@ app.config(function($stateProvider, $urlRouterProvider) {
   $urlRouterProvider.otherwise('/login');
 });
 
-app.controller('LoginController', function ($rootScope, $scope, userManager) {
+app.controller('LoginController', function ($rootScope, $scope, $location, userManager) {
     $rootScope.currentView = "Login";
+
+    //Needed on scope before login credentials are entered by user.
+    $scope.login = {};
 
     //Message to show in toast. Not implementet
     $scope.errorMessage = "";
 
-    $scope.userLogin = function (credentials) {
-
-            userManager.login(credentials.username, credentials.password).then(function (res) {
+    $scope.userLogin = function () {
+        if ($scope.login.username === undefined || $scope.login.password === undefined) {
+            console.log('Invalid logininformation.');
+            $scope.errorMessage = "Felaktiga inloggningsuppgifter.";
+        } else {
+            userManager.login($scope.login.username, $scope.login.password).then(function (res) {
                 console.log('Login successful.');
                 //Might use this....
                 $rootScope.isPrivate = false;
@@ -78,7 +84,7 @@ app.controller('LoginController', function ($rootScope, $scope, userManager) {
                 console.log('Login failed on server.');
                 $scope.errorMessage = "Felaktiga inloggningsuppgifter.";
             });
-
+        }
         $rootScope.successMessage = "";
     };
 });

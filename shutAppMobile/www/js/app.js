@@ -37,7 +37,7 @@ angular.module('starter', ['ionic', 'lib'])
     })
     .state('messages', {
         url: '/messages',
-        templateUrl: 'partials/messages.html',
+        templateUrl: 'partials/messages-and-menu.html',
         controller: 'MessagesController'
     })
     .state('settings', {
@@ -56,10 +56,89 @@ angular.module('starter', ['ionic', 'lib'])
     $rootScope.jepp = "Signup";
 })
 
-.controller('MessagesController', function ($rootScope, messageManager) {
+.controller('MessagesController', function ($scope, $ionicSideMenuDelegate, $rootScope, messageManager) {
     $rootScope.jepp = "Messages";
+    $scope.toggleLeft = function() {
+        $ionicSideMenuDelegate.toggleLeft();
+
+  };
 })
 
 .controller('SettingsController', function ($rootScope, messageManager) {
     $rootScope.jepp = "Settings";
 })
+
+.controller('LeftSideController', function ($rootScope, $scope, messageManager) {
+    /*
+    $scope.chatrooms = ["General", "Random", "FUN!!!"];
+    */
+    
+    messageManager.getChatrooms().then(function (response) {
+        $scope.chatrooms = response.data;
+    });
+    
+    /*
+    //get list of users with which we have had a conversation
+    messageManager.getConversations($rootScope.user.id).then(function(res) {
+        $rootScope.conversations = res.data;
+    });
+
+    $scope.changeChatroom = function (index) {
+        $location.path('/messages');
+        $rootScope.isPrivate = false;
+        $rootScope.selected = index;
+        $rootScope.privateRecipient = undefined;
+        //Leave chatroom if already in one.
+        if ($rootScope.selectedChatroom) {
+            mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
+        }
+        $rootScope.selectedChatroom = this.chatroom._id;
+        messageManager.getMessages($rootScope.selectedChatroom).then(function(res) {
+            $rootScope.messages = res.data;
+        });
+        mySocket.emit('join chatroom', $rootScope.selectedChatroom);
+    };
+
+    $scope.goToSettings = function () {
+        $location.path('/settings');
+        if ($rootScope.selectedChatroom) {
+            mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
+            $rootScope.selectedChatroom = null;
+            $rootScope.selected = null;
+        }
+    };
+    $rootScope.userLogout = function () {
+        userManager.logout();
+        mySocket.disconnect();
+        mySocket.removeAllListeners();
+        $rootScope.user = null;
+        $rootScope.showMenu = false;
+        $location.path('/');
+    };
+    $rootScope.changeRecipient = function changeRecipient(index) {
+        $rootScope.isPrivate = true;
+        $rootScope.selected = index;
+        $rootScope.privateRecipient = this.privateRoom;
+        if ($rootScope.newMessages.includes(this.privateRoom.id)) {
+            $rootScope.newMessages.splice($rootScope.newMessages.indexOf(this.privateRoom.id), 1);
+        }
+        if (!$rootScope.user) {
+            console.log("User not logged in! Redirecting to login.");
+            $location.path('/');
+        } else {
+            $location.path('/messages');
+            messageManager.getPrivateMessages($rootScope.user.id, $rootScope.privateRecipient.id).then(function(res) {
+                $rootScope.messages = res.data;
+            });
+            document.getElementById('my-message').focus();
+        }
+    };
+    */
+})
+/*
+.controller('ContentController', function($scope, $ionicSideMenuDelegate) {
+  $scope.toggleLeft = function() {
+    $ionicSideMenuDelegate.toggleLeft();
+  };
+})
+*/

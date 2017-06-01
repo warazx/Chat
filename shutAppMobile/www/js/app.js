@@ -96,15 +96,22 @@ app.controller('SettingsController', function ($rootScope, messageManager) {
     $rootScope.jepp = "Settings";
 });
 
-app.controller('LeftSideController', function ($rootScope, $scope, messageManager) {
+app.controller('LeftSideController', function ($rootScope, $scope, messageManager, socket) {
     /*
     $scope.chatrooms = ["General", "Random", "FUN!!!"];
     */
-    
+	//TODO change to real logged in user
+	$rootScope.user = { name: "Erika", id: "5927f744ac29ef07a783c7f5" };
+    socket.emit('connected', $rootScope.user);
     messageManager.getChatrooms().then(function (response) {
         $scope.chatrooms = response.data;
     });
-    
+	messageManager.getConversations($rootScope.user.id).then(function (response) {
+		$rootScope.conversations = response.data;
+	});
+    socket.on('active users', function (arr) {
+        $rootScope.activeUsers = arr;
+    });
     /*
     //get list of users with which we have had a conversation
     messageManager.getConversations($rootScope.user.id).then(function(res) {

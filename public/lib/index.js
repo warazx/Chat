@@ -29,7 +29,7 @@ lib.factory('messageManager', function ($http) {
         return $http.get('/messages?user=' + user + '&otheruser=' + otheruser);
     };
     messageManager.getConversations = function (userId) {
-        return $http.get('/conversations?userid=' + userId);
+        return $http.get('http://localhost:3000/conversations?userid=' + userId);
     };
     messageManager.postMessages = function (newMessage) {
         return $http.post('/messages', newMessage);

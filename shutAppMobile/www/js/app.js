@@ -47,6 +47,16 @@ app.config(function($stateProvider, $urlRouterProvider) {
     .state('messages', {
         url: '/messages',
         templateUrl: 'partials/messages-and-menu.html',
+        /*
+        views: {
+            'menuContent': {
+                templateUrl: 'partials/sidemenu.html'
+            },
+            'messagesContent': {
+                templateUrl: 'partials/messages.html'
+            }
+        },
+        */
         controller: 'MessagesController'
     })
     .state('settings', {

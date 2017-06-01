@@ -20,7 +20,7 @@ lib.factory('userManager', function ($http) {
 lib.factory('messageManager', function ($http) {
     var messageManager = {};
     messageManager.getChatrooms = function () {
-        return $http.get('chatrooms');
+        return $http.get('http://localhost:3000/chatrooms');
     };
     messageManager.getMessages = function (chatroomId) {
         return $http.get('http://localhost:3000/messages?chatroom=' + chatroomId);

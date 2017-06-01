@@ -48,18 +48,40 @@ angular.module('starter', ['ionic', 'lib'])
     $urlRouterProvider.otherwise('/login');
 })
 
-.controller('LoginController', function ($rootScope, messageManager) {
-    $rootScope.jepp = "Login";
+.controller('LoginController', function ($rootScope, $scope, userManager) {
+    $rootScope.currentView = "Login";
+
+    //Message to show in toast. Not implementet
+    $scope.errorMessage = "";
+
+    $scope.userLogin = function (credentials) {
+
+            userManager.login(credentials.username, credentials.password).then(function (res) {
+                console.log('Login successful.');
+                //Might use this....
+                $rootScope.isPrivate = false;
+                $rootScope.user = {
+                    id: res.data._id,
+                    name: res.data.username
+                };
+                $location.path(res.data.redirect); //Redirects to /messages.
+            }, function (res) {
+                console.log('Login failed on server.');
+                $scope.errorMessage = "Felaktiga inloggningsuppgifter.";
+            });
+
+        $rootScope.successMessage = "";
+    };
 })
 
 .controller('SignupController', function ($rootScope, messageManager) {
-    $rootScope.jepp = "Signup";
+    $rootScope.currentView = "Signup";
 })
 
 .controller('MessagesController', function ($rootScope, messageManager) {
-    $rootScope.jepp = "Messages";
+    $rootScope.currentView = "Messages";
 })
 
 .controller('SettingsController', function ($rootScope, messageManager) {
-    $rootScope.jepp = "Settings";
+    $rootScope.currentView = "Settings";
 })

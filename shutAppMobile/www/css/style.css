@@ -1,1 +1,36 @@
 /* Empty. Add your own CSS if you like */
+@font-face {
+    font-family: Catamaran-Thin;
+    src: url(../fonts/Catamaran-Thin.ttf);
+}
+
+@font-face {
+    font-family: Catamaran-Light;
+    src: url(../fonts/Catamaran-Light.ttf);
+}
+
+@font-face {
+    font-family: Raleway;
+    src: url(../fonts/Raleway-ExtraBold.ttf);
+}
+
+#shut-app-title {
+    color: #ccddcc;
+    font-family: Raleway;
+    font-size: 3rem;
+    text-align: center;
+}
+
+#login-container {
+    background-color: #52414C;
+}
+
+.input-field-container {
+    background-color: white;
+}
+
+form {
+    background-color: #ebe9ce;
+    padding: 0.6rem 0.6rem 0.001rem 0.6rem;
+    border-radius: 0.3rem;
+}

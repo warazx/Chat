@@ -11,6 +11,7 @@ $energized:                       #ffc900 !default;
 $assertive:                       #ef473a !default;
 $royal:                           #886aea !default;
 $dark:                            #444 !default;
+$shutapp:                         #52414C !default;
 
 
 // Base
@@ -125,6 +126,12 @@ $button-assertive-text:           #fff !default;
 $button-assertive-border:         darken($assertive, 10%) !default;
 $button-assertive-active-bg:      darken($assertive, 10%) !default;
 $button-assertive-active-border:  darken($assertive, 10%) !default;
+
+$button-shutapp-bg:             $shutapp !default;
+$button-shutapp-text:           #fff !default;
+$button-shutapp-border:         darken($shutapp, 10%) !default;
+$button-shutapp-active-bg:      darken($shutapp, 10%) !default;
+$button-shutapp-active-border:  darken($shutapp, 10%) !default;
 
 $button-balanced-bg:              $balanced !default;
 $button-balanced-text:            #fff !default;

@@ -1,36 +1,78 @@
 /* Empty. Add your own CSS if you like */
+
 @font-face {
     font-family: Catamaran-Thin;
     src: url(../fonts/Catamaran-Thin.ttf);
 }
-
 @font-face {
     font-family: Catamaran-Light;
     src: url(../fonts/Catamaran-Light.ttf);
 }
-
 @font-face {
     font-family: Raleway;
     src: url(../fonts/Raleway-ExtraBold.ttf);
 }
-
 #shut-app-title {
     color: #ccddcc;
     font-family: Raleway;
     font-size: 3rem;
     text-align: center;
 }
-
 #login-container {
     background-color: #52414C;
 }
-
 .input-field-container {
     background-color: white;
 }
-
 form {
     background-color: #ebe9ce;
     padding: 0.6rem 0.6rem 0.001rem 0.6rem;
     border-radius: 0.3rem;
+}
+.message-text {
+  font-size: 1em;
+  max-width: 78vw;
+  word-wrap: break-word;
+}
+.timestamp {
+  font-size: 0.7em;
+  color: #595959;
+}
+.username {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+.chat-message {
+  font-size: 1em;
+  margin-bottom: 0.5rem;
+}
+#chat-messages {
+  font-family: Catamaran-Light, sans-serif;
+  font-size: 1em;
+  height: auto;
+  width: 100%;
+  overflow-y: auto;
+  padding: 0em;
+}
+.message-input {
+  padding: 0 0 0 0.7rem;
+  margin-bottom: -2px;
+}
+.message-input-container {
+  padding: 0 0;
+}
+.bottommsg {
+  position: fixed;
+  bottom:0px;
+  width: 100%;
+}
+.divsend {
+  background-color: #eeeef2;
+  margin-left: 7px;
+}
+.iconsend {
+  font-size: 18px;
+}
+.nopadtop {
+  padding-top: 0px;
 }

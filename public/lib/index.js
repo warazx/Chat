@@ -23,7 +23,7 @@ lib.factory('messageManager', function ($http) {
         return $http.get('chatrooms');
     };
     messageManager.getMessages = function (chatroomId) {
-        return $http.get('/messages?chatroom=' + chatroomId);
+        return $http.get('http://localhost:3000/messages?chatroom=' + chatroomId);
     };
     messageManager.getPrivateMessages = function (user, otheruser) {
         return $http.get('/messages?user=' + user + '&otheruser=' + otheruser);

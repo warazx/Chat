@@ -9,7 +9,7 @@ lib.factory('userManager', function ($http) {
         return $http.get('/logout');
     };
     userManager.signupuser = function (signupCredentials) {
-        return $http.post('signup', signupCredentials);
+        return $http.post('http://localhost:3000/signup', signupCredentials);
     };
     userManager.updateUsername = function (newUsername) {
         return $http.post('/users/update', newUsername);

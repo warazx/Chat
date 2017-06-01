@@ -37,12 +37,19 @@
   width: 100%;
 }
 .divsend {
-  background-color: #eeeef2;
+  background-color: #efefef;
   margin-left: 7px;
 }
 .iconsend {
-  font-size: 18px;
+  background-color: #efefef;
+  font-size: 30px;
 }
 .nopadtop {
   padding-top: 0px;
+}
+.messages-content{
+  bottom: 2.3rem;
+}
+.message-input-field {
+  width: 100%;
 }

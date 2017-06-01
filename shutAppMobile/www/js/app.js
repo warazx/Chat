@@ -66,6 +66,7 @@ app.controller('SignupController', function ($rootScope, messageManager) {
 });
 
 app.controller('MessagesController', function ($rootScope, $scope, $ionicScrollDelegate, messageManager) {
+  
   messageManager.getMessages('591d5683f36d281c81b1e5ea').then(function(res) {
     $rootScope.messages = res.data;
     $ionicScrollDelegate.scrollBottom();

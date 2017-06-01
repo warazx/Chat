@@ -3,16 +3,16 @@ var lib = angular.module('lib', []);
 lib.factory('userManager', function ($http) {
     var userManager = {};
     userManager.login = function (username, password) {
-        return $http.get('login/' + username + '/' + password);
+        return $http.get('http://localhost:3000/login/' + username + '/' + password);
     };
     userManager.logout = function () {
-        return $http.get('/logout');
+        return $http.get('http://localhost:3000/logout');
     };
     userManager.signupuser = function (signupCredentials) {
         return $http.post('http://localhost:3000/signup', signupCredentials);
     };
     userManager.updateUsername = function (newUsername) {
-        return $http.post('/users/update', newUsername);
+        return $http.post('http://localhost:3000/users/update', newUsername);
     };
     return userManager;
 });

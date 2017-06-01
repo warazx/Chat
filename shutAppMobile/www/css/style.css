@@ -41,6 +41,7 @@ form {
 .username {
   font-weight: bold;
   font-size: 1.1em;
+  text-align: center;
 }
 .chat-message {
   font-size: 1em;

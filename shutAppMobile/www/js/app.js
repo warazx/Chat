@@ -294,6 +294,22 @@ app.controller('LeftSideController', function ($rootScope, $scope, messageManage
   socket.on('active users', function (arr) {
     $rootScope.activeUsers = arr;
   });
+
+  $scope.changeChatroom = function (index) {
+        //$location.path('/messages');
+        //$rootScope.isPrivate = false;
+        //$rootScope.selected = index;
+        $rootScope.privateRecipient = undefined;
+        //Leave chatroom if already in one.
+        if ($rootScope.selectedChatroom) {
+            mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
+        }
+        $rootScope.selectedChatroom = this.chatroom._id;
+        messageManager.getMessages($rootScope.selectedChatroom).then(function(res) {
+            $rootScope.messages = res.data;
+        });
+        mySocket.emit('join chatroom', $rootScope.selectedChatroom);
+    };
 });
 
 app.controller('SettingsController', function ($location, $scope, $rootScope, userManager, toaster) {

@@ -150,7 +150,7 @@ app.controller('LeftSideController', function ($rootScope, $scope, messageManage
     $scope.chatrooms = ["General", "Random", "FUN!!!"];
     */
 	//TODO change to real logged in user
-	$rootScope.user = { name: "Erika", id: "5927f744ac29ef07a783c7f5" };
+	//$rootScope.user = { name: "Erika", id: "5927f744ac29ef07a783c7f5" };
     socket.emit('connected', $rootScope.user);
     messageManager.getChatrooms().then(function (response) {
         $scope.chatrooms = response.data;

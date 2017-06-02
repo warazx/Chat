@@ -1,0 +1,26 @@
+<div class="item item-divider">
+Chatrum
+</div>
+<ion-list>
+    <ion-item ng-repeat="chatroom in chatrooms">
+    {{chatroom.name}}
+    </ion-item>
+</ion-list>
+
+<div class="item item-divider">
+Aktiva användare
+</div>
+<ion-list>
+    <ion-item ng-repeat="activeUser in activeUsers">
+    {{activeUser.name}}
+    </ion-item>
+</ion-list>
+
+<div class="item item-divider">
+Tidigare konversationer
+</div>
+<ion-list>
+    <ion-item ng-repeat="conversation in conversations">
+    {{conversation.name}}
+    </ion-item>
+</ion-list>

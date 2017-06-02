@@ -8,6 +8,7 @@ platforms
 plugins
 shutAppMobile/www/lib/angular*
 shutAppMobile/www/dist
+ngCordova
 
 ### Angular ###
 ## Angular ##

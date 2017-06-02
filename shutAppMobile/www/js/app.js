@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 
-var app = angular.module('starter', ['ionic', 'lib', 'ngSanitize', 'btford.socket-io']);
+var app = angular.module('starter', ['ionic', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova']);
 
 app.run(function($ionicPlatform, $rootScope) {
   $ionicPlatform.ready(function() {
@@ -30,6 +30,18 @@ app.factory('socket', function(socketFactory) {
     ioSocket: myIoSocket
   });
   return mySocket;
+});
+
+app.factory('toaster', function($cordovaToast) {
+  return {
+    toast: function(message, duration, location) {
+      $cordovaToast.show(message, duration, location).then(function(success) {
+        console.log("The toast was shown");
+      }, function (error) {
+        console.log("The toast was not shown due to " + error);
+      });
+    }
+  }
 });
 
 app.config(function($stateProvider, $urlRouterProvider) {
@@ -89,19 +101,24 @@ app.controller('LoginController', function ($rootScope, $scope, $location, userM
     };
 });
 
-app.controller('SignupController', function ($location, $scope, $rootScope, userManager) {
-  $scope.errorMessage = "";
+app.controller('SignupController', function ($location, $scope, $rootScope, userManager, toaster) {
   $rootScope.successMessage = "";
   $scope.userSignup = function (signup) {
     if (signup === undefined || signup.email === undefined || signup.username === undefined || signup.password === undefined || signup.passwordagain === undefined) {
       var message = "";
-      if (signup.username === undefined) message += "Du måste välja ett användarnamn som innehåller minst tre tecken och max 20 tecken." +
+      if(signup.username === undefined) message += "Du måste välja ett användarnamn som innehåller minst tre tecken och max 20 tecken." +
       "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";
-      if (signup.email === undefined) message += "\nFelaktig emailadress.";
-      if (signup.password === undefined) message += "\nDu måste välja ett lösenord som innehåller minst sex tecken och max 50 tecken.";
-      $scope.errorMessage = message;
+      if(signup.email === undefined) {
+        if(message.length > 0) message += "\n";
+        message += "Felaktig emailadress.";
+      };
+      if(signup.password === undefined) {
+        if(message.length > 0) message += "\n";
+        message += "Du måste välja ett lösenord som innehåller minst sex tecken och max 50 tecken.";
+      };
+      toaster.toast(message, 'long', 'bottom');
     } else if(signup.password !== signup.passwordagain) {
-      $scope.errorMessage = "Du skrev in lösenordet olika i de två fälten.";
+      toaster.toast('Du skrev in lösenordet olika i de två fälten.', 'long', 'bottom');
     } else {
       userManager.signupuser({
         username: signup.username,
@@ -113,16 +130,18 @@ app.controller('SignupController', function ($location, $scope, $rootScope, user
         $location.path(res.data.redirect);
       }, function (res) { //Failed codes 400-599+?
         console.log("Signup failed.");
+        var message = "";
         switch (res.data.reason) {
           case "username":
-            $scope.errorMessage = "Användarnamnet är upptaget.";
+            message = "Användarnamnet är upptaget.";
             break;
           case "email":
-            $scope.errorMessage = "Emailadressen är redan registrerad.";
+            message = "Emailadressen är redan registrerad.";
             break;
           default:
-            $scope.errorMessage = "Det blev lite fel!";
+            message = "Det blev lite fel!";
         }
+        toaster.toast(message, 'long', 'bottom');
       });
     }
   };
@@ -243,9 +262,7 @@ app.controller('LeftSideController', function ($rootScope, $scope, $location, me
 })
 */
 
-app.controller('SettingsController', function ($location, $scope, $rootScope, userManager) {
-  $scope.errorMessage = "";
-
+app.controller('SettingsController', function ($location, $scope, $rootScope, userManager, toaster) {
   $scope.changeUsername = function(newUsername) {
     if(newUsername) {
         userManager.updateUsername({
@@ -253,15 +270,16 @@ app.controller('SettingsController', function ($location, $scope, $rootScope, us
             "username": newUsername
         }).then(function () {
             $rootScope.user.name = newUsername;
-            $scope.errorMessage = "Användarnamnet har ändrats.";
+            toaster.toast('Användarnamnet har ändrats.', 'long', 'bottom');
         }, function () {
-            $scope.errorMessage = "Användarnamnet gick inte att ändra.";
+            toaster.toast('Användarnamnet gick inte att ändra.', 'long', 'bottom');
         });
         //TODO: Turn on again after sockets work
         //mySocket.emit('change username', {"id": $rootScope.user.id, "newUserName": newUsername});
     } else {
-        $scope.errorMessage = "Du måste välja ett användarnamn som innehåller minst tre tecken och max 20 tecken." +
+        var message = "Du måste välja ett användarnamn som innehåller minst tre tecken och max 20 tecken." +
             "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";
+        toaster.toast(message, 'long', 'bottom');
     }
   };
 

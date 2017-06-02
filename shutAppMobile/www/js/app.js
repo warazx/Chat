@@ -70,7 +70,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
 });
 
 app.controller('LoginController', function ($rootScope, $scope, $location, userManager, toaster) {
-    $rootScope.currentView = "Login";
 
   //Needed on scope before login credentials are entered by user.
   $scope.login = {};
@@ -83,8 +82,6 @@ app.controller('LoginController', function ($rootScope, $scope, $location, userM
         } else {
             userManager.login($scope.login.username, $scope.login.password).then(function (res) {
                 console.log('Login successful.');
-                //Might use this....
-                $rootScope.isPrivate = false;
                 $rootScope.user = {
                     id: res.data._id,
                     name: res.data.username
@@ -95,12 +92,10 @@ app.controller('LoginController', function ($rootScope, $scope, $location, userM
                 toaster.toast('Felaktiga inloggningsuppgifter.', 'long', 'bottom');
             });
         }
-        $rootScope.successMessage = "";
     };
 });
 
 app.controller('SignupController', function ($location, $scope, $rootScope, userManager, toaster) {
-  $rootScope.successMessage = "";
   $scope.userSignup = function (signup) {
     if (signup === undefined || signup.email === undefined || signup.username === undefined || signup.password === undefined || signup.passwordagain === undefined) {
       var message = "";
@@ -124,7 +119,7 @@ app.controller('SignupController', function ($location, $scope, $rootScope, user
         password: signup.password
       }).then(function (res) { //Successful codes 100-399.
         console.log("Signup OK. Redirecting to login.");
-        $rootScope.successMessage = "Användare registrerad.";
+        toaster.toast("Användare registrerad.", "long", "bottom");
         $location.path(res.data.redirect);
       }, function (res) { //Failed codes 400-599+?
         console.log("Signup failed.");

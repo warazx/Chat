@@ -31,7 +31,7 @@ app.run(function($ionicPlatform, $rootScope) {
 });
 
 app.factory('socket', function(socketFactory) {
-  var myIoSocket = io.connect('http://localhost:3000');
+  var myIoSocket = io.connect('http://shutapp.nu:3000');
   mySocket = socketFactory({
     ioSocket: myIoSocket
   });

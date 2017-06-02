@@ -32,10 +32,10 @@ lib.factory('messageManager', function ($http) {
         return $http.get('http://localhost:3000/conversations?userid=' + userId);
     };
     messageManager.postMessages = function (newMessage) {
-        return $http.post('/messages', newMessage);
+        return $http.post('http://localhost:3000/messages', newMessage);
     };
     messageManager.postPrivateMessage = function (newPrivateMessage) {
-        return $http.post('/private-messages', newPrivateMessage);
+        return $http.post('http://localhost:3000/private-messages', newPrivateMessage);
     };
     return messageManager;
 });

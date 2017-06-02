@@ -84,3 +84,7 @@ form {
 .message-input-field {
   width: 100%;
 }
+.markedroom {
+  background-color: #DDDDFF;
+  color: #595959;
+}

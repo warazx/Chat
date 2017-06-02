@@ -265,21 +265,6 @@ controllers.controller('MessagesController', function ($scope, $rootScope, $loca
             }
         };
 
-        $scope.postPrivateMessage = function () {
-            var newPrivateMessage = {
-                "senderId": $rootScope.user.id,
-                "senderName": $rootScope.user.name,
-                "timestamp": new Date(),
-                "text": $scope.textMessage,
-                "recipientId": $rootScope.privateRecipient.id,
-                "recipientName": $rootScope.privateRecipient.name
-            };
-            //Send a direct private message.
-            mySocket.emit('private message', newPrivateMessage);
-            //Post the message to the database
-            messageManager.postPrivateMessage(newPrivateMessage);
-        };
-
         $scope.blankTrim = function blankTrim(str) {
             var newStr = str;
             while (newStr.indexOf("&nbsp;") >= 0) {

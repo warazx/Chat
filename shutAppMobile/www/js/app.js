@@ -106,10 +106,16 @@ app.controller('SignupController', function ($location, $scope, $rootScope, user
   $scope.userSignup = function (signup) {
     if (signup === undefined || signup.email === undefined || signup.username === undefined || signup.password === undefined || signup.passwordagain === undefined) {
       var message = "";
-      if (signup.username === undefined) message += "Du måste välja ett användarnamn som innehåller minst tre tecken och max 20 tecken." +
+      if(signup.username === undefined) message += "Du måste välja ett användarnamn som innehåller minst tre tecken och max 20 tecken." +
       "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";
-      if (signup.email === undefined) message += "\nFelaktig emailadress.";
-      if (signup.password === undefined) message += "\nDu måste välja ett lösenord som innehåller minst sex tecken och max 50 tecken.";
+      if(signup.email === undefined) {
+        if(message.length > 0) message += "\n";
+        message += "Felaktig emailadress.";
+      };
+      if(signup.password === undefined) {
+        if(message.length > 0) message += "\n";
+        message += "Du måste välja ett lösenord som innehåller minst sex tecken och max 50 tecken.";
+      };
       toaster.toast(message, 'long', 'bottom');
     } else if(signup.password !== signup.passwordagain) {
       toaster.toast('Du skrev in lösenordet olika i de två fälten.', 'long', 'bottom');

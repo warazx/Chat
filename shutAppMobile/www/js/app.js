@@ -21,6 +21,12 @@ app.run(function($ionicPlatform, $rootScope) {
     if(window.StatusBar) {
       StatusBar.styleDefault();
     }
+    window.addEventListener('native.keyboardshow', keyboardShowHideHandler);
+    window.addEventListener('native.keyboardhide', keyboardShowHideHandler);
+
+    function keyboardShowHideHandler(e) {
+      $rootScope.$broadcast("keyboardShowHideEvent");
+    }
   });
 });
 
@@ -44,7 +50,7 @@ app.factory('toaster', function($cordovaToast) {
   }
 });
 
-app.config(function($stateProvider, $urlRouterProvider) {
+app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
   $stateProvider
     .state('login', {
       url: '/login',
@@ -67,13 +73,14 @@ app.config(function($stateProvider, $urlRouterProvider) {
       controller: 'SettingsController'
     });
   $urlRouterProvider.otherwise('/login');
+  $ionicConfigProvider.views.maxCache(0);
 });
 
 app.controller('LoginController', function ($rootScope, $scope, $location, userManager, toaster) {
-
   //Needed on scope before login credentials are entered by user.
   $scope.login = {};
-  $rootScope.user = {};
+  //$rootScope.user = {};
+
 
     $scope.userLogin = function () {
         if ($scope.login.username === undefined || $scope.login.password === undefined) {
@@ -143,6 +150,10 @@ app.controller('SignupController', function ($location, $scope, $rootScope, user
 app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicScrollDelegate, $ionicSideMenuDelegate, messageManager, socket) {
   socket.removeAllListeners();
 
+  $scope.$on("keyboardShowHideEvent", function() {
+    $ionicScrollDelegate.scrollBottom();
+  })
+
   $rootScope.$watch('messages', function () {
     if (!$rootScope.messages || $rootScope.messages.length <= 0) {
       $scope.noMessages = true;
@@ -189,21 +200,6 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     socket.on('disconnect message', function (msg) {
       $rootScope.statusMessage = msg;
     });
-	messageManager.getConversations($rootScope.user.id).then(function (response) {
-    //$rootScope.conversations will always hold all the people the user has chatted with. offlineConversations holds those that are offline.
-    //offlineConversations is what is shown in the side menu.
-		  $rootScope.conversations = $rootScope.offlineConversations = response.data;
-	});
-  socket.on('active users', function (arr) {
-      $rootScope.activeUsers = arr;
-      var activeUserIds = $rootScope.activeUsers.map(x=>x.id);
-      $rootScope.offlineConversations = [];
-      for(var i=0; i<$rootScope.conversations.length; i++) {
-        if(!activeUserIds.includes($rootScope.conversations[i].id)) {
-            $rootScope.offlineConversations.push($rootScope.conversations[i]);
-        }
-      }
-  });
 
   $rootScope.changeRecipient = function changeRecipient(recipientId) {
         $rootScope.selected = recipientId;
@@ -292,16 +288,55 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
   }
 });
 
-app.controller('LeftSideController', function ($rootScope, $scope, messageManager, socket) {
-  messageManager.getChatrooms().then(function (response) {
-    $scope.chatrooms = response.data;
-  });
-  messageManager.getConversations($rootScope.user.id).then(function (response) {
-    $rootScope.conversations = response.data;
-  });
-  socket.on('active users', function (arr) {
-    $rootScope.activeUsers = arr;
-  });
+
+app.controller('LeftSideController', function ($rootScope, $location, $scope, messageManager, socket) {
+  /*
+   $scope.chatrooms = ["General", "Random", "FUN!!!"];
+   */
+  //TODO change to real logged in user
+  //$rootScope.user = { name: "Erika", id: "5927f744ac29ef07a783c7f5" };
+
+  if ($rootScope.user) {
+    messageManager.getChatrooms().then(function (response) {
+      $scope.chatrooms = response.data;
+    });
+    messageManager.getConversations($rootScope.user.id).then(function (response) {
+      //$rootScope.conversations will always hold all the people the user has chatted with. offlineConversations holds those that are offline.
+      //offlineConversations is what is shown in the side menu.
+        $rootScope.conversations = $rootScope.offlineConversations = response.data;
+    });
+    socket.on('active users', function (arr) {
+        $rootScope.activeUsers = arr;
+        var activeUserIds = $rootScope.activeUsers.map(x=>x.id);
+        $rootScope.offlineConversations = [];
+        for(var i=0; i<$rootScope.conversations.length; i++) {
+          if(!activeUserIds.includes($rootScope.conversations[i].id)) {
+              $rootScope.offlineConversations.push($rootScope.conversations[i]);
+          }
+        }
+    });
+    socket.on('active users', function (arr) {
+      $rootScope.activeUsers = arr;
+    });
+    $scope.changeChatroom = function (index) {
+      //$location.path('/messages');
+      //$rootScope.isPrivate = false;
+      //$rootScope.selected = index;
+      $rootScope.privateRecipient = undefined;
+      //Leave chatroom if already in one.
+      if ($rootScope.selectedChatroom) {
+        mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
+      }
+      $rootScope.selectedChatroom = this.chatroom._id;
+      messageManager.getMessages($rootScope.selectedChatroom).then(function(res) {
+        $rootScope.messages = res.data;
+      });
+      mySocket.emit('join chatroom', $rootScope.selectedChatroom);
+    };
+  } else {
+    console.log("$rootScope.user is undefined, but WHYYY?!?!");
+    $location.path("/");
+  }
 });
 
 app.controller('SettingsController', function ($location, $scope, $rootScope, userManager, toaster) {

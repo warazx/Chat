@@ -27,12 +27,12 @@ app.use(cors());
 
 // Store profile picture on disc, specify path
 var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, __dirname + '/uploads')
-  },
-  filename: function (req, file, cb) {
-    cb(null, createProfilePictureFileName(file.originalname, req.body.userid))
-  }
+    destination: function (req, file, cb) {
+        cb(null, __dirname + '/uploads')
+    },
+    filename: function (req, file, cb) {
+        cb(null, createProfilePictureFileName(file.originalname, req.body.userid))
+    }
 })
 var upload = multer({ storage: storage })
 

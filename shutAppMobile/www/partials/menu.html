@@ -2,7 +2,7 @@
 Chatrum
 </div>
 <ion-list>
-    <ion-item ng-repeat="chatroom in chatrooms">
+    <ion-item ng-repeat="chatroom in chatrooms" ng-click="changeChatroom(chatroom._id)">
     {{chatroom.name}}
     </ion-item>
 </ion-list>

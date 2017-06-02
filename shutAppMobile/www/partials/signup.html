@@ -6,26 +6,25 @@
   <ion-content>
     <form name="signupForm" novalidate="true">
       <div class="list">
-        <label class="item item-input item-stacked-label">
+        <label class="item item-input item-floating-label">
           <span class="input-label">Användarnamn</span>
           <input type="text" ng-minlength="3" ng-maxlength="20" ng-model="signup.username" ng-pattern="/^[0-9a-zA-Z]{3,20}$/" placeholder="Coolkid" required>
         </label>
-        <label class="item item-input item-stacked-label">
+        <label class="item item-input item-floating-label">
           <span class="input-label">Email</span>
           <input type="email" ng-minlength="5" ng-model="signup.email" placeholder="c@ol.kid">
         </label>
-        <label class="item item-input item-stacked-label">
+        <label class="item item-input item-floating-label">
           <span class="input-label">Lösenord</span>
           <input type="password" placeholder="******" ng-minlength="6" ng-maxlength="50" ng-model="signup.password" required>
         </label>
-        <label class="item item-input item-stacked-label">
+        <label class="item item-input item-floating-label">
           <span class="input-label">Upprepa Lösenord</span>
           <input type="password" placeholder="******" ng-minlength="6" ng-maxlength="50" ng-model="signup.passwordagain" required>
         </label>
-        <button class="button button-block button-royal" ng-click="userSignup(signup)">
+        <button class="button button-block button-shutapp" ng-click="userSignup(signup)">
           Registrera
         </button>
-          <p class="error-message">{{errorMessage}}</p>
       </div>
     </form>
   </ion-content>

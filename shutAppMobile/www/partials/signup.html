@@ -1,31 +1,33 @@
 <ion-view view-title="Signup">
-  <ion-nav-bar class="bar-stable">
-    <ion-nav-back-button>
-    </ion-nav-back-button>
-  </ion-nav-bar>
-  <ion-content>
-    <form name="signupForm" novalidate="true">
-      <div class="list">
-        <label class="item item-input item-floating-label">
-          <span class="input-label">Användarnamn</span>
-          <input type="text" ng-minlength="3" ng-maxlength="20" ng-model="signup.username" ng-pattern="/^[0-9a-zA-Z]{3,20}$/" placeholder="Coolkid" required>
-        </label>
-        <label class="item item-input item-floating-label">
-          <span class="input-label">Email</span>
-          <input type="email" ng-minlength="5" ng-model="signup.email" placeholder="c@ol.kid">
-        </label>
-        <label class="item item-input item-floating-label">
-          <span class="input-label">Lösenord</span>
-          <input type="password" placeholder="******" ng-minlength="6" ng-maxlength="50" ng-model="signup.password" required>
-        </label>
-        <label class="item item-input item-floating-label">
-          <span class="input-label">Upprepa Lösenord</span>
-          <input type="password" placeholder="******" ng-minlength="6" ng-maxlength="50" ng-model="signup.passwordagain" required>
-        </label>
-        <button class="button button-block button-shutapp" ng-click="userSignup(signup)">
-          Registrera
-        </button>
-      </div>
-    </form>
-  </ion-content>
+    <ion-nav-bar class="bar-stable">
+        <ion-nav-back-button>
+        </ion-nav-back-button>
+    </ion-nav-bar>
+    <ion-content class="login-signup-container" padding="true">
+        <div class="list">
+            <form name="signupForm" novalidate="true">
+                <div class="input-field-container">
+                    <label class="item item-input item-floating-label">
+                        <span class="input-label">Användarnamn</span>
+                        <input type="text" ng-minlength="3" ng-maxlength="20" ng-model="signup.username" ng-pattern="/^[0-9a-zA-Z]{3,20}$/" placeholder="Användarnamn" required>
+                    </label>
+                    <label class="item item-input item-floating-label">
+                        <span class="input-label">Email</span>
+                        <input type="email" ng-minlength="5" ng-model="signup.email" placeholder="Email">
+                    </label>
+                    <label class="item item-input item-floating-label">
+                        <span class="input-label">Lösenord</span>
+                        <input type="password" placeholder="Lösenord" ng-minlength="6" ng-maxlength="50" ng-model="signup.password" required>
+                    </label>
+                    <label class="item item-input item-floating-label">
+                        <span class="input-label">Upprepa Lösenord</span>
+                        <input type="password" placeholder="Upprepa Lösenord" ng-minlength="6" ng-maxlength="50" ng-model="signup.passwordagain" required>
+                    </label>
+                </div>
+                <button class="button button-block button-shutapp" ng-click="userSignup(signup)">
+                    Registrera
+                </button>
+            </form>
+        </div>
+    </ion-content>
 </ion-view>

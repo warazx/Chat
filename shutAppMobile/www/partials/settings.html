@@ -1,9 +1,26 @@
 <ion-view view-title="Inställningar">
-    <ion-nav-bar class="bar-stable">
-      <ion-nav-back-button>
-      </ion-nav-back-button>
-    </ion-nav-bar>
-    <ion-content>
-        {{jepp}}
-    </ion-content>
+  <ion-nav-bar class="bar-stable">
+    <ion-nav-back-button>
+    </ion-nav-back-button>
+  </ion-nav-bar>
+  <ion-content>
+    <div class="username">
+      <h1>{{user.name}}</h1>
+    </div>
+    <div class="item-body">
+      <img class="full-image" src="https://img.devrant.io/devrant/rant/r_88286_ZsK5W.jpg">
+    </div>
+    <div class="item item-input-inset">
+      <label class="item-input-wrapper">
+        <input type="text" placeholder="Nytt användarnamn" ng-minlength="3" ng-maxlength="20" ng-pattern="/^[0-9a-zA-Z]{3,20}$/" ng-model="settings.username">
+      </label>
+      <button class="button button-small" ng-click="changeUsername(settings.username)">
+        Ändra
+      </button>
+    </div>
+    <p class="error-message">{{errorMessage}}</p>
+      <button class="button button-block button-energized" ng-click="logout()">
+        Logga ut
+      </button>
+  </ion-content>
 </ion-view>

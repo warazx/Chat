@@ -145,12 +145,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $ionicScrollD
   };
 });
 
-app.controller('LeftSideController', function ($rootScope, $scope, messageManager, socket) {
-    /*
-    $scope.chatrooms = ["General", "Random", "FUN!!!"];
-    */
-	//TODO change to real logged in user
-	//$rootScope.user = { name: "Erika", id: "5927f744ac29ef07a783c7f5" };
+app.controller('LeftSideController', function ($rootScope, $scope, $location, messageManager, socket) {
     socket.emit('connected', $rootScope.user);
     messageManager.getChatrooms().then(function (response) {
         $scope.chatrooms = response.data;
@@ -161,6 +156,27 @@ app.controller('LeftSideController', function ($rootScope, $scope, messageManage
     socket.on('active users', function (arr) {
         $rootScope.activeUsers = arr;
     });
+
+  $rootScope.changeRecipient = function changeRecipient(recipientId) {
+        //$rootScope.isPrivate = true;
+        //$rootScope.selected = index;
+        $rootScope.privateRecipient = this.privateRoom;
+        /*
+        if ($rootScope.newMessages.includes(this.privateRoom.id)) {
+            $rootScope.newMessages.splice($rootScope.newMessages.indexOf(this.privateRoom.id), 1);
+        }
+        */
+        if (!$rootScope.user) {
+            console.log("User not logged in! Redirecting to login.");
+            $location.path('/');
+        } else {
+            $location.path('/messages');
+            messageManager.getPrivateMessages($rootScope.user.id, $rootScope.privateRecipient.id).then(function(res) {
+                $rootScope.messages = res.data;
+            });
+        }
+    };
+
     /*
     //get list of users with which we have had a conversation
     messageManager.getConversations($rootScope.user.id).then(function(res) {

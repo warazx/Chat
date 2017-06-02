@@ -11,8 +11,8 @@ Chatrum
 Aktiva användare
 </div>
 <ion-list>
-    <ion-item ng-repeat="activeUser in activeUsers">
-    {{activeUser.name}}
+    <ion-item ng-repeat="privateRoom in activeUsers" ng-click="changeRecipient(privateRoom.id)">
+    {{privateRoom.name}}
     </ion-item>
 </ion-list>
 
@@ -20,7 +20,7 @@ Aktiva användare
 Tidigare konversationer
 </div>
 <ion-list>
-    <ion-item ng-repeat="conversation in conversations">
-    {{conversation.name}}
+    <ion-item ng-repeat="privateRoom in conversations" ng-click="changeRecipient(privateRoom.id)">
+    {{privateRoom.name}}
     </ion-item>
 </ion-list>

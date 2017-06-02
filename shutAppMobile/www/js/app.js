@@ -77,8 +77,6 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 });
 
 app.controller('LoginController', function ($rootScope, $scope, $location, userManager, toaster) {
-  console.log("LOGINCTRL:");
-  console.log($rootScope);
   //Needed on scope before login credentials are entered by user.
   $scope.login = {};
   //$rootScope.user = {};
@@ -151,9 +149,6 @@ app.controller('SignupController', function ($location, $scope, $rootScope, user
 
 app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicScrollDelegate, $ionicSideMenuDelegate, messageManager, socket) {
   socket.removeAllListeners();
-
-  console.log("MSGCTRL:");
-  console.log($rootScope);
 
   $scope.$on("keyboardShowHideEvent", function() {
     $ionicScrollDelegate.scrollBottom();
@@ -308,6 +303,21 @@ app.controller('LeftSideController', function ($rootScope, $location, $scope, me
     socket.on('active users', function (arr) {
       $rootScope.activeUsers = arr;
     });
+    $scope.changeChatroom = function (index) {
+      //$location.path('/messages');
+      //$rootScope.isPrivate = false;
+      //$rootScope.selected = index;
+      $rootScope.privateRecipient = undefined;
+      //Leave chatroom if already in one.
+      if ($rootScope.selectedChatroom) {
+        mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
+      }
+      $rootScope.selectedChatroom = this.chatroom._id;
+      messageManager.getMessages($rootScope.selectedChatroom).then(function(res) {
+        $rootScope.messages = res.data;
+      });
+      mySocket.emit('join chatroom', $rootScope.selectedChatroom);
+    };
   } else {
     console.log("$rootScope.user is undefined, but WHYYY?!?!");
     $location.path("/");

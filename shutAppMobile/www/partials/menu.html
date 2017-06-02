@@ -20,7 +20,7 @@ Aktiva användare
 Tidigare konversationer
 </div>
 <ion-list>
-    <ion-item ng-repeat="privateRoom in conversations" ng-click="changeRecipient(privateRoom.id)">
+    <ion-item ng-repeat="privateRoom in offlineConversations" ng-click="changeRecipient(privateRoom.id)">
     {{privateRoom.name}}
     </ion-item>
 </ion-list>

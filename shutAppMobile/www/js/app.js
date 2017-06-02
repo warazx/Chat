@@ -151,14 +151,17 @@ app.controller('LeftSideController', function ($rootScope, $scope, $location, me
         $scope.chatrooms = response.data;
     });
 	messageManager.getConversations($rootScope.user.id).then(function (response) {
+    //$rootScope.conversations will always hold all the people the user has chatted with. offlineConversations holds those that are offline.
+    //offlineConversations is what is shown in the side menu.
 		  $rootScope.conversations = $rootScope.offlineConversations = response.data;
 	});
   socket.on('active users', function (arr) {
       $rootScope.activeUsers = arr;
       var activeUserIds = $rootScope.activeUsers.map(x=>x.id);
+      $rootScope.offlineConversations = [];
       for(var i=0; i<$rootScope.conversations.length; i++) {
-        if(activeUserIds.includes($rootScope.conversations[i].id)) {
-
+        if(!activeUserIds.includes($rootScope.conversations[i].id)) {
+            $rootScope.offlineConversations.push($rootScope.conversations[i]);
         }
       }
   });

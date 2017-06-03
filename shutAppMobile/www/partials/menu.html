@@ -1,26 +1,29 @@
-<div class="item item-divider">
-Chatrum
-</div>
-<ion-list>
-    <ion-item ng-repeat="chatroom in chatrooms" ng-click="changeChatroom(chatroom._id)">
-    {{chatroom.name}}
-    </ion-item>
-</ion-list>
+<ion-content>
+    <div class="item item-divider">
+    Chatrum
+    </div>
+    <ion-list>
+        <ion-item ng-repeat="chatroom in chatrooms" ng-click="changeChatroom(chatroom._id)">
+        {{chatroom.name}}
+        </ion-item>
+    </ion-list>
 
-<div class="item item-divider">
-Aktiva användare
-</div>
-<ion-list>
-    <ion-item ng-repeat="privateRoom in activeUsers track by privateRoom.id" ng-click="changeRecipient(privateRoom.id)" ng-class="{markedroom: selected==privateRoom.id}">
-    {{privateRoom.name}}
-    </ion-item>
-</ion-list>
+    <div class="item item-divider">
+    Aktiva användare
+    </div>
+    <ion-list>
+        <ion-item ng-repeat="privateRoom in activeUsers track by privateRoom.id" ng-click="changeRecipient(privateRoom.id)" ng-class="{markedroom: selected==privateRoom.id}">
+        <i ng-class="{icon: true, 'ion-email': hadConversation(privateRoom.id)}"></i>
+        {{privateRoom.name}}
+        </ion-item>
+    </ion-list>
 
-<div class="item item-divider">
-Tidigare konversationer
-</div>
-<ion-list>
-    <ion-item ng-repeat="privateRoom in offlineConversations track by privateRoom.id" ng-click="changeRecipient(privateRoom.id)" ng-class="{markedroom: selected==privateRoom.id}">
-    {{privateRoom.name}}
-    </ion-item>
-</ion-list>
+    <div class="item item-divider">
+    Tidigare konversationer
+    </div>
+    <ion-list>
+        <ion-item ng-repeat="privateRoom in offlineConversations track by privateRoom.id" ng-click="changeRecipient(privateRoom.id)" ng-class="{markedroom: selected==privateRoom.id}">
+        {{privateRoom.name}}
+        </ion-item>
+    </ion-list>
+</ion-content>

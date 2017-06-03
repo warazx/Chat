@@ -290,11 +290,10 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
 
 
 app.controller('LeftSideController', function ($rootScope, $location, $scope, messageManager, socket) {
-  /*
-   $scope.chatrooms = ["General", "Random", "FUN!!!"];
-   */
-  //TODO change to real logged in user
-  //$rootScope.user = { name: "Erika", id: "5927f744ac29ef07a783c7f5" };
+  
+  $scope.hadConversation = function(userId) {
+    return $rootScope.conversations.map(x=>x.id).includes(userId);
+  };
 
   if ($rootScope.user) {
     messageManager.getChatrooms().then(function (response) {
@@ -303,17 +302,12 @@ app.controller('LeftSideController', function ($rootScope, $location, $scope, me
     messageManager.getConversations($rootScope.user.id).then(function (response) {
       //$rootScope.conversations will always hold all the people the user has chatted with. offlineConversations holds those that are offline.
       //offlineConversations is what is shown in the side menu.
-        $rootScope.conversations = $rootScope.offlineConversations = response.data;
+        $rootScope.conversations = response.data;
     });
     socket.on('active users', function (arr) {
         $rootScope.activeUsers = arr;
-        var activeUserIds = $rootScope.activeUsers.map(x=>x.id);
-        $rootScope.offlineConversations = [];
-        for(var i=0; i<$rootScope.conversations.length; i++) {
-          if(!activeUserIds.includes($rootScope.conversations[i].id)) {
-              $rootScope.offlineConversations.push($rootScope.conversations[i]);
-          }
-        }
+        var activeUserIds = arr.map(x=>x.id);
+        $rootScope.offlineConversations = $rootScope.conversations.filter(x=>!activeUserIds.includes(x.id));
     });
     socket.on('active users', function (arr) {
       $rootScope.activeUsers = arr;

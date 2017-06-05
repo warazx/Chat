@@ -211,7 +211,6 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
         $rootScope.newMessages.push(message.senderId);
         //whistleAudio.play();
       }
-      $scope.text.message = "";
     });
     mySocket.on('connect message', function (msg) {
       $rootScope.statusMessage = msg;
@@ -225,6 +224,9 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
         $rootScope.selected = recipientId;
         $rootScope.privateRecipient = this.privateRoom;
         $rootScope.chatroom = undefined;
+        if ($rootScope.selectedChatroom) {
+            mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
+        }
         /*
         if ($rootScope.newMessages.includes(this.privateRoom.id)) {
             $rootScope.newMessages.splice($rootScope.newMessages.indexOf(this.privateRoom.id), 1);

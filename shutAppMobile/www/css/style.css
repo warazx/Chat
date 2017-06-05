@@ -154,3 +154,8 @@ ion-nav-view {
   max-height: 30px;
   line-height: 22px;
 }
+.change-username-container {
+  margin: 0 1rem;
+  padding: 0.3rem;
+  border-radius: 0.3rem;
+}

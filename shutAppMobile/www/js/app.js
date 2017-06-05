@@ -310,7 +310,9 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
   }
 });
 
-app.controller('LeftSideController', function ($rootScope, $location, $timeout, $ionicSideMenuDelegate, $ionicScrollDelegate, $scope, messageManager, mySocket) {
+app.controller('LeftSideController', function ($rootScope, $location, $timeout, $ionicSideMenuDelegate, $ionicScrollDelegate, $scope, messageManager, mySocket, toaster) {
+  $scope.newChatroom = {};
+
   $timeout(function() {
     $scope.$watch(function () {
       return $ionicSideMenuDelegate.getOpenRatio();
@@ -323,6 +325,32 @@ app.controller('LeftSideController', function ($rootScope, $location, $timeout, 
 
   $scope.hadConversation = function(userId) {
     return $rootScope.conversations.map(x=>x.id).includes(userId);
+  };
+
+  $scope.toggleAddChatroom = function() {
+    $scope.addMode = true;
+  };
+
+  $scope.addChatroom = function() {
+    messageManager.addChatroom({"name": $scope.newChatroom.name}).then(function(res) {
+      console.log(res);
+      toaster.toast('Chatrummet ' + $scope.newChatroom.name + ' har skapats.', 'short', 'bottom');
+    }, function(res) {
+      switch(res.status) {
+        case 400:
+          toaster.toast('Chatrummet finns redan.', 'short', 'bottom');
+          break;
+          case 406:
+            toaster.toast('Namnet måste vara minst 3 tecken långt.', 'short', 'bottom');
+            break;
+        case 500:
+          toaster.toast('Databasfel: Chatrummet kunde inte skapas.', 'short', 'bottom');
+          break;
+        default:
+          toaster.toast('Okänt fel.', 'short', 'bottom');
+      }
+    });
+    $scope.addMode = false;
   };
 
   if ($rootScope.user) {
@@ -341,6 +369,11 @@ app.controller('LeftSideController', function ($rootScope, $location, $timeout, 
     });
     mySocket.on('active users', function (arr) {
       $rootScope.activeUsers = arr;
+    });
+    socket.on('refresh chatroom', function (chatroom) {
+      messageManager.getChatrooms().then(function (response) {
+        $scope.chatrooms = response.data;
+      });
     });
     $scope.changeChatroom = function (index) {
       $rootScope.isPrivate = false;

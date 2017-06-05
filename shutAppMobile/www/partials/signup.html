@@ -1,8 +1,4 @@
-<ion-view view-title="Signup">
-    <ion-nav-bar class="bar-stable">
-        <ion-nav-back-button>
-        </ion-nav-back-button>
-    </ion-nav-bar>
+<ion-view>
     <ion-content class="login-signup-container" padding="true">
         <div class="list">
             <form name="signupForm" novalidate="true">
@@ -27,6 +23,9 @@
                 <button class="button button-block button-shutapp" ng-click="userSignup(signup)">
                     Registrera
                 </button>
+                <div id="home-link-container">
+                  <a href="#!/">Logga in?</a>
+                </div>
             </form>
         </div>
     </ion-content>

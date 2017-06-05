@@ -3,8 +3,8 @@
     <ion-nav-back-button>
     </ion-nav-back-button>
   </ion-nav-bar>
-  <ion-content>
-    <div class="username">
+  <ion-content id="settings-page" padding="true">
+    <div class="settings-username">
       <h1>{{user.name}}</h1>
     </div>
     <div class="item-body">
@@ -14,11 +14,9 @@
       <label class="item-input-wrapper">
         <input type="text" placeholder="Nytt användarnamn" ng-minlength="3" ng-maxlength="20" ng-pattern="/^[0-9a-zA-Z]{3,20}$/" ng-model="settings.username">
       </label>
-      <button class="button button-small" ng-click="changeUsername(settings.username)">
-        Ändra
-      </button>
+      <button class="button change-username-button ion-compose" ng-click="changeUsername(settings.username)"></button>
     </div>
-      <button class="button button-block button-energized" ng-click="logout()">
+      <button class="button button-block button-shutapp" ng-click="logout()">
         Logga ut
       </button>
   </ion-content>

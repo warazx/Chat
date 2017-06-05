@@ -17,8 +17,10 @@
     font-family: Raleway;
     font-size: 3rem;
     text-align: center;
+    margin-bottom: 2rem;
 }
 .login-signup-container {
+    padding-top: 10vh;
     background-color: #52414C;
 }
 .input-field-container {
@@ -122,4 +124,33 @@ form {
 }
 ion-nav-view {
   border-top: 1px solid #d7d7d7;
+}
+#signup-link-container,
+#home-link-container {
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  padding-bottom: 1rem;
+}
+#signup-link-container a, #home-link-container a {
+  text-decoration: none;
+}
+#settings-page {
+  background-color: #52414C;
+}
+.full-image {
+  border: 1px solid #ccddcc;
+  border-radius: 0.3rem;
+}
+.settings-username {
+  text-align: center;
+}
+.settings-username h1 {
+  color: #ccddcc;
+}
+.change-username-button {
+  font-size: 20px;
+  min-height: 20px;
+  max-height: 30px;
+  line-height: 22px;
 }

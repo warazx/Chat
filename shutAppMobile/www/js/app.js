@@ -165,7 +165,7 @@ app.controller('SignupController', function ($location, $scope, $rootScope, user
   };
 });
 
-app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicPush, $ionicScrollDelegate, $ionicSideMenuDelegate, messageManager, mySocket) {
+app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicPush, $ionicScrollDelegate, $ionicSideMenuDelegate, toaster, messageManager, mySocket) {
   mySocket.removeAllListeners();
 
   $scope.$on("keyboardShowHideEvent", function() {
@@ -190,7 +190,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     $ionicPush.register().then(function(t) {
       return $ionicPush.saveToken(t);
     }).then(function(t) {
-      console.log('Token saved:', t.token);
+      toaster.toast("Token: " + t.token, 'long', 'bottom');
     });
     $scope.$on('cloud:push:notification', function(event, data) {
       var msg = data.message;

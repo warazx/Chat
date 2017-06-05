@@ -126,13 +126,13 @@ app.get('/chatrooms', function(req, res) {
 });
 
 app.post('/chatrooms/add', function(req, res) {
+  if(req.body.name === undefined || req.body.name.length < 3) return res.status(406).send();
   var roomName = req.body.name.toLowerCase();
-  db.collection('chatrooms').count({"name": roomName}).then(function(count) {
-    console.log(count);
-    if(count == 0) {
-      db.collection('chatrooms').insertOne({"name": roomName, "users": []}).then(function(doc) {
-        console.log(doc);
-        if(doc.result.ok > 0) {
+  db.collection('chatrooms').count({"name": roomName}).then(function(error, result) {
+    if(!error) {
+      db.collection('chatrooms').insertOne({"name": roomName, "users": []}).then(function(cb) {
+        if(cb.result.ok > 0) {
+          io.emit('refresh chatroom');
           res.status(201).send();
         } else {
           res.status(500).send();
@@ -140,7 +140,7 @@ app.post('/chatrooms/add', function(req, res) {
       });
     } else {
       res.status(400).send();
-    }
+    };
   })
 });
 

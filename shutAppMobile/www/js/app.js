@@ -301,12 +301,16 @@ app.controller('LeftSideController', function ($rootScope, $location, $scope, me
 
   $scope.addChatroom = function() {
     messageManager.addChatroom({"name": $scope.newChatroom.name}).then(function(res) {
+      console.log(res);
       toaster.toast('Chatrummet ' + $scope.newChatroom.name + ' har skapats.', 'short', 'bottom');
     }, function(res) {
       switch(res.status) {
         case 400:
           toaster.toast('Chatrummet finns redan.', 'short', 'bottom');
           break;
+          case 406:
+            toaster.toast('Namnet måste vara minst 3 tecken långt.', 'short', 'bottom');
+            break;
         case 500:
           toaster.toast('Databasfel: Chatrummet kunde inte skapas.', 'short', 'bottom');
           break;
@@ -333,6 +337,11 @@ app.controller('LeftSideController', function ($rootScope, $location, $scope, me
     });
     socket.on('active users', function (arr) {
       $rootScope.activeUsers = arr;
+    });
+    socket.on('refresh chatroom', function (chatroom) {
+      messageManager.getChatrooms().then(function (response) {
+        $scope.chatrooms = response.data;
+      });
     });
     $scope.changeChatroom = function (index) {
       //$location.path('/messages');

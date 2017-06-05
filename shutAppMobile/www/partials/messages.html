@@ -14,7 +14,7 @@
           <input class="line-light-grey message-input-field" type="text" placeholder="Skriv ditt meddelande..." ng-enter="postMessage()" ng-model="text.message">
         </label>
         <div class="divsend">
-          <button class="button ion-ios-arrow-forward iconsend" ng-click="postMessage()"></button>
+          <button class="button ion-ios-arrow-forward iconsend" ng-click="isPrivate ? postPrivateMessage() : postMessage()"></button>
         </div>
       </div>
     </div>

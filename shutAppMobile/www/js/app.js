@@ -202,6 +202,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     });
 
   $rootScope.changeRecipient = function changeRecipient(recipientId) {
+        $rootScope.isPrivate = true;
         $rootScope.selected = recipientId;
         $rootScope.privateRecipient = this.privateRoom;
         /*
@@ -313,7 +314,7 @@ app.controller('LeftSideController', function ($rootScope, $location, $scope, me
     });
     $scope.changeChatroom = function (index) {
       //$location.path('/messages');
-      //$rootScope.isPrivate = false;
+      $rootScope.isPrivate = false;
       //$rootScope.selected = index;
       $rootScope.privateRecipient = undefined;
       //Leave chatroom if already in one.

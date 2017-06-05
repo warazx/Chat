@@ -1,8 +1,4 @@
 <ion-view view-title="">
-    <ion-nav-bar class="bar-stable">
-        <ion-nav-back-button>
-        </ion-nav-back-button>
-    </ion-nav-bar>
     <ion-content class="login-signup-container" padding="true">
         <h1 class="title" id="shut-app-title">ShutApp</h1>
         <div class="list">
@@ -18,23 +14,10 @@
                     </label>
                 </div>
                 <input type="submit" value="Logga in" ng-click="userLogin()" class="button button-block button-shutapp">
+              <div id="signup-link-container">
+                <a href="#/signup">Ny användare?</a>
+              </div>
             </form>
         </div>
-        <p>----Temporär routing-----</p>
-        <a href="#/messages">
-            <button class="button button-block button-positive">
-                Meddelanden
-            </button>
-        </a>
-        <a href="#/settings">
-            <button class="button button-block button-energized">
-                Inställningar
-            </button>
-        </a>
-        <a href="#/signup">
-            <button class="button button-block button-royal">
-                Signup
-            </button>
-        </a>
     </ion-content>
 </ion-view>

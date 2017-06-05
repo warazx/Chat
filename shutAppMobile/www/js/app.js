@@ -4,7 +4,8 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 
-var app = angular.module('starter', ['ionic', 'ionic.cloud', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova']);
+
+var app = angular.module('starter', ['ionic', 'ionic.cloud', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova', 'monospaced.elastic']);
 
 app.run(function($ionicPlatform, $rootScope) {
   $ionicPlatform.ready(function() {
@@ -20,6 +21,7 @@ app.run(function($ionicPlatform, $rootScope) {
     }
     if(window.StatusBar) {
       StatusBar.styleDefault();
+      StatusBar.overlaysWebView(false);
     }
     window.addEventListener('native.keyboardshow', keyboardShowHideHandler);
     window.addEventListener('native.keyboardhide', keyboardShowHideHandler);
@@ -93,6 +95,24 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider, $i
     }
   });
 });
+
+function limitTextarea(textarea, maxLines, maxChar) {
+  var lines = textarea.value.replace(/\r/g, '').split('\n'), lines_removed, char_removed, i;
+  if (maxLines && lines.length > maxLines) {
+    lines = lines.slice(0, maxLines);
+    lines_removed = 1
+  }
+  if (maxChar) {
+    i = lines.length;
+    while (i-- > 0) if (lines[i].length > maxChar) {
+      lines[i] = lines[i].slice(0, maxChar);
+      char_removed = 1
+    }
+    if (char_removed || lines_removed) {
+      textarea.value = lines.join('\n')
+    }
+  }
+}
 
 app.controller('LoginController', function ($rootScope, $scope, $location, userManager, toaster) {
   //Needed on scope before login credentials are entered by user.
@@ -222,7 +242,6 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
         $rootScope.newMessages.push(message.senderId);
         //whistleAudio.play();
       }
-      $scope.text.message = "";
     });
     mySocket.on('connect message', function (msg) {
       $rootScope.statusMessage = msg;
@@ -232,8 +251,13 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     });
 
   $rootScope.changeRecipient = function changeRecipient(recipientId) {
+        $rootScope.isPrivate = true;
         $rootScope.selected = recipientId;
         $rootScope.privateRecipient = this.privateRoom;
+        $rootScope.chatroom = undefined;
+        if ($rootScope.selectedChatroom) {
+            mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
+        }
         /*
         if ($rootScope.newMessages.includes(this.privateRoom.id)) {
             $rootScope.newMessages.splice($rootScope.newMessages.indexOf(this.privateRoom.id), 1);
@@ -249,7 +273,6 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
             });
         }
         $rootScope.messagesBarTitle = $rootScope.privateRecipient.name;
-        $rootScope.toggleLeft();
   };
 
     /*
@@ -277,7 +300,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
       $rootScope.messages = res.data;
       $ionicScrollDelegate.scrollBottom();
     });
-    $rootScope.messagesBarTitle = "General";
+    $rootScope.messagesBarTitle = "#general";
 
     $scope.postMessage = function () {
       var newMessage = {
@@ -318,8 +341,17 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
   }
 });
 
+app.controller('LeftSideController', function ($rootScope, $location, $timeout, $ionicSideMenuDelegate, $ionicScrollDelegate, $scope, messageManager, mySocket) {
+  $timeout(function() {
+    $scope.$watch(function () {
+      return $ionicSideMenuDelegate.getOpenRatio();
+    }, function (ratio) {
+      if (ratio == 0) {
+        $ionicScrollDelegate.$getByHandle('side-menu-handle').scrollTop();
+      }
+    });
+  });
 
-app.controller('LeftSideController', function ($rootScope, $location, $scope, messageManager, mySocket) {
   $scope.hadConversation = function(userId) {
     return $rootScope.conversations.map(x=>x.id).includes(userId);
   };
@@ -342,9 +374,9 @@ app.controller('LeftSideController', function ($rootScope, $location, $scope, me
       $rootScope.activeUsers = arr;
     });
     $scope.changeChatroom = function (index) {
-      //$location.path('/messages');
-      //$rootScope.isPrivate = false;
-      //$rootScope.selected = index;
+      $rootScope.isPrivate = false;
+      $rootScope.selected = index;
+      $rootScope.chatroom = this.chatroom;
       $rootScope.privateRecipient = undefined;
       //Leave chatroom if already in one.
       if ($rootScope.selectedChatroom) {
@@ -355,6 +387,7 @@ app.controller('LeftSideController', function ($rootScope, $location, $scope, me
         $rootScope.messages = res.data;
       });
       mySocket.emit('join chatroom', $rootScope.selectedChatroom);
+      $rootScope.messagesBarTitle = "#" + $rootScope.chatroom.name;
     };
   } else {
     console.log("$rootScope.user is undefined, but WHYYY?!?!");
@@ -362,7 +395,7 @@ app.controller('LeftSideController', function ($rootScope, $location, $scope, me
   }
 });
 
-app.controller('SettingsController', function ($location, $scope, $rootScope, userManager, toaster) {
+app.controller('SettingsController', function ($location, $scope, $rootScope, userManager, toaster, mySocket) {
   $scope.changeUsername = function(newUsername) {
     if(newUsername) {
         userManager.updateUsername({
@@ -374,8 +407,7 @@ app.controller('SettingsController', function ($location, $scope, $rootScope, us
         }, function () {
             toaster.toast('Användarnamnet gick inte att ändra.', 'long', 'bottom');
         });
-        //TODO: Turn on again after sockets work
-        //mySocket.emit('change username', {"id": $rootScope.user.id, "newUserName": newUsername});
+        mySocket.emit('change username', {"id": $rootScope.user.id, "newUserName": newUsername});
     } else {
         var message = "Du måste välja ett användarnamn som innehåller minst tre tecken och max 20 tecken." +
             "\nDu kan inte använda speciella tecken, endast siffror och bokstäver(a-z).";

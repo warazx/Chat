@@ -17,8 +17,10 @@
     font-family: Raleway;
     font-size: 3rem;
     text-align: center;
+    margin-bottom: 2rem;
 }
 .login-signup-container {
+    padding-top: 10vh;
     background-color: #52414C;
 }
 .input-field-container {
@@ -70,6 +72,7 @@ form {
 .divsend {
   background-color: #efefef;
   margin-left: 7px;
+  padding: 2.5px 0;
 }
 .iconsend {
   background-color: #efefef;
@@ -77,14 +80,82 @@ form {
 }
 .nopadtop {
   padding-top: 0px;
+  margin: 0.5rem 0;
 }
 .messages-content{
   bottom: 2.3rem;
 }
 .message-input-field {
+  background-color: #efefef;
+  margin: 0.5rem 0;
   width: 100%;
+  resize: none;
 }
 .markedroom {
   background-color: #DDDDFF;
   color: #595959;
+}
+/*Disabling platform specific tweaks */
+.platform-ios.platform-cordova:not(.fullscreen) .bar-header {
+  height: 44px !important;
+}
+.platform-ios.platform-cordova:not(.fullscreen) .bar-header:not(.bar-subheader) {
+  height: 44px !important;
+}
+
+.platform-ios.platform-cordova:not(.fullscreen) .bar-header:not(.bar-subheader).item-input-inset .item-input-wrapper {
+  margin-top: 0px !important;
+}
+
+.platform-ios.platform-cordova:not(.fullscreen) .bar-header:not(.bar-subheader) > * {
+  margin-top: 0px !important;
+}
+
+.platform-ios.platform-cordova:not(.fullscreen) .tabs-top > .tabs, .platform-ios.platform-cordova:not(.fullscreen) .tabs.tabs-top {
+  top: 44px !important;
+}
+
+.platform-ios.platform-cordova:not(.fullscreen) .has-header, .platform-ios.platform-cordova:not(.fullscreen) .bar-subheader {
+  top: 44px !important;
+}
+
+.platform-ios.platform-cordova:not(.fullscreen) .has-subheader {
+  top: 88px !important;
+}
+ion-nav-view {
+  border-top: 1px solid #d7d7d7;
+}
+#signup-link-container,
+#home-link-container {
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  padding-bottom: 1rem;
+}
+#signup-link-container a, #home-link-container a {
+  text-decoration: none;
+}
+#settings-page {
+  background-color: #52414C;
+}
+.full-image {
+  border: 1px solid #ccddcc;
+  border-radius: 0.3rem;
+}
+.settings-username {
+  text-align: center;
+}
+.settings-username h1 {
+  color: #ccddcc;
+}
+.change-username-button {
+  font-size: 20px;
+  min-height: 20px;
+  max-height: 30px;
+  line-height: 22px;
+}
+.change-username-container {
+  margin: 0 1rem;
+  padding: 0.3rem;
+  border-radius: 0.3rem;
 }

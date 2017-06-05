@@ -135,11 +135,11 @@ app.post('/chatrooms/add', function(req, res) {
         if(doc.result.ok > 0) {
           res.status(201).send();
         } else {
-          res.status(500).send({"reason": "database error"});
+          res.status(500).send();
         }
       });
     } else {
-      res.status(400).send({"reason": "name in use"});
+      res.status(400).send();
     }
   })
 });

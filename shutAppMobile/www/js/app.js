@@ -30,12 +30,12 @@ app.run(function($ionicPlatform, $rootScope) {
   });
 });
 
-app.factory('socket', function(socketFactory) {
+app.factory('mySocket', function(socketFactory) {
   var myIoSocket = io.connect('http://shutapp.nu:3000');
-  mySocket = socketFactory({
+  socket = socketFactory({
     ioSocket: myIoSocket
   });
-  return mySocket;
+  return socket;
 });
 
 app.factory('toaster', function($cordovaToast) {
@@ -147,8 +147,8 @@ app.controller('SignupController', function ($location, $scope, $rootScope, user
   };
 });
 
-app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicScrollDelegate, $ionicSideMenuDelegate, messageManager, socket) {
-  socket.removeAllListeners();
+app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicScrollDelegate, $ionicSideMenuDelegate, messageManager, mySocket) {
+  mySocket.removeAllListeners();
 
   $scope.$on("keyboardShowHideEvent", function() {
     $ionicScrollDelegate.scrollBottom();
@@ -170,11 +170,11 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     $scope.text = {};
     $scope.text.message = "";
     $rootScope.newMessages = [];
-    socket.connect();
-    socket.on('chatroom message', function (msg) {
+    mySocket.connect();
+    mySocket.on('chatroom message', function (msg) {
       $rootScope.messages.push(msg);
     });
-    socket.on('private message', function (message) {
+    mySocket.on('private message', function (message) {
       //Trying to add user to user conversations list
       if (message.senderId == $rootScope.user.id) {
         if (!$rootScope.conversations.map(function (obj) { return obj.id; }).includes(message.recipientId)) {
@@ -194,10 +194,10 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
       }
       $scope.text.message = "";
     });
-    socket.on('connect message', function (msg) {
+    mySocket.on('connect message', function (msg) {
       $rootScope.statusMessage = msg;
     });
-    socket.on('disconnect message', function (msg) {
+    mySocket.on('disconnect message', function (msg) {
       $rootScope.statusMessage = msg;
     });
 
@@ -229,7 +229,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     /*socket.on('join chatroom', function () {
      document.getElementById('my-message').focus();
      });*/
-    socket.on('change username', function(obj) {
+    mySocket.on('change username', function(obj) {
       for(var i=0; i<$rootScope.conversations.length; i++) {
         if($rootScope.conversations[i].id == obj.id) {
           $rootScope.conversations[i].name = obj.newUserName;
@@ -238,11 +238,11 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     });
 
     //send $rootScope.user to server.js, it receives it with socket.on('connected')
-    socket.emit('connected', $rootScope.user);
-    socket.emit('connect message', { date: new Date(), text: $rootScope.user.name + " har loggat in." });
+    mySocket.emit('connected', $rootScope.user);
+    mySocket.emit('connect message', { date: new Date(), text: $rootScope.user.name + " har loggat in." });
     $rootScope.selected = "591d5683f36d281c81b1e5ea";
     $rootScope.selectedChatroom = $rootScope.selected;   //"General"
-    socket.emit('join chatroom', $rootScope.selectedChatroom);
+    mySocket.emit('join chatroom', $rootScope.selectedChatroom);
     messageManager.getMessages($rootScope.selectedChatroom).then(function(res) {
       $rootScope.messages = res.data;
       $ionicScrollDelegate.scrollBottom();
@@ -258,7 +258,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
         "chatroom": $rootScope.selectedChatroom
       };
       //Send message to the current chatroom
-      socket.emit('chatroom message', newMessage);
+      mySocket.emit('chatroom message', newMessage);
       messageManager.postMessages(newMessage);
       $scope.text.message = "";
       $ionicScrollDelegate.scrollBottom();
@@ -275,7 +275,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
         "recipientName": $rootScope.privateRecipient.name
       };
       //Send a direct private message.
-      socket.emit('private message', newPrivateMessage);
+      mySocket.emit('private message', newPrivateMessage);
       //Post the message to the database
       messageManager.postPrivateMessage(newPrivateMessage);
       $scope.text.message = "";
@@ -289,8 +289,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
 });
 
 
-app.controller('LeftSideController', function ($rootScope, $location, $scope, messageManager, socket) {
-  
+app.controller('LeftSideController', function ($rootScope, $location, $scope, messageManager, mySocket) {
   $scope.hadConversation = function(userId) {
     return $rootScope.conversations.map(x=>x.id).includes(userId);
   };
@@ -304,12 +303,12 @@ app.controller('LeftSideController', function ($rootScope, $location, $scope, me
       //offlineConversations is what is shown in the side menu.
         $rootScope.conversations = response.data;
     });
-    socket.on('active users', function (arr) {
+    mySocket.on('active users', function (arr) {
         $rootScope.activeUsers = arr;
         var activeUserIds = arr.map(x=>x.id);
         $rootScope.offlineConversations = $rootScope.conversations.filter(x=>!activeUserIds.includes(x.id));
     });
-    socket.on('active users', function (arr) {
+    mySocket.on('active users', function (arr) {
       $rootScope.activeUsers = arr;
     });
     $scope.changeChatroom = function (index) {

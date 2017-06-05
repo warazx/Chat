@@ -47,6 +47,9 @@ controllers.controller('RightSideController', function ($location, $scope, $root
         $rootScope.isPrivate = true;
         $rootScope.selected = index;
         $rootScope.privateRecipient = this.privateRoom;
+        if ($rootScope.selectedChatroom) {
+            mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
+        }
         if ($rootScope.newMessages.includes(this.privateRoom.id)) {
             $rootScope.newMessages.splice($rootScope.newMessages.indexOf(this.privateRoom.id), 1);
         }
@@ -168,7 +171,6 @@ controllers.controller('MessagesController', function ($scope, $rootScope, $loca
                 $rootScope.newMessages.push(message.senderId);
                 whistleAudio.play();
             }
-            $scope.textMessage = "";
         });
         mySocket.on('connect message', function (msg) {
             $rootScope.statusMessage = msg;

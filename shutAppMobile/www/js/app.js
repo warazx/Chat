@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 
-var app = angular.module('starter', ['ionic', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova']);
+var app = angular.module('starter', ['ionic', 'ionic.cloud', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova']);
 
 app.run(function($ionicPlatform, $rootScope) {
   $ionicPlatform.ready(function() {
@@ -50,7 +50,7 @@ app.factory('toaster', function($cordovaToast) {
   }
 });
 
-app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider, $ionicCloudProvider) {
   $stateProvider
     .state('login', {
       url: '/login',
@@ -74,6 +74,24 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
     });
   $urlRouterProvider.otherwise('/login');
   $ionicConfigProvider.views.maxCache(0);
+  $ionicCloudProvider.init({
+    "core": {
+      "app_id": "381a5d8c"
+    },
+    //inject $ionicPush to push
+    "push": {
+      "sender_id": "195920830260",
+      "pluginConfig": {
+        "ios": {
+          "badge": true,
+          "sound": true
+        },
+        "android": {
+          "iconColor": "#343434"
+        }
+      }
+    }
+  });
 });
 
 app.controller('LoginController', function ($rootScope, $scope, $location, userManager, toaster) {
@@ -147,7 +165,7 @@ app.controller('SignupController', function ($location, $scope, $rootScope, user
   };
 });
 
-app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicScrollDelegate, $ionicSideMenuDelegate, messageManager, mySocket) {
+app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicPush, $ionicScrollDelegate, $ionicSideMenuDelegate, messageManager, mySocket) {
   mySocket.removeAllListeners();
 
   $scope.$on("keyboardShowHideEvent", function() {
@@ -167,6 +185,18 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     console.log("User not logged in! Redirecting to login.");
     $location.path('/login');
   } else {
+
+    //Stuff to do with push notifications
+    $ionicPush.register().then(function(t) {
+      return $ionicPush.saveToken(t);
+    }).then(function(t) {
+      console.log('Token saved:', t.token);
+    });
+    $scope.$on('cloud:push:notification', function(event, data) {
+      var msg = data.message;
+      alert(msg.title + ': ' + msg.text);
+    });
+
     $scope.text = {};
     $scope.text.message = "";
     $rootScope.newMessages = [];

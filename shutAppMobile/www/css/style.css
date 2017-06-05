@@ -159,6 +159,9 @@ ion-nav-view {
   padding: 0.3rem;
   border-radius: 0.3rem;
 }
+.android-margin-bottom {
+  margin-bottom: 1rem;
+}
 .ion-ios-plus-outline {
   float: right;
 }

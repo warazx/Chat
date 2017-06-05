@@ -7,6 +7,7 @@ var MongoStore = require('connect-mongo')(session);
 var multer  = require('multer')
 var bcrypt = require('bcrypt');
 var cors = require('cors');
+var gcm = require('node-gcm');
 const saltRounds = 10;
 
 var app = express();
@@ -20,6 +21,9 @@ var port = 3000;
 var db;
 
 var filename;
+
+//push notifictions
+var sender = new gcm.Sender('AAAALZ3KnzQ:APA91bEqXgPxY2rQAE8G78hqauB-bo3gdHRKzcOZsx5_1WLfjcAUdnz94z9ol9jwNelj1oc_gHJeOsDtYk-cvVxcDh-FQejjid1uD4xZwSD10T6MjNGcERG6ydft6wQWS6VrzRggYTH4');
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
@@ -321,6 +325,17 @@ io.on('connection', function(socket){
         console.log("In server.js", message);
         console.log("socket rooms: ", socket.rooms);
         io.in(message.chatroom).emit('chatroom message', message);
+        /*
+        //trying out push notifications
+        var message = new gcm.Message({
+            data: { key1: 'msg1' }
+        });
+        var regTokens = [''];
+        sender.send(message, { registrationTokens: regTokens }, function (err, response) {
+            if (err) console.error(err);
+            else console.log(response);
+        });
+        */
     });
     socket.on('leave chatroom', function(chatroomId) {
         socket.leave(chatroomId);

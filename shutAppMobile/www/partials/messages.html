@@ -1,10 +1,10 @@
 <ion-view>
-    <ion-content class="messages-content has-header" padding="true">
+    <ion-content class="messages-content has-header" ng-class="{'android-margin-bottom': $root.android}" padding="true">
       <div id="chat-messages">
         <p ng-show="noMessages"> Det finns inga meddelanden att visa i denna konversation. </p>
         <div class="chat-message" ng-repeat="message in messages | orderBy:'timestamp' track by $index">
           <span class="username">{{message.senderName}}</span> <span class="timestamp">{{message.timestamp | date : 'MMM d, HH:mm'}}</span>
-          <div class="message-text" ng-bind-html="message.text"></div>
+          <div class="message-text" ng-bind-html="message.text | smilies"></div>
         </div>
       </div>
     </ion-content>

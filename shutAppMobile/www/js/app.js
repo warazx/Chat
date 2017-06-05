@@ -4,10 +4,11 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 
-var app = angular.module('starter', ['ionic', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova', 'monospaced.elastic']);
+var app = angular.module('starter', ['ionic', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova', 'monospaced.elastic', 'angular-smilies']);
 
 app.run(function($ionicPlatform, $rootScope) {
   $ionicPlatform.ready(function() {
+    $rootScope.android = ionic.Platform.isAndroid();
     if(window.cordova && window.cordova.plugins.Keyboard) {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
       // for form inputs)
@@ -98,8 +99,6 @@ function limitTextarea(textarea, maxLines, maxChar) {
 app.controller('LoginController', function ($rootScope, $scope, $location, userManager, toaster) {
   //Needed on scope before login credentials are entered by user.
   $scope.login = {};
-  //$rootScope.user = {};
-
 
     $scope.userLogin = function () {
         if ($scope.login.username === undefined || $scope.login.password === undefined) {

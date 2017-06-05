@@ -224,6 +224,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
         $rootScope.isPrivate = true;
         $rootScope.selected = recipientId;
         $rootScope.privateRecipient = this.privateRoom;
+        $rootScope.chatroom = undefined;
         /*
         if ($rootScope.newMessages.includes(this.privateRoom.id)) {
             $rootScope.newMessages.splice($rootScope.newMessages.indexOf(this.privateRoom.id), 1);

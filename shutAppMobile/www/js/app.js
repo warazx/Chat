@@ -202,8 +202,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     });
 
   $rootScope.changeRecipient = function changeRecipient(recipientId) {
-        //$rootScope.isPrivate = true;
-        //$rootScope.selected = index;
+        $rootScope.selected = recipientId;
         $rootScope.privateRecipient = this.privateRoom;
         /*
         if ($rootScope.newMessages.includes(this.privateRoom.id)) {
@@ -219,7 +218,9 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
                 $rootScope.messages = res.data;
             });
         }
-    };
+        $rootScope.messagesBarTitle = $rootScope.privateRecipient.name;
+        $rootScope.toggleLeft();
+  };
 
     /*
     //get list of users with which we have had a conversation
@@ -246,6 +247,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
       $rootScope.messages = res.data;
       $ionicScrollDelegate.scrollBottom();
     });
+    $rootScope.messagesBarTitle = "General";
 
     $scope.postMessage = function () {
       var newMessage = {
@@ -280,25 +282,32 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
       $ionicScrollDelegate.scrollBottom();
     };
 
-    $scope.toggleLeft = function() {
+    $rootScope.toggleLeft = function() {
       $ionicSideMenuDelegate.toggleLeft();
     };
   }
 });
 
+
 app.controller('LeftSideController', function ($rootScope, $location, $scope, messageManager, socket) {
-  /*
-   $scope.chatrooms = ["General", "Random", "FUN!!!"];
-   */
-  //TODO change to real logged in user
-  //$rootScope.user = { name: "Erika", id: "5927f744ac29ef07a783c7f5" };
+  
+  $scope.hadConversation = function(userId) {
+    return $rootScope.conversations.map(x=>x.id).includes(userId);
+  };
 
   if ($rootScope.user) {
     messageManager.getChatrooms().then(function (response) {
       $scope.chatrooms = response.data;
     });
     messageManager.getConversations($rootScope.user.id).then(function (response) {
-      $rootScope.conversations = response.data;
+      //$rootScope.conversations will always hold all the people the user has chatted with. offlineConversations holds those that are offline.
+      //offlineConversations is what is shown in the side menu.
+        $rootScope.conversations = response.data;
+    });
+    socket.on('active users', function (arr) {
+        $rootScope.activeUsers = arr;
+        var activeUserIds = arr.map(x=>x.id);
+        $rootScope.offlineConversations = $rootScope.conversations.filter(x=>!activeUserIds.includes(x.id));
     });
     socket.on('active users', function (arr) {
       $rootScope.activeUsers = arr;

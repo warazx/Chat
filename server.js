@@ -125,6 +125,25 @@ app.get('/chatrooms', function(req, res) {
     });
 });
 
+app.post('/chatrooms/add', function(req, res) {
+  var roomName = req.body.name.toLowerCase();
+  db.collection('chatrooms').count({"name": roomName}).then(function(count) {
+    console.log(count);
+    if(count == 0) {
+      db.collection('chatrooms').insertOne({"name": roomName, "users": []}).then(function(doc) {
+        console.log(doc);
+        if(doc.result.ok > 0) {
+          res.status(201).send();
+        } else {
+          res.status(500).send({"reason": "database error"});
+        }
+      });
+    } else {
+      res.status(400).send({"reason": "name in use"});
+    }
+  })
+});
+
 app.post('/private-messages', function(req, res) {
     var newPrivateMessage = req.body;
     newPrivateMessage.timestamp = new Date();

@@ -22,6 +22,10 @@ lib.factory('messageManager', function ($http) {
     messageManager.getChatrooms = function () {
         return $http.get('http://shutapp.nu:3000/chatrooms');
     };
+    messageManager.addChatroom = function () {
+        //TODO: Change to shutapp.nu
+        return $http.post('http://localhost:3000/chatrooms/add', newChatroom);
+    };
     messageManager.getMessages = function (chatroomId) {
         return $http.get('http://shutapp.nu:3000/messages?chatroom=' + chatroomId);
     };

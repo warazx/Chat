@@ -1,29 +1,39 @@
 <ion-content>
-    <div class="item item-divider">
+  <div class="item item-divider" ng-hide="addMode">
     Chatrum
-    </div>
-    <ion-list>
-        <ion-item ng-repeat="chatroom in chatrooms" ng-click="changeChatroom(chatroom._id)">
-        {{chatroom.name}}
-        </ion-item>
-    </ion-list>
+    <button ng-click="toggleAddChatroom()" class="button button-icon icon ion-ios-plus-outline">
+    </button>
+  </div>
+  <div class="item item-input-inset" ng-show="addMode">
+    <label class="item-input-wrapper">
+      <input type="text" placeholder="Chatroom" ng-model="newChatroom">
+    </label>
+    <button class="button button-small" ng-click="addChatroom()">
+      Add
+    </button>
+  </div>
+  <ion-list>
+    <ion-item ng-repeat="chatroom in chatrooms" ng-click="changeChatroom(chatroom._id)">
+      {{chatroom.name}}
+    </ion-item>
+  </ion-list>
 
-    <div class="item item-divider">
+  <div class="item item-divider">
     Aktiva användare
-    </div>
-    <ion-list>
-        <ion-item ng-repeat="privateRoom in activeUsers track by privateRoom.id" ng-click="changeRecipient(privateRoom.id)" ng-class="{markedroom: selected==privateRoom.id}">
-        <i ng-class="{icon: true, 'ion-email': hadConversation(privateRoom.id)}"></i>
-        {{privateRoom.name}}
-        </ion-item>
-    </ion-list>
+  </div>
+  <ion-list>
+    <ion-item ng-repeat="privateRoom in activeUsers track by privateRoom.id" ng-click="changeRecipient(privateRoom.id)" ng-class="{markedroom: selected==privateRoom.id}">
+      <i ng-class="{icon: true, 'ion-email': hadConversation(privateRoom.id)}"></i>
+      {{privateRoom.name}}
+    </ion-item>
+  </ion-list>
 
-    <div class="item item-divider">
+  <div class="item item-divider">
     Tidigare konversationer
-    </div>
-    <ion-list>
-        <ion-item ng-repeat="privateRoom in offlineConversations track by privateRoom.id" ng-click="changeRecipient(privateRoom.id)" ng-class="{markedroom: selected==privateRoom.id}">
-        {{privateRoom.name}}
-        </ion-item>
-    </ion-list>
+  </div>
+  <ion-list>
+    <ion-item ng-repeat="privateRoom in offlineConversations track by privateRoom.id" ng-click="changeRecipient(privateRoom.id)" ng-class="{markedroom: selected==privateRoom.id}">
+      {{privateRoom.name}}
+    </ion-item>
+  </ion-list>
 </ion-content>

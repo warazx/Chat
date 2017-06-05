@@ -290,9 +290,21 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
 
 
 app.controller('LeftSideController', function ($rootScope, $location, $scope, messageManager, socket) {
-  
+  $scope.newChatroom = "";
+
   $scope.hadConversation = function(userId) {
     return $rootScope.conversations.map(x=>x.id).includes(userId);
+  };
+
+  $scope.toggleAddChatroom = function() {
+    $scope.addMode = true;
+  };
+
+  $scope.addChatroom = function() {
+    messageManager.addChatroom({"name": $scope.newChatroom}).then(function(res) {
+      console.log(res);
+    });
+    $scope.addMode = false;
   };
 
   if ($rootScope.user) {

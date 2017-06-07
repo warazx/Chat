@@ -33,7 +33,7 @@ app.run(function($ionicPlatform, $rootScope) {
 });
 
 app.factory('mySocket', function(socketFactory) {
-  var myIoSocket = io.connect('http://shutapp.nu:3000');
+  var myIoSocket = io.connect('http://192.168.1.157:3000');
   socket = socketFactory({
     ioSocket: myIoSocket
   });
@@ -115,6 +115,7 @@ function limitTextarea(textarea, maxLines, maxChar) {
 }
 
 app.controller('LoginController', function ($rootScope, $scope, $location, userManager, toaster) {
+  console.log("LOGINCONTROLLER");
   //Needed on scope before login credentials are entered by user.
   $scope.login = {};
   //$rootScope.user = {};
@@ -134,7 +135,7 @@ app.controller('LoginController', function ($rootScope, $scope, $location, userM
                 $location.path(res.data.redirect); //Redirects to /messages.
             }, function (res) {
                 console.log('Login failed on server.');
-                toaster.toast('Felaktiga inloggningsuppgifter.', 'long', 'bottom');
+                toaster.toast('Felaktiga inloggningsuppgifter!', 'long', 'bottom');
             });
         }
     };
@@ -185,7 +186,7 @@ app.controller('SignupController', function ($location, $scope, $rootScope, user
   };
 });
 
-app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicPush, $ionicScrollDelegate, $ionicSideMenuDelegate, toaster, messageManager, mySocket) {
+app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicPush, $ionicScrollDelegate, $ionicSideMenuDelegate, toaster, messageManager, mySocket, userManager) {
   mySocket.removeAllListeners();
 
   $scope.$on("keyboardShowHideEvent", function() {
@@ -205,12 +206,15 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     console.log("User not logged in! Redirecting to login.");
     $location.path('/login');
   } else {
-
     //Stuff to do with push notifications
     $ionicPush.register().then(function(t) {
+      var postObj = {id: $rootScope.user.id, token: t.token.toString()};
+      //Save device to user in database
+      userManager.addDevice(postObj);
       return $ionicPush.saveToken(t);
     }).then(function(t) {
       toaster.toast("Token: " + t.token, 'long', 'bottom');
+      alert("Type of token: " + typeof(t.token));
     });
     $scope.$on('cloud:push:notification', function(event, data) {
       var msg = data.message;
@@ -369,9 +373,6 @@ app.controller('LeftSideController', function ($rootScope, $location, $timeout, 
         $rootScope.activeUsers = arr;
         var activeUserIds = arr.map(x=>x.id);
         $rootScope.offlineConversations = $rootScope.conversations.filter(x=>!activeUserIds.includes(x.id));
-    });
-    mySocket.on('active users', function (arr) {
-      $rootScope.activeUsers = arr;
     });
     $scope.changeChatroom = function (index) {
       $rootScope.isPrivate = false;

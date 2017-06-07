@@ -25,6 +25,7 @@
 }
 .input-field-container {
     background-color: white;
+    border-radius: 0.3rem;
 }
 form {
     background-color: #ebe9ce;

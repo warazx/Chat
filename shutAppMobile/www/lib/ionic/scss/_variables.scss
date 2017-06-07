@@ -225,6 +225,12 @@ $bar-royal-border:                $button-royal-border !default;
 $bar-royal-active-bg:             $button-royal-active-bg !default;
 $bar-royal-active-border:         $button-royal-active-border !default;
 
+$bar-shutapp-bg:                    rgba($button-shutapp-bg, $bar-transparency) !default;
+$bar-shutapp-text:                  $button-shutapp-text !default;
+$bar-shutapp-border:                $button-shutapp-border !default;
+$bar-shutapp-active-bg:             $button-shutapp-active-bg !default;
+$bar-shutapp-active-border:         $button-shutapp-active-border !default;
+
 $bar-dark-bg:                     rgba($button-dark-bg, $bar-transparency) !default;
 $bar-dark-text:                   $button-dark-text !default;
 $bar-dark-border:                 $button-dark-border !default;

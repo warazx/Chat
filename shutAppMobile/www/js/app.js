@@ -397,6 +397,13 @@ app.controller('LeftSideController', function ($rootScope, $location, $timeout, 
     console.log("$rootScope.user is undefined, but WHYYY?!?!");
     $location.path("/");
   }
+ 
+  $rootScope.person = {};
+  $scope.searchUser = function() {
+	  $rootScope.person.name;
+	  console.log($rootScope.person.name);
+  };
+  
 });
 
 app.controller('SettingsController', function ($location, $scope, $rootScope, userManager, toaster, mySocket) {

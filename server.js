@@ -22,7 +22,7 @@ var db;
 
 var filename;
 
-//push notifictions
+//push notifications
 var sender = new gcm.Sender('AAAALZ3KnzQ:APA91bEqXgPxY2rQAE8G78hqauB-bo3gdHRKzcOZsx5_1WLfjcAUdnz94z9ol9jwNelj1oc_gHJeOsDtYk-cvVxcDh-FQejjid1uD4xZwSD10T6MjNGcERG6ydft6wQWS6VrzRggYTH4');
 
 app.use(bodyParser.json());
@@ -247,6 +247,13 @@ app.post('/users/update', function (req, res) {
     };
 });
 
+app.post('/device', function(req, res) {
+    //This is run at login. Add device to database
+    db.collection('users').update({"_id": ObjectID(req.body.id)}, {$addToSet: {"devices": req.body.token}}).then(function(doc) {
+        console.log("register:", doc);
+    });
+});
+
 app.get('/login/:username/:password', function (req, res) {
     db.collection('users').findOne({username: req.params.username.toLowerCase()}, function(err, user) {
         if(err) {
@@ -287,14 +294,36 @@ io.on('connection', function(socket){
         io.emit('active users', activeUsers);
     });
     socket.on('private message', function(message){
+        console.log("TEST");
         //Gets correct socketId for recipient.
         var index = activeUsers.findIndex(function(activeUser) {
             return activeUser.id === message.recipientId;
         });
-
+        console.log("index of user: " + index);
         if(index >= 0) {
             //Send to the other person
             socket.to(activeUsers[index].socketId).emit('private message', message);
+        } else {
+            //Prepare notification
+            var pushNotification = new gcm.Message({
+                data: { key1: 'msg1' },
+                notification: {
+                    title: "ShutApp",
+                    //icon: "ic_launcher",
+                    body: message.text
+                }
+            });
+            console.log("created push notification, probably");
+            //get regTokens from database
+            db.collection('users').findOne({"_id": ObjectID(message.recipientId)},{"devices": 1}).then(function(obj) {
+                var regTokens = obj.devices;
+                console.log("tokens: ", obj.devices);
+                //Send the notification
+                sender.send(pushNotification, { registrationTokens: regTokens }, function (err, response) {
+                    if (err) console.error("error: ", err);
+                    else console.log("push notification response: ", response);
+                });
+            });
         }
         //Send to myself
         socket.emit('private message', message);
@@ -325,17 +354,6 @@ io.on('connection', function(socket){
         console.log("In server.js", message);
         console.log("socket rooms: ", socket.rooms);
         io.in(message.chatroom).emit('chatroom message', message);
-        /*
-        //trying out push notifications
-        var message = new gcm.Message({
-            data: { key1: 'msg1' }
-        });
-        var regTokens = [''];
-        sender.send(message, { registrationTokens: regTokens }, function (err, response) {
-            if (err) console.error(err);
-            else console.log(response);
-        });
-        */
     });
     socket.on('leave chatroom', function(chatroomId) {
         socket.leave(chatroomId);

@@ -261,14 +261,17 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     //send $rootScope.user to server.js, it receives it with socket.on('connected')
     mySocket.emit('connected', $rootScope.user);
     mySocket.emit('connect message', { date: new Date(), text: $rootScope.user.name + " har loggat in." });
-    $rootScope.selected = "591d5683f36d281c81b1e5ea";
-    $rootScope.selectedChatroom = $rootScope.selected;   //"General"
-    mySocket.emit('join chatroom', $rootScope.selectedChatroom);
+    if (!$rootScope.selectedChatroom) {
+      $rootScope.selected = "591d5683f36d281c81b1e5ea";
+      $rootScope.selectedChatroom = $rootScope.selected; // "general"
+      mySocket.emit('join chatroom', $rootScope.selectedChatroom);
+      $rootScope.messagesBarTitle = "#general";
+    }
+
     messageManager.getMessages($rootScope.selectedChatroom).then(function(res) {
       $rootScope.messages = res.data;
       $ionicScrollDelegate.scrollBottom();
     });
-    $rootScope.messagesBarTitle = "#general";
 
     $scope.postMessage = function () {
       var newMessage = {
@@ -397,6 +400,11 @@ app.controller('LeftSideController', function ($rootScope, $location, $timeout, 
 });
 
 app.controller('SettingsController', function ($location, $scope, $rootScope, userManager, toaster, mySocket) {
+  $scope.goBackToMessages = function() {
+    $location.path("/messages");
+
+  };
+
   $scope.changeUsername = function(newUsername) {
     if(newUsername) {
         userManager.updateUsername({

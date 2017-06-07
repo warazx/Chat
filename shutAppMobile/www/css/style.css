@@ -165,3 +165,8 @@ ion-nav-view {
 .ion-ios-plus-outline {
   float: right;
 }
+.add-channel-button {
+  margin-top: -0.5rem;
+  height: 2rem;
+  font-size: 1.5rem;
+}

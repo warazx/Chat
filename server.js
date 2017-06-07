@@ -294,12 +294,10 @@ io.on('connection', function(socket){
         io.emit('active users', activeUsers);
     });
     socket.on('private message', function(message){
-        console.log("TEST");
         //Gets correct socketId for recipient.
         var index = activeUsers.findIndex(function(activeUser) {
             return activeUser.id === message.recipientId;
         });
-        console.log("index of user: " + index);
         if(index >= 0) {
             //Send to the other person
             socket.to(activeUsers[index].socketId).emit('private message', message);
@@ -310,10 +308,9 @@ io.on('connection', function(socket){
                 notification: {
                     title: "ShutApp",
                     //icon: "ic_launcher",
-                    body: message.text
+                    body: message.senderName + " skriver: " + message.text
                 }
             });
-            console.log("created push notification, probably");
             //get regTokens from database
             db.collection('users').findOne({"_id": ObjectID(message.recipientId)},{"devices": 1}).then(function(obj) {
                 var regTokens = obj.devices;
@@ -321,7 +318,6 @@ io.on('connection', function(socket){
                 //Send the notification
                 sender.send(pushNotification, { registrationTokens: regTokens }, function (err, response) {
                     if (err) console.error("error: ", err);
-                    else console.log("push notification response: ", response);
                 });
             });
         }

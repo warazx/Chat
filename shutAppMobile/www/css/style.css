@@ -97,6 +97,12 @@ form {
   border-color: #52414C;
   color: #ccddcc;
 }
+.new-message {
+  color: #00FE54;
+}
+.my-user::after {
+  content: ' (du)';
+}
 .back-button {
   color: #ccddcc !important;
 }

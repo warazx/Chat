@@ -4,10 +4,11 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 
-var app = angular.module('starter', ['ionic', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova', 'monospaced.elastic']);
+var app = angular.module('starter', ['ionic', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova', 'monospaced.elastic', 'angular-smilies']);
 
 app.run(function($ionicPlatform, $rootScope) {
   $ionicPlatform.ready(function() {
+    $rootScope.android = ionic.Platform.isAndroid();
     if(window.cordova && window.cordova.plugins.Keyboard) {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
       // for form inputs)
@@ -98,8 +99,6 @@ function limitTextarea(textarea, maxLines, maxChar) {
 app.controller('LoginController', function ($rootScope, $scope, $location, userManager, toaster) {
   //Needed on scope before login credentials are entered by user.
   $scope.login = {};
-  //$rootScope.user = {};
-
 
     $scope.userLogin = function () {
         if ($scope.login.username === undefined || $scope.login.password === undefined) {
@@ -262,14 +261,17 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     //send $rootScope.user to server.js, it receives it with socket.on('connected')
     mySocket.emit('connected', $rootScope.user);
     mySocket.emit('connect message', { date: new Date(), text: $rootScope.user.name + " har loggat in." });
-    $rootScope.selected = "591d5683f36d281c81b1e5ea";
-    $rootScope.selectedChatroom = $rootScope.selected;   //"General"
-    mySocket.emit('join chatroom', $rootScope.selectedChatroom);
+    if (!$rootScope.selectedChatroom) {
+      $rootScope.selected = "591d5683f36d281c81b1e5ea";
+      $rootScope.selectedChatroom = $rootScope.selected; // "general"
+      mySocket.emit('join chatroom', $rootScope.selectedChatroom);
+      $rootScope.messagesBarTitle = "#general";
+    }
+
     messageManager.getMessages($rootScope.selectedChatroom).then(function(res) {
       $rootScope.messages = res.data;
       $ionicScrollDelegate.scrollBottom();
     });
-    $rootScope.messagesBarTitle = "#general";
 
     $scope.postMessage = function () {
       var newMessage = {
@@ -310,7 +312,9 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
   }
 });
 
-app.controller('LeftSideController', function ($rootScope, $location, $timeout, $ionicSideMenuDelegate, $ionicScrollDelegate, $scope, messageManager, mySocket) {
+app.controller('LeftSideController', function ($rootScope, $location, $timeout, $ionicSideMenuDelegate, $ionicScrollDelegate, $scope, messageManager, mySocket, toaster) {
+  $scope.newChatroom = {};
+
   $timeout(function() {
     $scope.$watch(function () {
       return $ionicSideMenuDelegate.getOpenRatio();
@@ -323,6 +327,32 @@ app.controller('LeftSideController', function ($rootScope, $location, $timeout, 
 
   $scope.hadConversation = function(userId) {
     return $rootScope.conversations.map(x=>x.id).includes(userId);
+  };
+
+  $scope.toggleAddChatroom = function() {
+    $scope.addMode = true;
+  };
+
+  $scope.addChatroom = function() {
+    messageManager.addChatroom({"name": $scope.newChatroom.name}).then(function(res) {
+      console.log(res);
+      toaster.toast('Chatrummet ' + $scope.newChatroom.name + ' har skapats.', 'short', 'bottom');
+    }, function(res) {
+      switch(res.status) {
+        case 400:
+          toaster.toast('Chatrummet finns redan.', 'short', 'bottom');
+          break;
+          case 406:
+            toaster.toast('Namnet måste vara minst 3 tecken långt.', 'short', 'bottom');
+            break;
+        case 500:
+          toaster.toast('Databasfel: Chatrummet kunde inte skapas.', 'short', 'bottom');
+          break;
+        default:
+          toaster.toast('Okänt fel.', 'short', 'bottom');
+      }
+    });
+    $scope.addMode = false;
   };
 
   if ($rootScope.user) {
@@ -341,6 +371,11 @@ app.controller('LeftSideController', function ($rootScope, $location, $timeout, 
     });
     mySocket.on('active users', function (arr) {
       $rootScope.activeUsers = arr;
+    });
+    socket.on('refresh chatroom', function (chatroom) {
+      messageManager.getChatrooms().then(function (response) {
+        $scope.chatrooms = response.data;
+      });
     });
     $scope.changeChatroom = function (index) {
       $rootScope.isPrivate = false;
@@ -365,6 +400,11 @@ app.controller('LeftSideController', function ($rootScope, $location, $timeout, 
 });
 
 app.controller('SettingsController', function ($location, $scope, $rootScope, userManager, toaster, mySocket) {
+  $scope.goBackToMessages = function() {
+    $location.path("/messages");
+
+  };
+
   $scope.changeUsername = function(newUsername) {
     if(newUsername) {
         userManager.updateUsername({

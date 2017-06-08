@@ -10,7 +10,7 @@
           </div>
           <div class="message-content">
             <div class="message-info">
-              <span class="username" g-click="changeRecipientFromMessage(message)">{{message.senderName}}</span> <span class="timestamp">{{message.timestamp | date : 'MMM d, HH:mm'}}</span>
+              <span class="username" ng-click="changeRecipientFromMessage(message)">{{message.senderName}}</span> <span class="timestamp">{{message.timestamp | date : 'MMM d, HH:mm'}}</span>
             </div>
             <div class="message-text" ng-bind-html="message.text | smilies"></div>
           </div>

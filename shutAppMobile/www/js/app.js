@@ -276,6 +276,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     });
 
     $scope.changeRecipientFromMessage = function(message) {
+        console.log('wtf');
         var socketId = $rootScope.activeUsers.filter(function(user) {
             if(message.senderId == user.id) return user.socketId;
         });
@@ -295,8 +296,8 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
         if ($rootScope.selectedChatroom) {
             mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
         }
-        if ($rootScope.newMessages.includes(this.privateRoom.id)) {
-            $rootScope.newMessages.splice($rootScope.newMessages.indexOf(this.privateRoom.id), 1);
+        if ($rootScope.newMessages.includes(recipient.id)) {
+            $rootScope.newMessages.splice($rootScope.newMessages.indexOf(recipient.id), 1);
         }
         if (!$rootScope.user) {
             console.log("User not logged in! Redirecting to login.");

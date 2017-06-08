@@ -272,10 +272,22 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
       $rootScope.statusMessage = msg;
     });
 
-  $rootScope.changeRecipient = function changeRecipient(recipientId) {
+    $scope.changeRecipientFromMessage = function(message) {
+        var socketId = $rootScope.activeUsers.filter(function(user) {
+            if(message.senderId == user.id) return user.socketId;
+        });
+        $rootScope.changeRecipient({
+            name: message.senderName,
+            id: message.senderId,
+            socketId: socketId
+        });
+    }
+
+  $rootScope.changeRecipient = function changeRecipient(recipient) {
+        console.log($rootScope.activeUsers);
         $rootScope.isPrivate = true;
-        $rootScope.selected = recipientId;
-        $rootScope.privateRecipient = this.privateRoom;
+        $rootScope.selected = recipient.id;
+        $rootScope.privateRecipient = recipient;
         $rootScope.chatroom = undefined;
         if ($rootScope.selectedChatroom) {
             mySocket.emit('leave chatroom', $rootScope.selectedChatroom);

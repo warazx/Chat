@@ -32,6 +32,8 @@ app.run(function($ionicPlatform, $rootScope) {
   });
 });
 
+app.value('messageAudio', new Audio('sounds/meow.mp3'));
+
 app.factory('mySocket', function(socketFactory) {
   var myIoSocket = io.connect('http://shutapp.nu:3000');
   socket = socketFactory({
@@ -204,7 +206,7 @@ app.controller('SignupController', function ($location, $scope, $rootScope, user
   };
 });
 
-app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicPush, $ionicScrollDelegate, $ionicSideMenuDelegate, toaster, messageManager, mySocket, userManager) {
+app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicPush, $ionicScrollDelegate, $ionicSideMenuDelegate, toaster, messageManager, mySocket, userManager, messageAudio) {
   mySocket.removeAllListeners();
 
   $scope.$on("keyboardShowHideEvent", function() {
@@ -263,7 +265,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
         $rootScope.messages.push(message);
       } else {
         $rootScope.newMessages.push(message.senderId);
-        //whistleAudio.play();
+        messageAudio.play();
       }
     });
     mySocket.on('connect message', function (msg) {
@@ -281,11 +283,9 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
         if ($rootScope.selectedChatroom) {
             mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
         }
-        /*
         if ($rootScope.newMessages.includes(this.privateRoom.id)) {
             $rootScope.newMessages.splice($rootScope.newMessages.indexOf(this.privateRoom.id), 1);
         }
-        */
         if (!$rootScope.user) {
             console.log("User not logged in! Redirecting to login.");
             $location.path('/');

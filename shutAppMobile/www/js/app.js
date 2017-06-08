@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 
-var app = angular.module('starter', ['ionic', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova', 'monospaced.elastic', 'angular-smilies']);
+var app = angular.module('starter', ['ionic', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova', 'monospaced.elastic', 'angular-smilies', 'ngStorage']);
 
 app.run(function($ionicPlatform, $rootScope) {
   $ionicPlatform.ready(function() {
@@ -38,6 +38,20 @@ app.factory('mySocket', function(socketFactory) {
     ioSocket: myIoSocket
   });
   return socket;
+});
+
+app.factory('autoLoginManager', function($localStorage) {
+  return {
+    addUser: function(user) {
+      $localStorage.currentUser = user;
+    },
+    removeUser: function() {
+      delete $localStorage.currentUser;
+    },
+    currentUser: function() {
+      return $localStorage.currentUser;
+    }
+  };
 });
 
 app.factory('toaster', function($cordovaToast) {
@@ -96,9 +110,14 @@ function limitTextarea(textarea, maxLines, maxChar) {
   }
 }
 
-app.controller('LoginController', function ($rootScope, $scope, $location, userManager, toaster) {
+app.controller('LoginController', function (autoLoginManager, $rootScope, $scope, $location, userManager, toaster) {
   //Needed on scope before login credentials are entered by user.
   $scope.login = {};
+
+  if(autoLoginManager.currentUser()) {
+    $rootScope.user = autoLoginManager.currentUser();
+    $location.path('/messages'); //Redirects to /messages.
+  };
 
     $scope.userLogin = function () {
         if ($scope.login.username === undefined || $scope.login.password === undefined) {
@@ -111,6 +130,7 @@ app.controller('LoginController', function ($rootScope, $scope, $location, userM
                     id: res.data._id,
                     name: res.data.username
                 };
+                autoLoginManager.addUser($rootScope.user);
                 $location.path(res.data.redirect); //Redirects to /messages.
             }, function (res) {
                 console.log('Login failed on server.');
@@ -399,7 +419,7 @@ app.controller('LeftSideController', function ($rootScope, $location, $timeout, 
   }
 });
 
-app.controller('SettingsController', function ($location, $scope, $rootScope, userManager, toaster, mySocket) {
+app.controller('SettingsController', function ($location, $scope, $rootScope, userManager, toaster, mySocket, autoLoginManager) {
   $scope.goBackToMessages = function() {
     $location.path("/messages");
 
@@ -412,6 +432,7 @@ app.controller('SettingsController', function ($location, $scope, $rootScope, us
             "username": newUsername
         }).then(function () {
             $rootScope.user.name = newUsername;
+            autoLoginManager.addUser($rootScope.user);
             toaster.toast('Användarnamnet har ändrats.', 'long', 'bottom');
         }, function () {
             toaster.toast('Användarnamnet gick inte att ändra.', 'long', 'bottom');
@@ -426,6 +447,7 @@ app.controller('SettingsController', function ($location, $scope, $rootScope, us
 
   $scope.logout = function() {
     $rootScope.user = {};
+    autoLoginManager.removeUser();
     $location.path('/login');
   };
 });

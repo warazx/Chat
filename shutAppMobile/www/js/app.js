@@ -4,9 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 
-
-var app = angular.module('starter', ['ionic', 'ionic.cloud', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova', 'monospaced.elastic', 'angular-smilies']);
-
+var app = angular.module('starter', ['ionic', 'ionic.cloud', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova', 'monospaced.elastic', 'angular-smilies', 'ngStorage']);
 
 app.run(function($ionicPlatform, $rootScope) {
   $ionicPlatform.ready(function() {
@@ -34,12 +32,28 @@ app.run(function($ionicPlatform, $rootScope) {
   });
 });
 
+app.value('messageAudio', new Audio('sounds/meow.mp3'));
+
 app.factory('mySocket', function(socketFactory) {
   var myIoSocket = io.connect('http://shutapp.nu:3000');
   socket = socketFactory({
     ioSocket: myIoSocket
   });
   return socket;
+});
+
+app.factory('autoLoginManager', function($localStorage) {
+  return {
+    addUser: function(user) {
+      $localStorage.currentUser = user;
+    },
+    removeUser: function() {
+      delete $localStorage.currentUser;
+    },
+    currentUser: function() {
+      return $localStorage.currentUser;
+    }
+  };
 });
 
 app.factory('toaster', function($cordovaToast) {
@@ -116,10 +130,14 @@ function limitTextarea(textarea, maxLines, maxChar) {
   }
 }
 
-app.controller('LoginController', function ($rootScope, $scope, $location, userManager, toaster) {
-  console.log("LOGINCONTROLLER");
+app.controller('LoginController', function ($rootScope, $scope, $location, userManager, toaster, autoLoginManager) {
   //Needed on scope before login credentials are entered by user.
   $scope.login = {};
+
+  if(autoLoginManager.currentUser()) {
+    $rootScope.user = autoLoginManager.currentUser();
+    $location.path('/messages'); //Redirects to /messages.
+  };
 
     $scope.userLogin = function () {
         if ($scope.login.username === undefined || $scope.login.password === undefined) {
@@ -130,8 +148,10 @@ app.controller('LoginController', function ($rootScope, $scope, $location, userM
                 console.log('Login successful.');
                 $rootScope.user = {
                     id: res.data._id,
-                    name: res.data.username
+                    name: res.data.username,
+                    image: res.data.image
                 };
+                autoLoginManager.addUser($rootScope.user);
                 $location.path(res.data.redirect); //Redirects to /messages.
             }, function (res) {
                 console.log('Login failed on server.');
@@ -186,7 +206,7 @@ app.controller('SignupController', function ($location, $scope, $rootScope, user
   };
 });
 
-app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicPush, $ionicScrollDelegate, $ionicSideMenuDelegate, toaster, messageManager, mySocket, userManager) {
+app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicPush, $ionicScrollDelegate, $ionicSideMenuDelegate, toaster, messageManager, mySocket, userManager, messageAudio) {
   mySocket.removeAllListeners();
 
   $scope.$on("keyboardShowHideEvent", function() {
@@ -245,7 +265,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
         $rootScope.messages.push(message);
       } else {
         $rootScope.newMessages.push(message.senderId);
-        //whistleAudio.play();
+        messageAudio.play();
       }
     });
     mySocket.on('connect message', function (msg) {
@@ -255,19 +275,30 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
       $rootScope.statusMessage = msg;
     });
 
-  $rootScope.changeRecipient = function changeRecipient(recipientId) {
+    $scope.changeRecipientFromMessage = function(message) {
+        console.log('wtf');
+        var socketId = $rootScope.activeUsers.filter(function(user) {
+            if(message.senderId == user.id) return user.socketId;
+        });
+        $rootScope.changeRecipient({
+            name: message.senderName,
+            id: message.senderId,
+            socketId: socketId
+        });
+    }
+
+  $rootScope.changeRecipient = function changeRecipient(recipient) {
+        console.log($rootScope.activeUsers);
         $rootScope.isPrivate = true;
-        $rootScope.selected = recipientId;
-        $rootScope.privateRecipient = this.privateRoom;
+        $rootScope.selected = recipient.id;
+        $rootScope.privateRecipient = recipient;
         $rootScope.chatroom = undefined;
         if ($rootScope.selectedChatroom) {
             mySocket.emit('leave chatroom', $rootScope.selectedChatroom);
         }
-        /*
-        if ($rootScope.newMessages.includes(this.privateRoom.id)) {
-            $rootScope.newMessages.splice($rootScope.newMessages.indexOf(this.privateRoom.id), 1);
+        if ($rootScope.newMessages.includes(recipient.id)) {
+            $rootScope.newMessages.splice($rootScope.newMessages.indexOf(recipient.id), 1);
         }
-        */
         if (!$rootScope.user) {
             console.log("User not logged in! Redirecting to login.");
             $location.path('/');
@@ -314,12 +345,14 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
       var newMessage = {
         "senderId": $rootScope.user.id,
         "senderName": $rootScope.user.name,
+        "senderImage": $rootScope.user.image,
         "timestamp": new Date(),
         "text": $scope.text.message,
         "chatroom": $rootScope.selectedChatroom
       };
       //Send message to the current chatroom
       mySocket.emit('chatroom message', newMessage);
+      console.log(newMessage);
       messageManager.postMessages(newMessage);
       $scope.text.message = "";
       $ionicScrollDelegate.scrollBottom();
@@ -330,6 +363,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
       var newPrivateMessage = {
         "senderId": $rootScope.user.id,
         "senderName": $rootScope.user.name,
+        "senderImage": $rootScope.user.image,
         "timestamp": new Date(),
         "text": $scope.text.message,
         "recipientId": $rootScope.privateRecipient.id,
@@ -444,10 +478,9 @@ app.controller('LeftSideController', function ($rootScope, $location, $timeout, 
   
 });
 
-app.controller('SettingsController', function ($location, $scope, $rootScope, userManager, toaster, mySocket) {
+app.controller('SettingsController', function ($location, $scope, $rootScope, userManager, toaster, mySocket, autoLoginManager) {
   $scope.goBackToMessages = function() {
     $location.path("/messages");
-
   };
 
   $scope.changeUsername = function(newUsername) {
@@ -457,6 +490,7 @@ app.controller('SettingsController', function ($location, $scope, $rootScope, us
             "username": newUsername
         }).then(function () {
             $rootScope.user.name = newUsername;
+            autoLoginManager.addUser($rootScope.user);
             toaster.toast('Användarnamnet har ändrats.', 'long', 'bottom');
         }, function () {
             toaster.toast('Användarnamnet gick inte att ändra.', 'long', 'bottom');
@@ -474,6 +508,7 @@ app.controller('SettingsController', function ($location, $scope, $rootScope, us
     var token = $rootScope.user.token;
     userManager.removeDevice({id: userId, token: token});
     $rootScope.user = {};
+    autoLoginManager.removeUser();
     $location.path('/login');
   };
 });

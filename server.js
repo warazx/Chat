@@ -302,6 +302,7 @@ app.get('/login/:username/:password', function (req, res) {
             res.status(200).send({
                 _id: user._id,
                 username: user.username,
+                image: user.image,
                 redirect: 'messages'
             });
         } else {

@@ -4,7 +4,9 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 
-var app = angular.module('starter', ['ionic', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova', 'monospaced.elastic', 'angular-smilies']);
+
+var app = angular.module('starter', ['ionic', 'ionic.cloud', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova', 'monospaced.elastic', 'angular-smilies']);
+
 
 app.run(function($ionicPlatform, $rootScope) {
   $ionicPlatform.ready(function() {
@@ -52,7 +54,7 @@ app.factory('toaster', function($cordovaToast) {
   }
 });
 
-app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider, $ionicCloudProvider) {
   $stateProvider
     .state('login', {
       url: '/login',
@@ -76,6 +78,24 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
     });
   $urlRouterProvider.otherwise('/login');
   $ionicConfigProvider.views.maxCache(0);
+  $ionicCloudProvider.init({
+    "core": {
+      "app_id": "381a5d8c"
+    },
+    //inject $ionicPush to push
+    "push": {
+      "sender_id": "195920830260",
+      "pluginConfig": {
+        "ios": {
+          "badge": true,
+          "sound": true
+        },
+        "android": {
+          "iconColor": "#343434"
+        }
+      }
+    }
+  });
 });
 
 function limitTextarea(textarea, maxLines, maxChar) {
@@ -97,6 +117,7 @@ function limitTextarea(textarea, maxLines, maxChar) {
 }
 
 app.controller('LoginController', function ($rootScope, $scope, $location, userManager, toaster) {
+  console.log("LOGINCONTROLLER");
   //Needed on scope before login credentials are entered by user.
   $scope.login = {};
 
@@ -114,7 +135,7 @@ app.controller('LoginController', function ($rootScope, $scope, $location, userM
                 $location.path(res.data.redirect); //Redirects to /messages.
             }, function (res) {
                 console.log('Login failed on server.');
-                toaster.toast('Felaktiga inloggningsuppgifter.', 'long', 'bottom');
+                toaster.toast('Felaktiga inloggningsuppgifter!', 'long', 'bottom');
             });
         }
     };
@@ -165,7 +186,7 @@ app.controller('SignupController', function ($location, $scope, $rootScope, user
   };
 });
 
-app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicScrollDelegate, $ionicSideMenuDelegate, messageManager, mySocket) {
+app.controller('MessagesController', function ($rootScope, $scope, $location, $ionicPush, $ionicScrollDelegate, $ionicSideMenuDelegate, toaster, messageManager, mySocket, userManager) {
   mySocket.removeAllListeners();
 
   $scope.$on("keyboardShowHideEvent", function() {
@@ -185,6 +206,22 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     console.log("User not logged in! Redirecting to login.");
     $location.path('/login');
   } else {
+    //Register the device and get an id to be able to receive push notifications
+    $ionicPush.register().then(function(t) {
+      $rootScope.user.token = t.token;
+      var postObj = {id: $rootScope.user.id, token: t.token};
+      //Save device to user in database
+      userManager.addDevice(postObj);
+      return $ionicPush.saveToken(t);
+    }).then(function(t) {
+      //alert("Token: " + t.token);
+    });
+    /*This is for testing purposes
+    $scope.$on('cloud:push:notification', function(event, data) {
+      var msg = data.message;
+      alert(msg.title + ': ' + msg.text);
+    });
+    */
     $scope.text = {};
     $scope.text.message = "";
     $rootScope.newMessages = [];
@@ -343,7 +380,7 @@ app.controller('LeftSideController', function ($rootScope, $location, $timeout, 
           toaster.toast('Chatrummet finns redan.', 'short', 'bottom');
           break;
           case 406:
-            toaster.toast('Namnet måste vara minst 3 tecken långt.', 'short', 'bottom');
+            toaster.toast('Namnet måste vara mellan 3 och 15 tecken långt.', 'short', 'bottom');
             break;
         case 500:
           toaster.toast('Databasfel: Chatrummet kunde inte skapas.', 'short', 'bottom');
@@ -359,18 +396,19 @@ app.controller('LeftSideController', function ($rootScope, $location, $timeout, 
     messageManager.getChatrooms().then(function (response) {
       $scope.chatrooms = response.data;
     });
-    messageManager.getConversations($rootScope.user.id).then(function (response) {
-      //$rootScope.conversations will always hold all the people the user has chatted with. offlineConversations holds those that are offline.
-      //offlineConversations is what is shown in the side menu.
-        $rootScope.conversations = response.data;
-    });
     mySocket.on('active users', function (arr) {
         $rootScope.activeUsers = arr;
         var activeUserIds = arr.map(x=>x.id);
-        $rootScope.offlineConversations = $rootScope.conversations.filter(x=>!activeUserIds.includes(x.id));
-    });
-    mySocket.on('active users', function (arr) {
-      $rootScope.activeUsers = arr;
+        if(!$rootScope.conversations) {
+          messageManager.getConversations($rootScope.user.id).then(function (response) {
+            //$rootScope.conversations will always hold all the people the user has chatted with. offlineConversations holds those that are offline.
+            //offlineConversations is what is shown in the side menu.
+            $rootScope.conversations = response.data;
+            $rootScope.offlineConversations = $rootScope.conversations.filter(x=>!activeUserIds.includes(x.id));
+          });
+        } else {
+          $rootScope.offlineConversations = $rootScope.conversations.filter(x=>!activeUserIds.includes(x.id));
+        }
     });
     socket.on('refresh chatroom', function (chatroom) {
       messageManager.getChatrooms().then(function (response) {
@@ -425,6 +463,9 @@ app.controller('SettingsController', function ($location, $scope, $rootScope, us
   };
 
   $scope.logout = function() {
+    var userId = $rootScope.user.id;
+    var token = $rootScope.user.token;
+    userManager.removeDevice({id: userId, token: token});
     $rootScope.user = {};
     $location.path('/login');
   };

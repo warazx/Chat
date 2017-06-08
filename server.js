@@ -7,6 +7,7 @@ var MongoStore = require('connect-mongo')(session);
 var multer  = require('multer')
 var bcrypt = require('bcrypt');
 var cors = require('cors');
+var gcm = require('node-gcm');
 const saltRounds = 10;
 
 var app = express();
@@ -20,6 +21,9 @@ var port = 3000;
 var db;
 
 var filename;
+
+//push notifications
+var sender = new gcm.Sender('AAAALZ3KnzQ:APA91bEqXgPxY2rQAE8G78hqauB-bo3gdHRKzcOZsx5_1WLfjcAUdnz94z9ol9jwNelj1oc_gHJeOsDtYk-cvVxcDh-FQejjid1uD4xZwSD10T6MjNGcERG6ydft6wQWS6VrzRggYTH4');
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
@@ -108,7 +112,7 @@ app.get('/conversations', function(req, res) {
                 }
             });
         }, function(err) {
-            console.log(err);
+            console.log("conversation error? ", err);
         });
     });
 });
@@ -126,7 +130,7 @@ app.get('/chatrooms', function(req, res) {
 });
 
 app.post('/chatrooms/add', function(req, res) {
-  if(req.body.name === undefined || req.body.name.length < 3) return res.status(406).send();
+  if(req.body.name === undefined || req.body.name.length < 3 || req.body.name.length > 15) return res.status(406).send();
   var roomName = req.body.name.toLowerCase();
   db.collection('chatrooms').count({"name": roomName}).then(function(error, result) {
     if(!error) {
@@ -262,6 +266,20 @@ app.post('/users/update', function (req, res) {
     };
 });
 
+app.post('/device', function(req, res) {
+    //This is run at login. Add device to database
+    db.collection('users').update({"_id": ObjectID(req.body.id)}, {$addToSet: {"devices": req.body.token}}).then(function(doc) {
+        console.log("registered a device");
+    });
+});
+
+app.post('/removedevice', function(req, res) {
+    //This is run at logout. Remove device from database
+    db.collection('users').update({"_id": ObjectID(req.body.id)}, {$pull: {"devices": req.body.token}}).then(function(doc) {
+        console.log("removed a device");
+    });
+});
+
 app.get('/login/:username/:password', function (req, res) {
     db.collection('users').findOne({username: req.params.username.toLowerCase()}, function(err, user) {
         if(err) {
@@ -307,10 +325,28 @@ io.on('connection', function(socket){
         var index = activeUsers.findIndex(function(activeUser) {
             return activeUser.id === message.recipientId;
         });
-
         if(index >= 0) {
             //Send to the other person
             socket.to(activeUsers[index].socketId).emit('private message', message);
+        } else {
+            //Prepare notification
+            var pushNotification = new gcm.Message({
+                data: { key1: 'msg1' },
+                notification: {
+                    title: "ShutApp",
+                    tag: message.senderId,
+                    body: message.senderName + " skriver: " + message.text
+                }
+            });
+            //get regTokens from database
+            db.collection('users').findOne({"_id": ObjectID(message.recipientId)},{"devices": 1}).then(function(obj) {
+                var regTokens = obj.devices;
+                console.log("tokens: ", obj.devices);
+                //Send the notification
+                sender.send(pushNotification, { registrationTokens: regTokens }, function (err, response) {
+                    if (err) console.error("error: ", err);
+                });
+            });
         }
         //Send to myself
         socket.emit('private message', message);

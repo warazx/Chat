@@ -35,7 +35,7 @@ app.run(function($ionicPlatform, $rootScope) {
 });
 
 app.factory('mySocket', function(socketFactory) {
-  var myIoSocket = io.connect('http://192.168.1.157:3000');
+  var myIoSocket = io.connect('http://shutapp.nu:3000');
   socket = socketFactory({
     ioSocket: myIoSocket
   });
@@ -208,7 +208,8 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
   } else {
     //Register the device and get an id to be able to receive push notifications
     $ionicPush.register().then(function(t) {
-      var postObj = {id: $rootScope.user.id, token: t.token.toString()};
+      $rootScope.user.token = t.token;
+      var postObj = {id: $rootScope.user.id, token: t.token};
       //Save device to user in database
       userManager.addDevice(postObj);
       return $ionicPush.saveToken(t);
@@ -379,7 +380,7 @@ app.controller('LeftSideController', function ($rootScope, $location, $timeout, 
           toaster.toast('Chatrummet finns redan.', 'short', 'bottom');
           break;
           case 406:
-            toaster.toast('Namnet måste vara minst 3 tecken långt.', 'short', 'bottom');
+            toaster.toast('Namnet måste vara mellan 3 och 15 tecken långt.', 'short', 'bottom');
             break;
         case 500:
           toaster.toast('Databasfel: Chatrummet kunde inte skapas.', 'short', 'bottom');
@@ -462,6 +463,9 @@ app.controller('SettingsController', function ($location, $scope, $rootScope, us
   };
 
   $scope.logout = function() {
+    var userId = $rootScope.user.id;
+    var token = $rootScope.user.token;
+    userManager.removeDevice({id: userId, token: token});
     $rootScope.user = {};
     $location.path('/login');
   };

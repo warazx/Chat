@@ -112,7 +112,7 @@ app.get('/conversations', function(req, res) {
                 }
             });
         }, function(err) {
-            console.log(err);
+            console.log("conversation error? ", err);
         });
     });
 });
@@ -130,7 +130,7 @@ app.get('/chatrooms', function(req, res) {
 });
 
 app.post('/chatrooms/add', function(req, res) {
-  if(req.body.name === undefined || req.body.name.length < 3) return res.status(406).send();
+  if(req.body.name === undefined || req.body.name.length < 3 || req.body.name.length > 15) return res.status(406).send();
   var roomName = req.body.name.toLowerCase();
   db.collection('chatrooms').count({"name": roomName}).then(function(error, result) {
     if(!error) {
@@ -269,7 +269,14 @@ app.post('/users/update', function (req, res) {
 app.post('/device', function(req, res) {
     //This is run at login. Add device to database
     db.collection('users').update({"_id": ObjectID(req.body.id)}, {$addToSet: {"devices": req.body.token}}).then(function(doc) {
-        console.log("register:", doc);
+        console.log("registered a device");
+    });
+});
+
+app.post('/removedevice', function(req, res) {
+    //This is run at logout. Remove device from database
+    db.collection('users').update({"_id": ObjectID(req.body.id)}, {$pull: {"devices": req.body.token}}).then(function(doc) {
+        console.log("removed a device");
     });
 });
 
@@ -326,7 +333,7 @@ io.on('connection', function(socket){
                 data: { key1: 'msg1' },
                 notification: {
                     title: "ShutApp",
-                    //icon: "ic_launcher",
+                    tag: message.senderId,
                     body: message.senderName + " skriver: " + message.text
                 }
             });

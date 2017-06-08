@@ -109,7 +109,8 @@ app.controller('LoginController', function ($rootScope, $scope, $location, userM
                 console.log('Login successful.');
                 $rootScope.user = {
                     id: res.data._id,
-                    name: res.data.username
+                    name: res.data.username,
+                    image: res.data.image
                 };
                 $location.path(res.data.redirect); //Redirects to /messages.
             }, function (res) {
@@ -277,12 +278,14 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
       var newMessage = {
         "senderId": $rootScope.user.id,
         "senderName": $rootScope.user.name,
+        "senderImage": $rootScope.user.image,
         "timestamp": new Date(),
         "text": $scope.text.message,
         "chatroom": $rootScope.selectedChatroom
       };
       //Send message to the current chatroom
       mySocket.emit('chatroom message', newMessage);
+      console.log(newMessage);
       messageManager.postMessages(newMessage);
       $scope.text.message = "";
       $ionicScrollDelegate.scrollBottom();
@@ -293,6 +296,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
       var newPrivateMessage = {
         "senderId": $rootScope.user.id,
         "senderName": $rootScope.user.name,
+        "senderImage": $rootScope.user.image,
         "timestamp": new Date(),
         "text": $scope.text.message,
         "recipientId": $rootScope.privateRecipient.id,
@@ -402,7 +406,6 @@ app.controller('LeftSideController', function ($rootScope, $location, $timeout, 
 app.controller('SettingsController', function ($location, $scope, $rootScope, userManager, toaster, mySocket) {
   $scope.goBackToMessages = function() {
     $location.path("/messages");
-
   };
 
   $scope.changeUsername = function(newUsername) {

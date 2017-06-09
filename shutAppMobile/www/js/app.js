@@ -249,7 +249,7 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     }).then(function(t) {
       //alert("Token: " + t.token);
     });
-    /*This is for testing purposes
+    /* Might be needed in the future?
     $scope.$on('cloud:push:notification', function(event, data) {
       var msg = data.message;
       alert(msg.title + ': ' + msg.text);

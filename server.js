@@ -334,12 +334,15 @@ io.on('connection', function(socket){
         } else {
             //Prepare notification
             var pushNotification = new gcm.Message({
-                data: { key1: 'msg1' },
-                notification: {
-                    title: "ShutApp",
-                    tag: message.senderId,
-                    body: message.senderName + " skriver: " + message.text
-                }
+                data: {
+                    "key": "msg"
+                 },
+                 notification: {
+                    "tag": message.senderId,
+                    "title": "ShutApp",
+                    "body": message.senderName + " skriver: " + message.text,
+                    "sound": "default"
+                 }
             });
             //get regTokens from database
             db.collection('users').findOne({"_id": ObjectID(message.recipientId)},{"devices": 1}).then(function(obj) {

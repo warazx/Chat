@@ -6,7 +6,7 @@
 
 var app = angular.module('starter', ['ionic', 'ionic.cloud', 'lib', 'ngSanitize', 'btford.socket-io', 'ngCordova', 'monospaced.elastic', 'angular-smilies', 'ngStorage']);
 
-app.run(function($ionicPlatform, $rootScope) {
+app.run(function($ionicPlatform, $rootScope, $ionicPopup, $state) {
   $ionicPlatform.ready(function() {
     $rootScope.android = ionic.Platform.isAndroid();
     if(window.cordova && window.cordova.plugins.Keyboard) {
@@ -29,6 +29,19 @@ app.run(function($ionicPlatform, $rootScope) {
     function keyboardShowHideHandler(e) {
       $rootScope.$broadcast("keyboardShowHideEvent");
     }
+
+    //If you press the hardware backbutton on android, shows a dialog box
+    //if you are really sure about exiting.
+    $ionicPlatform.registerBackButtonAction(function(event) {
+      if ($state.current.name == 'messages') {
+        $ionicPopup.confirm({
+          title: 'Avsluta ShutApp',
+          template: 'Är du säker på att du vill avsluta?'
+        }).then(function(res) {
+          if (res) ionic.Platform.exitApp();
+        });
+      }
+    }, 100);
   });
 });
 

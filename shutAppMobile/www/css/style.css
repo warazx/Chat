@@ -162,8 +162,8 @@ ion-nav-view {
   border-radius: 0.2rem;
   display: inline-block;
   vertical-align: top;
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 2.7rem;
+  height: 2.7rem;
   overflow: hidden;
 }
 .user-image-container {
@@ -175,7 +175,7 @@ ion-nav-view {
   display: block;
   min-width: 100%;
   min-height: 100%;
-  max-width: 3.5rem;
+  max-width: 2.7rem;
   margin: auto;
   position: absolute;
   top: -100%;
@@ -188,10 +188,10 @@ ion-nav-view {
   border-radius: 0.2rem;
   display: inline-block;
   vertical-align: top;
-  width: 25vw;
-  height: 25vw;
+  width: 40vw;
+  height: 40vw;
   overflow: hidden;
-  margin: 0 37% 1rem;
+  margin: 0 28% 1rem;
 }
 .full-image-container {
   height: 100%;
@@ -212,8 +212,8 @@ ion-nav-view {
 }
 .ion-camera {
   position: absolute;
-  bottom: 0rem;
-  right: 0.5rem;
+  bottom: -0.5rem;
+  right: 0rem;
 }
 .settings-username {
   text-align: center;

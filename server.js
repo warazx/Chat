@@ -55,8 +55,10 @@ app.use(session({
 }));
 
 app.post('/messages', function(req, res) {
-    console.log(req.body.chatroom);
-    db.collection('chatMessages').insert(req.body).then(function() {
+    var newMessage = req.body;
+    newMessage.timestamp = new Date();
+    console.log(newMessage);
+    db.collection('chatMessages').insert(newMessage).then(function() {
         //201 is a "created" status code
         res.status(201).send({});
     });
@@ -349,6 +351,7 @@ io.on('connection', function(socket){
             });
         }
         //Send to myself
+        message.timestamp = new Date();
         socket.emit('private message', message);
     });
     socket.on('connect message', function(message) {
@@ -376,6 +379,7 @@ io.on('connection', function(socket){
     socket.on('chatroom message', function(message) {
         console.log("In server.js", message);
         console.log("socket rooms: ", socket.rooms);
+        message.timestamp = new Date();
         io.in(message.chatroom).emit('chatroom message', message);
     });
     socket.on('leave chatroom', function(chatroomId) {

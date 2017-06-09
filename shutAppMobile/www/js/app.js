@@ -344,7 +344,6 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
         "senderId": $rootScope.user.id,
         "senderName": $rootScope.user.name,
         "senderImage": $rootScope.user.image,
-        "timestamp": new Date(),
         "text": $scope.text.message,
         "chatroom": $rootScope.selectedChatroom
       };
@@ -361,7 +360,6 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
         "senderId": $rootScope.user.id,
         "senderName": $rootScope.user.name,
         "senderImage": $rootScope.user.image,
-        "timestamp": new Date(),
         "text": $scope.text.message,
         "recipientId": $rootScope.privateRecipient.id,
         "recipientName": $rootScope.privateRecipient.name

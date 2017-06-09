@@ -276,7 +276,6 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     });
 
     $scope.changeRecipientFromMessage = function(message) {
-        console.log('wtf');
         var socketId = $rootScope.activeUsers.filter(function(user) {
             if(message.senderId == user.id) return user.socketId;
         });
@@ -288,7 +287,6 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
     }
 
   $rootScope.changeRecipient = function changeRecipient(recipient) {
-        console.log($rootScope.activeUsers);
         $rootScope.isPrivate = true;
         $rootScope.selected = recipient.id;
         $rootScope.privateRecipient = recipient;
@@ -352,7 +350,6 @@ app.controller('MessagesController', function ($rootScope, $scope, $location, $i
       };
       //Send message to the current chatroom
       mySocket.emit('chatroom message', newMessage);
-      console.log(newMessage);
       messageManager.postMessages(newMessage);
       $scope.text.message = "";
       $ionicScrollDelegate.scrollBottom();
@@ -406,7 +403,6 @@ app.controller('LeftSideController', function ($rootScope, $location, $timeout, 
 
   $scope.addChatroom = function() {
     messageManager.addChatroom({"name": $scope.newChatroom.name}).then(function(res) {
-      console.log(res);
       toaster.toast('Chatrummet ' + $scope.newChatroom.name + ' har skapats.', 'short', 'bottom');
     }, function(res) {
       switch(res.status) {

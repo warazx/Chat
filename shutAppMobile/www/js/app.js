@@ -91,7 +91,7 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider, $i
       controller: 'SettingsController'
     });
   $urlRouterProvider.otherwise('/login');
-  $ionicConfigProvider.views.maxCache(0);
+  //$ionicConfigProvider.views.maxCache(0);
   $ionicCloudProvider.init({
     "core": {
       "app_id": "381a5d8c"

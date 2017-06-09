@@ -323,6 +323,7 @@ io.on('connection', function(socket){
         io.emit('active users', activeUsers);
     });
     socket.on('private message', function(message){
+        message.timestamp = new Date();
         //Gets correct socketId for recipient.
         var index = activeUsers.findIndex(function(activeUser) {
             return activeUser.id === message.recipientId;
@@ -351,7 +352,6 @@ io.on('connection', function(socket){
             });
         }
         //Send to myself
-        message.timestamp = new Date();
         socket.emit('private message', message);
     });
     socket.on('connect message', function(message) {

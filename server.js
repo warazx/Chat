@@ -58,9 +58,27 @@ app.post('/messages', function(req, res) {
     var newMessage = req.body;
     newMessage.timestamp = new Date();
     console.log(newMessage);
-    db.collection('chatMessages').insert(newMessage).then(function() {
+    db.collection('chatMessages').insert(newMessage).then(function(result) {
         //201 is a "created" status code
-        res.status(201).send({});
+        if(result) {
+            res.status(201).send({});
+        } else {
+            res.status(400).send({});
+        }
+    });
+});
+
+app.post('/private-messages', function(req, res) {
+    var newPrivateMessage = req.body;
+    newPrivateMessage.timestamp = new Date();
+    console.log(newPrivateMessage);
+    db.collection('privateMessages').insert(newPrivateMessage).then(function(result) {
+        //201 is a "created" status code
+        if(result) {
+            res.status(201).send({});
+        } else {
+            res.status(400).send({});
+        }
     });
 });
 
@@ -148,16 +166,6 @@ app.post('/chatrooms/add', function(req, res) {
       res.status(400).send();
     };
   })
-});
-
-app.post('/private-messages', function(req, res) {
-    var newPrivateMessage = req.body;
-    newPrivateMessage.timestamp = new Date();
-    db.collection('privateMessages').insert(newPrivateMessage).then(function(err, result) {
-        if(!err) {
-            res.status(201).send({});
-        }
-    });
 });
 
 app.post('/signup', function(req, res) {
@@ -349,9 +357,11 @@ io.on('connection', function(socket){
                 var regTokens = obj.devices;
                 console.log("tokens: ", obj.devices);
                 //Send the notification
-                sender.send(pushNotification, { registrationTokens: regTokens }, function (err, response) {
-                    if (err) console.error("error: ", err);
-                });
+                if(regTokens) {
+                    sender.send(pushNotification, { registrationTokens: regTokens }, function (err, response) {
+                        if (err) console.error("error: ", err);
+                    });
+                }
             });
         }
         //Send to myself
@@ -380,8 +390,8 @@ io.on('connection', function(socket){
         socket.emit('join chatroom');
     });
     socket.on('chatroom message', function(message) {
-        console.log("In server.js", message);
-        console.log("socket rooms: ", socket.rooms);
+        //console.log("In server.js", message);
+        //console.log("socket rooms: ", socket.rooms);
         message.timestamp = new Date();
         io.in(message.chatroom).emit('chatroom message', message);
     });

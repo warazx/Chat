@@ -32,12 +32,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tobiashillen/Chat.git"
+    "url": "git+https://github.com/warazx/Chat.git"
   },
   "author": "gruppett",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/tobiashillen/Chat/issues"
+    "url": "https://github.com/warazx/Chat/issues"
   },
-  "homepage": "https://github.com/tobiashillen/Chat#readme"
+  "homepage": "https://github.com/warazx/Chat#readme"
 }
